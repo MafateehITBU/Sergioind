@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import SuperAdmin from '../models/SuperAdmin.js';
+import Admin from '../models/Admin.js';
+import User from '../models/User.js';
 import { getTokenFromRequest } from '../utils/cookieUtils.js';
 
 // Protect routes - Authentication
@@ -9,29 +11,46 @@ export const protect = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized to access this route'
+      message: 'Not authorized to access this route',
     });
   }
 
   try {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let user;
 
-    // Get user from token
-    req.user = await SuperAdmin.findById(decoded.id).select('-password');
+    // Check based on the role
+    switch (decoded.role) {
+      case 'superadmin':
+        user = await SuperAdmin.findById(decoded.id).select('-password');
+        break;
+      case 'admin':
+        user = await Admin.findById(decoded.id).select('-password');
+        break;
+      case 'user':
+        user = await User.findById(decoded.id).select('-password');
+        break;
+      default:
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid role in token',
+        });
+    }
 
-    if (!req.user) {
+    if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
+    req.user = user; // Attach the user to the request
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized to access this route'
+      message: 'Not authorized to access this route',
     });
   }
 };
@@ -47,4 +66,30 @@ export const authorize = (...roles) => {
     }
     next();
   };
-}; 
+};
+
+// Check Admin Permissions (only for admin role)
+export const permissions = (...requiredPermissions) => {
+  return (req, res, next) => {
+    // Only apply this middleware to admins
+    if (req.user.role !== 'admin') {
+      return next(); // Skip permission check for non-admins
+    }
+
+    const adminPermissions = req.user.permissions;
+
+    // If adminPermissions is not an array, handle gracefully
+    const hasPermission = Array.isArray(adminPermissions)
+      ? requiredPermissions.some(permission => adminPermissions.includes(permission))
+      : requiredPermissions.includes(adminPermissions);
+
+    if (!hasPermission) {
+      return res.status(403).json({
+        success: false,
+        message: `Admin does not have permission to access this route`,
+      });
+    }
+
+    next();
+  };
+};

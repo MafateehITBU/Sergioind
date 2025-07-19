@@ -1,0 +1,712 @@
+import Admin from "../models/Admin.js";
+import SuperAdmin from "../models/SuperAdmin.js";
+import cloudinary from '../config/cloudinary.js';
+import fs from 'fs';
+import path from 'path';
+import { getAvatarUrl, avatarStyles } from '../utils/avatarGenerator.js';
+import { setTokenCookie, clearTokenCookie } from '../utils/cookieUtils.js';
+import {
+    generateOTP,
+    getOTPExpiry,
+    sendOTPEmail,
+    verifyOTPMatch,
+} from "../utils/otp.js";
+
+
+// @desc    Register Admin
+// @route   POST /api/admin/register
+// @access  Private
+export const registerAdmin = async (req, res) => {
+    try {
+        const { name, email, password, phoneNumber, permissions } = req.body;
+
+        // Validation
+        if (!name || !email || !password || !phoneNumber || !permissions) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide all required fields: name, email, password, phoneNumber and permissions'
+            });
+        }
+
+        if (name.length < 2 || name.length > 50) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name must be between 2 and 50 characters'
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters'
+            });
+        }
+
+        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid email'
+            });
+        }
+
+        const phoneRegex = /^(\+?962|0)?7[789]\d{7}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid Jordanian phone number'
+            });
+        }
+
+        // Validate permissions (parse if needed)
+        const allowedPermissions = ['Users', 'Categories', 'Files', 'Products', 'Quotations'];
+
+        let parsedPermissions;
+        try {
+            parsedPermissions = typeof permissions === 'string' ? JSON.parse(permissions) : permissions;
+        } catch (err) {
+            return res.status(400).json({
+                success: false,
+                message: 'Permissions must be a valid JSON array'
+            });
+        }
+
+        if (!Array.isArray(parsedPermissions) || parsedPermissions.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Permissions must be a non-empty array'
+            });
+        }
+
+        const invalidPermissions = parsedPermissions.filter(p => !allowedPermissions.includes(p));
+        if (invalidPermissions.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid permissions: ${invalidPermissions.join(', ')}`
+            });
+        }
+
+        // Check for existing email or phoneNumber in Admin
+        const existingAdmin = await Admin.findOne({
+            $or: [{ email }, { phoneNumber }]
+        });
+
+        // Check for existing email or phoneNumber in SuperAdmin
+        const existingSuperAdmin = await SuperAdmin.findOne({
+            $or: [{ email }, { phoneNumber }]
+        });
+
+        if (existingAdmin || existingSuperAdmin) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email or phone number is already in use'
+            });
+        }
+
+        // Create new admin
+        const admin = new Admin({
+            name,
+            email,
+            password,
+            phoneNumber,
+            image: getAvatarUrl({ name }),
+            permissions
+        });
+
+        // Handle image upload if provided
+        if (req.file) {
+            try {
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    folder: 'sergioind/admins',
+                    width: 300,
+                    crop: 'scale'
+                });
+                admin.image = {
+                    public_id: result.public_id,
+                    url: result.secure_url
+                };
+                await admin.save();
+                fs.unlinkSync(req.file.path);
+            } catch (uploadError) {
+                if (req.file) fs.unlinkSync(req.file.path);
+                console.error('Image upload error:', uploadError);
+            }
+        }
+
+        // Save admin if image not uploaded
+        if (!req.file) await admin.save();
+
+        // Generate token
+        const token = admin.getJwtToken();
+
+        // Set token in HTTP-only cookie
+        setTokenCookie(res, token);
+
+        res.status(201).json({
+            success: true,
+            message: 'Admin registered successfully',
+            data: admin,
+            token
+        });
+    } catch (error) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        res.status(500).json({
+            success: false,
+            message: 'Error registering Admin',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Login Admin
+// @route   POST /api/admin/login
+// @access  Public
+export const loginAdmin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check if email and password are provided
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email and password'
+            });
+        }
+
+        // Find admin and include password
+        const admin = await Admin.findOne({ email }).select('+password');
+        if (!admin) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
+        }
+
+        // Check if password matches
+        const isPasswordMatch = await admin.comparePassword(password);
+        if (!isPasswordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
+        }
+
+        // Update last login
+        admin.lastLogin = new Date();
+        await admin.save();
+
+        // Generate token
+        const token = admin.getJwtToken();
+
+        // Set token in HTTP-only cookie
+        setTokenCookie(res, token);
+
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            data: admin,
+            token
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error logging in',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get Current Admin
+// @route   GET /api/admin/me
+// @access  Private
+export const getCurrentAdmin = async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.user.id);
+
+        res.status(200).json({
+            success: true,
+            data: admin
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching Admin',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get all Admins
+// @route   GET /api/admin
+// @access  Private
+export const getAllAdmins = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search = '' } = req.query;
+
+        const query = {};
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const admins = await Admin.find(query)
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ createdAt: -1 });
+
+        const total = await Admin.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            data: admins,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(total / limit),
+                totalItems: total,
+                itemsPerPage: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching Admins',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Update Admin
+// @route   PUT /api/admin/:id
+// @access  Private
+export const updateAdmin = async (req, res) => {
+    try {
+        const { name, email, phoneNumber, permissions } = req.body;
+        const updateData = {};
+
+        // Validation for provided fields
+        if (name) {
+            if (name.length < 2 || name.length > 50) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Name must be between 2 and 50 characters'
+                });
+            }
+            updateData.name = name;
+        }
+
+        if (email) {
+            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please enter a valid email'
+                });
+            }
+            updateData.email = email;
+        }
+
+        if (phoneNumber) {
+            const phoneRegex = /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please enter a valid phone number'
+                });
+            }
+            updateData.phoneNumber = phoneNumber;
+        }
+
+        // Check if email is being updated and if it already exists
+        if (email) {
+            const existingAdmin = await Admin.findOne({
+                email,
+                _id: { $ne: req.params.id }
+            });
+            if (existingAdmin) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Email already exists'
+                });
+            }
+        }
+
+        
+        if (permissions){// Validate permissions (parse if needed)
+        const allowedPermissions = ['Users', 'Categories', 'Files', 'Products', 'Quotations'];
+
+        let parsedPermissions;
+        try {
+            parsedPermissions = typeof permissions === 'string' ? JSON.parse(permissions) : permissions;
+        } catch (err) {
+            return res.status(400).json({
+                success: false,
+                message: 'Permissions must be a valid JSON array'
+            });
+        }
+
+        if (!Array.isArray(parsedPermissions) || parsedPermissions.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Permissions must be a non-empty array'
+            });
+        }
+
+        const invalidPermissions = parsedPermissions.filter(p => !allowedPermissions.includes(p));
+        if (invalidPermissions.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid permissions: ${invalidPermissions.join(', ')}`
+            });
+        }
+
+        updateData.permissions = parsedPermissions;
+    }
+
+        const admin = await Admin.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Handle image upload if provided
+        if (req.file) {
+            try {
+                // Delete old image from Cloudinary if exists
+                if (admin.image.public_id) {
+                    await cloudinary.uploader.destroy(admin.image.public_id);
+                }
+                // Upload new image to Cloudinary
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    folder: 'sergioind/admins',
+                    width: 300,
+                    crop: 'scale'
+                });
+                // Update admin with new Cloudinary image info
+                admin.image = {
+                    public_id: result.public_id,
+                    url: result.secure_url
+                };
+                await admin.save();
+                // Delete file from server
+                fs.unlinkSync(req.file.path);
+            } catch (uploadError) {
+                if (req.file) {
+                    fs.unlinkSync(req.file.path);
+                }
+                console.error('Image upload error:', uploadError);
+                // Continue without image if upload fails
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin updated successfully',
+            data: admin
+        });
+    } catch (error) {
+        // Delete uploaded file if error occurs
+        if (req.file) {
+            fs.unlinkSync(req.file.path);
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Error updating Admin',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Delete Admin image
+// @route   DELETE /api/admin/:id/delete-image
+// @access  Private
+export const deleteImage = async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.params.id);
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Delete image file if exists
+        if (admin.image.public_id) {
+            const imagePath = path.join('uploads', admin.image.public_id);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+                console.log('Image file deleted:', imagePath);
+            }
+        }
+
+        // Remove image info from admin
+        admin.image = {
+            public_id: null,
+            url: null
+        };
+        await admin.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Image deleted successfully',
+            data: admin
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting image',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Delete Admin
+// @route   DELETE /api/admin/:id
+// @access  Private
+export const deleteAdmin = async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.params.id);
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Delete image file if exists
+        if (admin.image.public_id) {
+            const imagePath = path.join('uploads', admin.image.public_id);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+                console.log('Image file deleted:', imagePath);
+            }
+        }
+
+        await Admin.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Admin deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting Admin',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get Admin avatar options
+// @route   GET /api/admin/:id/avatar-options
+// @access  Private
+export const getAvatarOptions = async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.params.id);
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        const name = admin.name || 'Admin';
+        const avatarOptions = {
+            current: getAvatarUrl(admin),
+            styles: {
+                profile: avatarStyles.profile(name),
+                thumbnail: avatarStyles.thumbnail(name),
+                list: avatarStyles.list(name),
+                square: avatarStyles.square(name),
+                primary: avatarStyles.primary(name),
+                secondary: avatarStyles.secondary(name),
+                success: avatarStyles.success(name),
+                warning: avatarStyles.warning(name),
+                danger: avatarStyles.danger(name)
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            data: avatarOptions
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching avatar options',
+            error: error.message
+        });
+    }
+};
+
+// @desc Send OTP for Admin
+// @route POST /api/admin/send-otp
+export const sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Validate email
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide an email address'
+            });
+        }
+
+        // Find admin by email
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Generate OTP and expiry
+        const otp = generateOTP();
+        const otpExpiresAt = getOTPExpiry();
+
+        // Update admin with OTP and expiry
+        admin.otp = otp;
+        admin.otpExpires = otpExpiresAt;
+        await admin.save();
+
+        // Send OTP via email
+        await sendOTPEmail({
+            to: email,
+            otp,
+            senderLabel: 'Sergio',
+            emailUser: process.env.EMAIL_USER
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP sent successfully'
+        });
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error sending OTP',
+            error: error.message
+        });
+    }
+};
+
+// @desc Verify OTP for Admin
+// @route POST /api/admin/verify-otp
+export const verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const lowercaseEmail = email.toLowerCase();
+        const admin = await Admin.findOne({ email: lowercaseEmail });
+
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        if (!verifyOTPMatch(admin, otp)) {
+            return res.status(401).json({ error: "Invalid OTP" });
+        }
+
+        res.status(200).json({ message: "OTP correct!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Change Admin Password
+// @route   PUT /api/admin/change-password
+export const changePassword = async (req, res) => {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+
+        // Validation
+        if (!email || !currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide both current password and new password'
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters'
+            });
+        }
+
+        // Get admin with password
+        const admin = await Admin.findOne({ email }).select('+password');
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Check if current password matches
+        const isCurrentPasswordMatch = await admin.comparePassword(currentPassword);
+        if (!isCurrentPasswordMatch) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+
+        // Check if new password is same as current password
+        const isNewPasswordSame = await admin.comparePassword(newPassword);
+        if (isNewPasswordSame) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be different from current password'
+            });
+        }
+
+        // Update password
+        admin.password = newPassword;
+        await admin.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error changing password',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Logout Admin
+// @route   POST /api/admin/logout
+// @access  Private
+export const logoutAdmin = async (req, res) => {
+    try {
+        // Clear the token cookie
+        clearTokenCookie(res);
+
+        res.status(200).json({
+            success: true,
+            message: 'Logged out successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error logging out',
+            error: error.message
+        });
+    }
+};

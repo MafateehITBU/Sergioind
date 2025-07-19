@@ -8,7 +8,7 @@ import {
   deleteSize,
   toggleSizeStatus
 } from '../controllers/sizeController.js';
-import { protect, authorize } from '../middleware/auth.js';
+import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 
 const router = express.Router();
@@ -55,7 +55,8 @@ router.get('/:id', getSizeById);
 
 // Protected routes - SuperAdmin only
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
+router.use(permissions('Products'));
 
 router.post('/', sizeValidation, validate, createSize);
 router.put('/:id', updateSizeValidation, validate, updateSize);

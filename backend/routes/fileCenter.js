@@ -12,7 +12,7 @@ import {
   toggleFileCenterStatus,
   getFileStats
 } from '../controllers/fileCenterController.js';
-import { protect, authorize } from '../middleware/auth.js';
+import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import upload from '../middleware/upload.js';
 
@@ -55,7 +55,8 @@ router.get('/:id/view', viewFile);
 
 // Protected routes - SuperAdmin only
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
+router.use(permissions('Files'));
 
 router.post('/', upload.fields([
   { name: 'file', maxCount: 1 },

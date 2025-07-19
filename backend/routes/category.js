@@ -9,7 +9,7 @@ import {
   deleteCategory,
   toggleCategoryStatus
 } from '../controllers/categoryController.js';
-import { protect, authorize } from '../middleware/auth.js';
+import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import upload from '../middleware/upload.js';
 
@@ -50,7 +50,8 @@ router.get('/:id', getCategoryById);
 
 // Protected routes - SuperAdmin only
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
+router.use(permissions('Categories'));
 
 router.post('/', upload.single('image'), categoryValidation, validate, createCategory);
 router.put('/:id', upload.single('image'), updateCategoryValidation, validate, updateCategory);

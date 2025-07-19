@@ -11,7 +11,7 @@ import {
   toggleProductStatus,
   updateProductStock
 } from '../controllers/productController.js';
-import { protect, authorize } from '../middleware/auth.js';
+import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import upload from '../middleware/upload.js';
 
@@ -115,7 +115,8 @@ router.get('/:id', getProductById);
 
 // Protected routes - SuperAdmin only
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
+router.use(permissions('Products'));
 
 router.post('/', upload.single('image'), productValidation, validate, createProduct);
 router.put('/:id', upload.single('image'), updateProductValidation, validate, updateProduct);

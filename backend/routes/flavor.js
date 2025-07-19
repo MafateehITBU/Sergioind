@@ -8,7 +8,7 @@ import {
   deleteFlavor,
   toggleFlavorStatus
 } from '../controllers/flavorController.js';
-import { protect, authorize } from '../middleware/auth.js';
+import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 
 const router = express.Router();
@@ -57,7 +57,8 @@ router.get('/:id', getFlavorById);
 
 // Protected routes - SuperAdmin only
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
+router.use(permissions('Products'));
 
 router.post('/', flavorValidation, validate, createFlavor);
 router.put('/:id', updateFlavorValidation, validate, updateFlavor);

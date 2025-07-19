@@ -16,6 +16,8 @@ import fileCenterRoutes from './routes/fileCenter.js';
 import flavorRoutes from './routes/flavor.js';
 import sizeRoutes from './routes/size.js';
 import quotationRequestRoutes from './routes/quotationRequest.js';
+import userRoutes from './routes/user.js';
+import adminRoutes from './routes/admin.js';
 import upload from './middleware/upload.js';
 
 dotenv.config();
@@ -93,6 +95,8 @@ app.use('/api/filecenter', fileCenterRoutes);
 app.use('/api/flavors', flavorRoutes);
 app.use('/api/sizes', sizeRoutes);
 app.use('/api/quotation-requests', quotationRequestRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
@@ -106,7 +110,9 @@ app.get('/', (req, res) => {
       filecenter: '/api/filecenter',
       flavors: '/api/flavors',
       sizes: '/api/sizes',
-      quotationRequests: '/api/quotation-requests'
+      quotationRequests: '/api/quotation-requests',
+      user: '/api/user',
+      admin: '/api/admin'
     }
   });
 });
