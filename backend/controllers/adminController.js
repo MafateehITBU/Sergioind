@@ -59,7 +59,7 @@ export const registerAdmin = async (req, res) => {
         }
 
         // Validate permissions (parse if needed)
-        const allowedPermissions = ['Users', 'Categories', 'Files', 'Products', 'Quotations'];
+        const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations'];
 
         let parsedPermissions;
         try {
@@ -179,6 +179,14 @@ export const loginAdmin = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
+            });
+        }
+
+        // Check if the admin isActive
+        if (!admin.isActive) {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account is deactivated. Please contact support.'
             });
         }
 
@@ -334,7 +342,7 @@ export const updateAdmin = async (req, res) => {
 
         
         if (permissions){// Validate permissions (parse if needed)
-        const allowedPermissions = ['Users', 'Categories', 'Files', 'Products', 'Quotations'];
+        const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations'];
 
         let parsedPermissions;
         try {
@@ -424,6 +432,37 @@ export const updateAdmin = async (req, res) => {
         });
     }
 };
+
+// @desc    Toggle Active Status
+// @route   PUT /api/admin/:id/toggle-active
+// @access  Private
+export const toggleActive = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if Admin exists
+        const admin = await Admin.findById(id);
+        if (!admin) {
+            return res.status(404).json({ message: "Admin not found" });
+        }
+
+        // Toggle verification status
+        admin.isActive = !admin.isActive;
+        await admin.save();
+
+        return res.status(200).json({
+            success: true,
+            message: `Admin ${admin.isActive? 'activated': 'deactivated'} successfully`
+        })
+
+    } catch(error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error toggling Admin Active Status',
+            error: error.message
+        });
+    }
+}
 
 // @desc    Delete Admin image
 // @route   DELETE /api/admin/:id/delete-image

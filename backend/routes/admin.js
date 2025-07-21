@@ -6,6 +6,7 @@ import {
     getCurrentAdmin,
     getAllAdmins,
     updateAdmin,
+    toggleActive,
     deleteImage,
     deleteAdmin,
     logoutAdmin,
@@ -107,6 +108,7 @@ router.use(authorize('superadmin'));
 
 router.post('/register', upload.single('image'), registerValidation, validate, registerAdmin);
 router.get('/', getAllAdmins);
+router.put('/:id/toggle-active', toggleActive);
 router.delete('/:id', deleteAdmin);
 
 export default router;
