@@ -13,7 +13,7 @@ const AddAdminModal = ({ show, handleClose, fetchAdmins }) => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const allPermissions = ['Users', 'Categories', 'Files','Sizes', 'Flavors', 'Products', 'Quotations'];
+    const allPermissions = ['Users', 'Categories', 'Files','Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
 
     const validateForm = () => {
         const newErrors = {};

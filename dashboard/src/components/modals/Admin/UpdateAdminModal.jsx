@@ -3,7 +3,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axiosInstance from '../../../axiosConfig';
 import { toast } from 'react-toastify';
 
-const allPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations'];
+const allPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
 
 const UpdateAdminModal = ({ show, handleClose, admin, fetchAdmins }) => {
     const [name, setName] = useState('');

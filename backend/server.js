@@ -18,6 +18,7 @@ import sizeRoutes from './routes/size.js';
 import quotationRequestRoutes from './routes/quotationRequest.js';
 import userRoutes from './routes/user.js';
 import adminRoutes from './routes/admin.js';
+import contactRoutes from './routes/contact.js';
 import upload from './middleware/upload.js';
 
 dotenv.config();
@@ -97,6 +98,7 @@ app.use('/api/sizes', sizeRoutes);
 app.use('/api/quotation-requests', quotationRequestRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact-us', contactRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
