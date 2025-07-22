@@ -5,9 +5,8 @@ import axiosInstance from "../axiosConfig.js";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
-import QuotationItemsModal from './modals/Quotation/QuotationItemsModal.jsx';
-import StatusHistoryModal from './modals/Quotation/StatusHistoryModal.jsx';
-import UpdateQuotationStatusModal from './modals/Quotation/UpdateQuotationStatusModal.jsx';
+import StatusHistoryModal from './modals/ContactUs/StatusHistoryModal.jsx';
+import UpdateContactStatusModal from './modals/ContactUs/UpdateContactStatusModal.jsx';
 import DeleteModal from './modals/DeleteModal.jsx';
 
 const GlobalFilter = ({ globalFilter, setGlobalFilter }) => (
@@ -15,21 +14,19 @@ const GlobalFilter = ({ globalFilter, setGlobalFilter }) => (
         className="form-control w-100"
         value={globalFilter || ''}
         onChange={e => setGlobalFilter(e.target.value)}
-        placeholder="Search Quotations..."
+        placeholder="Search Contact Us..."
     />
 );
 
-const QuotationsLayer = () => {
-    const [quots, setQuots] = useState([]);
+const ContactUsLayer = () => {
+    const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showItemsModal, setShowItemsModal] = useState(false);
-    const [selectedItems, setSelectedItems] = useState([]);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [statusHistory, setStatusHistory] = useState([]);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedQuot, setSelectedQuot] = useState(null);
+    const [selectedContact, setSelectedContact] = useState(null);
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -38,16 +35,16 @@ const QuotationsLayer = () => {
     const pageSize = 10;
 
     useEffect(() => {
-        fetchQuots();
+        fetchContacts();
     }, [page, search]);
 
-    const fetchQuots = async () => {
+    const fetchContacts = async () => {
         try {
             setLoading(true);
-            const res = await axiosInstance.get('/quotation-requests', {
+            const res = await axiosInstance.get('/contact-us', {
                 params: { page, limit: pageSize, search }
             });
-            setQuots(res.data.data.quotationRequests || []);
+            setContacts(res.data.data.contacts || []);
             setTotalPages(res.data.pagination?.totalPages || 1);
             setLoading(false);
         } catch (error) {
@@ -57,18 +54,18 @@ const QuotationsLayer = () => {
         }
     };
 
-    const handleUpdateQuotStatus = (quot) => {
-        setSelectedQuot(quot);
+    const handleUpdateContactStatus = (contact) => {
+        setSelectedContact(contact);
         setShowUpdateModal(true);
     };
 
-    const handleViewHistory = (quotation) => {
-        setStatusHistory(quotation.statusHistory || []);
+    const handleViewHistory = (contact) => {
+        setStatusHistory(contact.statusHistory || []);
         setShowHistoryModal(true);
     };
 
-    const handleDeleteQuot = (quot) => {
-        setSelectedQuot(quot);
+    const handleDeleteContact = (contact) => {
+        setSelectedContact(contact);
         setShowDeleteModal(true);
     };
 
@@ -81,18 +78,24 @@ const QuotationsLayer = () => {
         { Header: 'Email', accessor: 'email' },
         { Header: 'Phone', accessor: 'phoneNumber' },
         {
-            Header: 'Items',
-            Cell: ({ row }) => (
-                <button
-                    className="btn btn-sm btn-info"
-                    onClick={() => {
-                        setSelectedItems(row.original.items || []);
-                        setShowItemsModal(true);
+            Header: 'Message',
+            accessor: 'message',
+            Cell: ({ value }) => (
+                <span
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        maxWidth: '300px',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        textAlign: 'center',
+                        margin: '0 auto',
                     }}
                 >
-                    View
-                </button>
-            ),
+                    {value || '-'}
+                </span>
+            )
         },
         {
             Header: 'Status History',
@@ -119,7 +122,7 @@ const QuotationsLayer = () => {
                     case 'ongoing':
                         badgeClass = 'bg-warning text-light'; // yellow with white text
                         break;
-                    case 'sent':
+                    case 'pending':
                         badgeClass = 'bg-primary'; // blue
                         break;
                     default:
@@ -138,10 +141,10 @@ const QuotationsLayer = () => {
             Header: 'Actions',
             Cell: ({ row }) => (
                 <div className="d-flex gap-2">
-                    <button className="btn btn-sm btn-primary" onClick={() => handleUpdateQuotStatus(row.original)}>
+                    <button className="btn btn-sm btn-primary" onClick={() => handleUpdateContactStatus(row.original)}>
                         <Icon icon="mdi:pencil" />
                     </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteQuot(row.original)}>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteContact(row.original)}>
                         <Icon icon="mdi:delete" />
                     </button>
                 </div>
@@ -157,7 +160,7 @@ const QuotationsLayer = () => {
         rows,
         setGlobalFilter
     } = useTable(
-        { columns, data: quots },
+        { columns, data: contacts },
         useGlobalFilter,
         useSortBy
     );
@@ -179,7 +182,7 @@ const QuotationsLayer = () => {
             <div className="card-body p-0 d-flex flex-column">
                 {loading ? (
                     <div className="text-center p-4">Loading...</div>
-                ) : quots.length === 0 ? (
+                ) : contacts.length === 0 ? (
                     <div className="text-center p-4">No quotations found</div>
                 ) : (
                     <>
@@ -234,12 +237,6 @@ const QuotationsLayer = () => {
                     </>
                 )}
             </div>
-            
-            <QuotationItemsModal
-                show={showItemsModal}
-                handleClose={() => setShowItemsModal(false)}
-                items={selectedItems}
-            />
 
             <StatusHistoryModal
                 show={showHistoryModal}
@@ -247,22 +244,22 @@ const QuotationsLayer = () => {
                 history={statusHistory}
             />
 
-            <UpdateQuotationStatusModal
+            <UpdateContactStatusModal
                 show={showUpdateModal}
                 handleClose={() => setShowUpdateModal(false)}
-                quotation={selectedQuot}
-                fetchQuotations={fetchQuots}
+                quotation={selectedContact}
+                fetchContacts={fetchContacts}
             />
 
             <DeleteModal
                 show={showDeleteModal}
                 handleClose={() => setShowDeleteModal(false)}
-                item={selectedQuot}
-                itemType="quotation-requests"
-                fetchData={fetchQuots}
+                item={selectedContact}
+                itemType="contact-us"
+                fetchData={fetchContacts}
             />
         </div>
     );
 };
 
-export default QuotationsLayer;
+export default ContactUsLayer;

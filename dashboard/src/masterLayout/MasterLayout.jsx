@@ -21,6 +21,7 @@ const MasterLayout = ({ children }) => {
     { path: '/products', label: 'Products', icon: 'material-symbols:category-rounded' },
     { path: '/quotations', label: 'Quotations', icon: 'material-symbols:category-rounded' },
     { path: '/files', label: 'Files Center', icon: 'material-symbols:category-rounded' },
+    { path: '/contact-us', label: 'Contact Us', icon: 'material-symbols:category-rounded' },
   ];
 
 

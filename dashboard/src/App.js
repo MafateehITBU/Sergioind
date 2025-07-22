@@ -11,6 +11,7 @@ import FlavorsPage from "./pages/FlavorsPage";
 import ProductsPage from "./pages/ProductsPage";
 import QuotationPage from "./pages/QuotationPage";
 import FileCenterPage from "./pages/FileCenterPage";
+import ContactUsPage from "./pages/ContactUsPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from "./components/ProtectedRoutes";
@@ -108,6 +109,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
               <FileCenterPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/contact-us"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
+              <ContactUsPage />
             </ProtectedRoute>
           }
         />
