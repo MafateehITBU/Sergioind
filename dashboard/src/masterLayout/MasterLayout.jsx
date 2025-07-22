@@ -16,12 +16,12 @@ const MasterLayout = ({ children }) => {
     { path: '/admins', label: 'Admins', icon: 'line-md:account' },
     { path: '/users', label: 'Users', icon: 'line-md:account' },
     { path: '/categories', label: 'Categories', icon: 'material-symbols:category-rounded' },
-    { path: '/sizes', label: 'Sizes', icon: 'material-symbols:category-rounded' },
-    { path: '/flavors', label: 'Flavors', icon: 'material-symbols:category-rounded' },
-    { path: '/products', label: 'Products', icon: 'material-symbols:category-rounded' },
-    { path: '/quotations', label: 'Quotations', icon: 'material-symbols:category-rounded' },
-    { path: '/files', label: 'Files Center', icon: 'material-symbols:category-rounded' },
-    { path: '/contact-us', label: 'Contact Us', icon: 'material-symbols:category-rounded' },
+    { path: '/sizes', label: 'Sizes', icon: 'line-md:pencil-twotone' },
+    { path: '/flavors', label: 'Flavors', icon: 'line-md:paint-drop-twotone' },
+    { path: '/products', label: 'Products', icon: 'line-md:clipboard-list-twotone' },
+    { path: '/quotations', label: 'Quotations', icon: 'line-md:briefcase-twotone' },
+    { path: '/files', label: 'Files Center', icon: 'line-md:folder-settings-twotone' },
+    { path: '/contact-us', label: 'Contact Us', icon: 'line-md:chat-twotone' },
   ];
 
 
@@ -195,14 +195,14 @@ const MasterLayout = ({ children }) => {
         <div>
           <Link to='/' className='sidebar-logo'>
             <img
-              src='/assets/images/freelancer/no-bg.png'
+              src='/assets/images/Sergio_logo.png'
               alt='site logo'
-              className='light-logo'
+              className='light-logo mx-auto'
             />
             <img
-              src='/assets/images/freelancer/no-bg.png'
+              src='/assets/images/Sergio_logo.png'
               alt='site logo'
-              className='dark-logo'
+              className='dark-logo mx-auto'
             />
             <img
               src='/assets/images/freelancer/no-bg.png'

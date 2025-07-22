@@ -155,7 +155,7 @@
   --font-sm: 0.875rem;
   --font-xs: 0.75rem;
   --font-xxs: 0.625rem;
-  --primary-50: #e4f1ff;
+  --primary-50: #58cb005b;
   --primary-100: #bfdcff;
   --primary-200: #95c7ff;
   --primary-300: #6bb1ff;
@@ -8581,15 +8581,15 @@ h6,
 }
 
 .btn-success {
-  background-color: var(--success-main);
+  background-color: #77c33d;
   color: #fff;
-  border-color: var(--success-main);
+  border-color: #77c33d;
 }
 
 .btn-success:hover {
-  background-color: var(--success-hover);
+  background-color: #6cb037;
   color: #fff;
-  border-color: var(--success-main);
+  border-color: #6cb037;
 }
 
 .btn-success:active,
@@ -8600,9 +8600,9 @@ h6,
 }
 
 .btn-danger {
-  background-color: var(--danger-main);
+  background-color: #FF0000;
   color: #fff;
-  border-color: var(--danger-main);
+  border-color: #FF0000;
 }
 
 .btn-danger:hover {
@@ -8733,6 +8733,23 @@ h6,
 }
 
 /* Pill Btn */
+.btn-primary {
+  background-color: #59CB00;
+  color: #fff;
+  border-color: #59CB00;
+}
+
+.btn-primary:hover {
+  background-color: #52bc01;
+  color: #fff !important;
+  border-color: #59CB00;
+}
+.btn-primary:active,
+.btn-primary:focus {
+  background-color: #59CB00 !important;
+  color: #fff !important;
+  border-color: #59CB00 !important;
+}
 .btn-primary-50 {
   background-color: var(--primary-50);
   color: #fff;
@@ -13284,7 +13301,8 @@ select option {
 /* Active Text Css Start */
 .active-text-tab.nav-pills .nav-link.active {
   background-color: transparent !important;
-  color: var(--primary-600) !important;
+  
+  color: #59CB00 !important;
 }
 
 /* Active Text Css End */
@@ -15587,7 +15605,7 @@ td.fc-header-center {
 }
 
 .sidebar-menu li > a.active-page {
-  background-color: var(--brand);
+  background-color: rgb(179, 252, 124);
   color: #fff;
 }
 
@@ -15615,7 +15633,7 @@ td.fc-header-center {
   }
 }
 .sidebar-menu li a:hover {
-  color: var(--brand);
+  color: #63A331;
 }
 
 .sidebar-menu li a .menu-icon {

@@ -413,7 +413,8 @@ const ProfilePageLayer = () => {
                                             />
                                             <label
                                                 htmlFor="imageUpload"
-                                                className="w-32-px h-32-px d-flex justify-content-center align-items-center bg-primary-50 text-primary-600 border border-primary-600 bg-hover-primary-100 text-lg rounded-circle"
+                                                className="w-32-px h-32-px d-flex justify-content-center align-items-center text-primary-600 border  bg-hover-primary-100 text-lg rounded-circle"
+                                                style={{ marginTop: "120px", background: "white" }}
                                             >
                                                 <Icon icon="solar:camera-outline" className="icon"></Icon>
                                             </label>
@@ -519,7 +520,7 @@ const ProfilePageLayer = () => {
                                         </button>
                                         <button
                                             type="submit"
-                                            className="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8"
+                                            className="btn btn-primary border  text-md px-56 py-12 radius-8"
                                             disabled={isSubmitting}
                                         >
                                             {isSubmitting ? 'Saving...' : 'Save'}

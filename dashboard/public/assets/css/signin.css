@@ -1,0 +1,88 @@
+.green-bg {
+    background-color: #59cb00;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.circle {
+    position: absolute;
+    background-color: #42B32F;
+    border-radius: 50%;
+    z-index: 0;
+    animation: magnetMotion 2s infinite cubic-bezier(0.52, -0.01, 0.48, 1.03);
+}
+
+.circle-top-right {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    right: -100px;
+}
+
+.circle-bottom-left {
+    width: 400px;
+    height: 400px;
+    bottom: -120px;
+    left: -120px;
+    animation-delay: 1s;
+}
+
+/* Keyframes for the Magnet Effect */
+@keyframes magnetMotion {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-25px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.z-1 {
+    z-index: 1;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h2,
+p {
+    margin: 0;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-control {
+    font-size: 16px;
+}
+
+.auth .icon-field {
+    position: relative;
+}
+
+.auth .icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+}
+
+input:focus,
+button:focus {
+    outline: none;
+    box-shadow: none;
+}

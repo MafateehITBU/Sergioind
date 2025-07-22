@@ -13,17 +13,17 @@ const DashBoardLayerTen = () => {
 
 
       {/* OverallReport */}
-      <OverallReport />
+      {/* <OverallReport /> */}
 
       {/* PurchaseAndSales */}
-      <PurchaseAndSales />
+      {/* <PurchaseAndSales /> */}
 
       {/* UsersChart */}
-      <UsersChart />
+      {/* <UsersChart /> */}
 
 
       {/* TopCustomer */}
-      <TopCustomer />
+      {/* <TopCustomer /> */}
 
 
     </div>

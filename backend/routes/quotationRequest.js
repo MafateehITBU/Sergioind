@@ -19,10 +19,12 @@ router.get('/email/:email', getQuotationRequestsByEmail);
 // Admin routes (authentication required)
 router.use(protect);
 router.use(authorize('superadmin', 'admin'));
+
+router.get('/stats', getQuotationRequestStats);
+
 router.use(permissions('Quotations'));
 
 router.get('/', getAllQuotationRequests);
-router.get('/stats', getQuotationRequestStats);
 router.get('/:id', getQuotationRequestById);
 router.patch('/:id/status', updateQuotationRequestStatus);
 router.delete('/:id', deleteQuotationRequest);

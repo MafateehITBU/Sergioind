@@ -16,10 +16,12 @@ router.post('/', createContact);
 // Admin routes (authentication required)
 router.use(protect);
 router.use(authorize('superadmin', 'admin'));
+
+router.get('/stats', getContactStats);
+
 router.use(permissions('Contact-us'));
 
 router.get('/', getAllContacts);
-router.get('/stats', getContactStats);
 router.get('/:id', getContactById);
 router.patch('/:id/status', updateContactStatus);
 router.delete('/:id', deleteContact);
