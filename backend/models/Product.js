@@ -20,12 +20,6 @@ const productSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Product description cannot exceed 1000 characters']
   },
-  price: {
-    type: Number,
-    required: [true, 'Product price is required'],
-    min: [0, 'Price cannot be negative'],
-    max: [999999.99, 'Price cannot exceed 999,999.99']
-  },
   image: {
     public_id: {
       type: String,
@@ -66,10 +60,6 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ name: 'text', description: 'text' });
 productSchema.index({ category: 1 });
 
-// Virtual for formatted price
-productSchema.virtual('formattedPrice').get(function() {
-  return `$${this.price.toFixed(2)}`;
-});
 
 // Ensure virtual fields are serialized
 productSchema.set('toJSON', { virtuals: true });

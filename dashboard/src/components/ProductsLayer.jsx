@@ -110,7 +110,6 @@ const ProductsLayer = () => {
                 </span>
             )
         },
-        { Header: 'Price', accessor: 'price' },
         {
             Header: 'Flavors',
             accessor: 'flavors',

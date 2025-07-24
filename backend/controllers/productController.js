@@ -8,13 +8,13 @@ import fs from 'fs';
 // @access  Private - SuperAdmin Only
 export const createProduct = async (req, res) => {
   try {
-    const { name, sku, description, price, category, stock } = req.body;
+    const { name, sku, description, category, stock } = req.body;
 
     // Validation
-    if (!name || !sku || !description || !price || !category) {
+    if (!name || !sku || !description || !category) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, sku, description, price, and category'
+        message: 'Please provide name, sku, description, and category'
       });
     }
 
@@ -45,13 +45,6 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Description must be between 10 and 1000 characters'
-      });
-    }
-
-    if (price < 0 || price > 999999.99) {
-      return res.status(400).json({
-        success: false,
-        message: 'Price must be between 0 and 999,999.99'
       });
     }
 
@@ -103,7 +96,6 @@ export const createProduct = async (req, res) => {
       name,
       sku,
       description,
-      price: parseFloat(price),
       category,
       stock: stock ? parseInt(stock) : 0,
       flavors: Array.isArray(req.body.flavors) ? req.body.flavors : (req.body.flavors ? [req.body.flavors] : []),
@@ -167,8 +159,6 @@ export const getAllProducts = async (req, res) => {
       limit = 10, 
       search = '', 
       category, 
-      minPrice, 
-      maxPrice, 
       active,
       sortBy = 'createdAt',
       sortOrder = 'desc'
@@ -187,13 +177,6 @@ export const getAllProducts = async (req, res) => {
     // Filter by category
     if (category) {
       query.category = category;
-    }
-
-    // Filter by price range
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
     }
 
     // Filter by active status
@@ -273,8 +256,6 @@ export const getProductsByCategory = async (req, res) => {
       page = 1, 
       limit = 10, 
       search = '', 
-      minPrice, 
-      maxPrice,
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
@@ -287,13 +268,6 @@ export const getProductsByCategory = async (req, res) => {
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
-    }
-
-    // Filter by price range
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
     }
 
     // Sort options
@@ -334,7 +308,7 @@ export const getProductsByCategory = async (req, res) => {
 // @access  Private - SuperAdmin Only
 export const updateProduct = async (req, res) => {
   try {
-    const { name, sku, description, price, category, stock } = req.body;
+    const { name, sku, description, category, stock } = req.body;
     const updateData = {};
 
     // Validation for provided fields
@@ -374,16 +348,6 @@ export const updateProduct = async (req, res) => {
         });
       }
       updateData.description = description;
-    }
-
-    if (price !== undefined) {
-      if (price < 0 || price > 999999.99) {
-        return res.status(400).json({
-          success: false,
-          message: 'Price must be between 0 and 999,999.99'
-        });
-      }
-      updateData.price = parseFloat(price);
     }
 
     if (stock !== undefined) {
