@@ -8,7 +8,6 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
     const [name, setName] = useState('');
     const [sku, setSku] = useState('');
     const [description, setDescription] = useState('');
-    const [price, setPrice] = useState('');
     const [category, setCategory] = useState('');
     const [stock, setStock] = useState('');
     const [images, setImages] = useState([]);
@@ -52,7 +51,6 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
                 setName(product.name);
                 setSku(product.sku);
                 setDescription(product.description);
-                setPrice(product.price);
                 setCategory(product.category?._id || '');
                 setStock(product.stock);
                 setSelectedFlavors(product.flavors?.map(f => f._id) || []);
@@ -73,7 +71,6 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
         setName('');
         setSku('');
         setDescription('');
-        setPrice('');
         setCategory('');
         setStock('');
         setImages([]);
@@ -96,7 +93,7 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!name || !sku || !description || !price || !category) {
+        if (!name || !sku || !description || !category) {
             toast.error('Please fill all required fields');
             return;
         }
@@ -108,7 +105,6 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
             formData.append('name', name);
             formData.append('sku', sku);
             formData.append('description', description);
-            formData.append('price', price);
             formData.append('category', category);
             formData.append('stock', stock);
 
@@ -197,19 +193,6 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
                         </Form.Group>
 
                         <Row>
-                            <Col md={4}>
-                                <Form.Group className="mb-3" controlId="productPrice">
-                                    <Form.Label>Price *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={price}
-                                        onChange={e => setPrice(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
 
                             <Col md={4}>
                                 <Form.Group className="mb-3" controlId="productCategory">

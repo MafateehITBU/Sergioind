@@ -2,6 +2,8 @@ import QuotationRequest from '../models/QuotationRequest.js';
 import Product from '../models/Product.js';
 import Size from '../models/Size.js';
 import Flavor from '../models/Flavor.js';
+import Admin from '../models/Admin.js';
+import SuperAdmin from '../models/SuperAdmin.js';
 import { successResponse, errorResponse } from '../utils/responseHandler.js';
 
 // Create a new quotation request (public endpoint)
@@ -96,18 +98,20 @@ const getAllQuotationRequests = async (req, res) => {
       ];
     }
 
-    // Build sort
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
-
-    // Execute query with pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
+
     const [quotationRequests, total] = await Promise.all([
       QuotationRequest.find(filter)
         .populate([
           { path: 'items.product', select: 'name sku price' },
           { path: 'items.size', select: 'name' },
-          { path: 'items.flavor', select: 'name' }
+          { path: 'items.flavor', select: 'name' },
+          {
+            path: 'statusHistory.changedBy',
+            select: 'name',
+          }
         ])
         .sort(sort)
         .skip(skip)
@@ -161,35 +165,35 @@ const updateQuotationRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, adminResponse, totalPrice } = req.body;
-    const adminId = req.user.id; // From auth middleware
-
-    // Validate status
-    if (status && !['closed', 'ongoing', 'sent'].includes(status)) {
-      return errorResponse(res, 400, 'Invalid status. Must be closed, ongoing, or sent');
-    }
+    const adminId = req.user.id;
+    const adminModel = req.user.role === 'superadmin' ? 'SuperAdmin' : 'Admin';
 
     const quotationRequest = await QuotationRequest.findById(id);
     if (!quotationRequest) {
       return errorResponse(res, 404, 'Quotation request not found');
     }
 
+    // Store old status to compare
+    const previousStatus = quotationRequest.status;
+
     // Update fields
     if (status) quotationRequest.status = status;
     if (adminResponse !== undefined) quotationRequest.adminResponse = adminResponse;
     if (totalPrice !== undefined) quotationRequest.totalPrice = totalPrice;
 
-    // Update status history with admin info
-    if (status && status !== quotationRequest.status) {
+    // Only add to history if status has changed
+    if (status && status !== previousStatus) {
       quotationRequest.statusHistory.push({
         status,
-        changedAt: Date.now(),
-        changedBy: adminId
+        changedAt: new Date(),
+        changedBy: adminId,
+        adminModel: adminModel
       });
     }
 
     await quotationRequest.save();
 
-    // Populate for response
+    // Populate fields for response
     await quotationRequest.populate([
       { path: 'items.product', select: 'name sku price' },
       { path: 'items.size', select: 'name' },

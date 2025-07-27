@@ -13,6 +13,7 @@ import {
     getAvatarOptions,
     sendOTP,
     verifyOTP,
+    resetPassword,
     changePassword
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
@@ -93,6 +94,7 @@ const changePasswordValidation = [
 router.post('/login', loginValidation, validate, loginAdmin);
 router.put('/send-otp', sendOTP);
 router.post('/verify-otp',  verifyOTP);
+router.post('/reset-password', resetPassword);
 
 // Protected routes (admin must be logged in)
 router.use(protect);

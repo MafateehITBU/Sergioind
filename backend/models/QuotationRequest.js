@@ -49,29 +49,29 @@ const quotationRequestSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  
+
   // Products requested
   items: [quotationItemSchema],
-  
+
   // Status management
   status: {
     type: String,
     enum: ['closed', 'ongoing', 'sent'],
     default: 'closed'
   },
-  
+
   // Admin response
   adminResponse: {
     type: String,
     trim: true
   },
-  
+
   // Pricing (filled by admin)
   totalPrice: {
     type: Number,
     min: 0
   },
-  
+
   // Timestamps
   createdAt: {
     type: Date,
@@ -81,7 +81,7 @@ const quotationRequestSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  
+
   // Status change tracking
   statusHistory: [{
     status: {
@@ -94,30 +94,25 @@ const quotationRequestSchema = new mongoose.Schema({
     },
     changedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SuperAdmin'
+      refPath: 'statusHistory.adminModel'
+    },
+    adminModel: {
+      type: String,
+      enum: ['Admin', 'SuperAdmin'],
+      required: true
     }
   }]
 });
 
 // Update the updatedAt field before saving
-quotationRequestSchema.pre('save', function(next) {
+quotationRequestSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Add status to history when status changes
-quotationRequestSchema.pre('save', function(next) {
-  if (this.isModified('status')) {
-    this.statusHistory.push({
-      status: this.status,
-      changedAt: Date.now()
-    });
-  }
-  next();
-});
 
 // Virtual for total items count
-quotationRequestSchema.virtual('totalItems').get(function() {
+quotationRequestSchema.virtual('totalItems').get(function () {
   return this.items.reduce((total, item) => total + item.quantity, 0);
 });
 

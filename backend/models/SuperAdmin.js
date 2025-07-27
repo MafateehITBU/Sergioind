@@ -56,13 +56,21 @@ const superAdminSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: null
-  }
+  },
+  otp: {
+    type: String,
+    default: null
+  },
+  otpExpires: {
+    type: Date,
+    default: null
+  },
 }, {
   timestamps: true
 });
 
 // Encrypt password before saving
-superAdminSchema.pre('save', async function(next) {
+superAdminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
@@ -70,12 +78,12 @@ superAdminSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-superAdminSchema.methods.comparePassword = async function(enteredPassword) {
+superAdminSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Generate JWT token
-superAdminSchema.methods.getJwtToken = function() {
+superAdminSchema.methods.getJwtToken = function () {
   return jwt.sign(
     { id: this._id, role: this.role },
     process.env.JWT_SECRET,
@@ -84,15 +92,15 @@ superAdminSchema.methods.getJwtToken = function() {
 };
 
 // Remove password from response and add default avatar only if no image is uploaded
-superAdminSchema.methods.toJSON = function() {
+superAdminSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
-  
+
   // Only use default avatar if image is null, undefined, or has no URL
   if (!user.image || !user.image.url) {
     user.image = getAvatarUrl(user);
   }
-  
+
   return user;
 };
 

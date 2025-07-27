@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookie from 'js-cookie';
 import axiosInstance from '../axiosConfig';
 import { jwtDecode } from 'jwt-decode';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext(null);
 
@@ -44,18 +45,28 @@ export const AuthProvider = ({ children }) => {
       const endpoint = role === 'superadmin' ? `/superadmin/${userId}` : `/admin/me`;
       const response = await axiosInstance.get(endpoint, config);
 
+      const userData = response.data.data;
+
+      if (!userData.isActive) {
+        // If user is not active, logout and redirect or show message
+        logout();
+        toast.error('Your account is deactivated. Please contact support.');
+        return;
+      }
+
       setUser({
-        id: response.data.data._id || userId,
-        name: response.data.data.name || '',
-        email: response.data.data.email || '',
-        phoneNumber: response.data.data.phoneNumber || '',
-        image: response.data.data.image?.url || '',
-        role: response.data.data.role || role,
-        isActive: response.data.data.isActive || true,
-        permissions: response.data.data.permissions || [],
+        id: userData._id || userId,
+        name: userData.name || '',
+        email: userData.email || '',
+        phoneNumber: userData.phoneNumber || '',
+        image: userData.image?.url || '',
+        role: userData.role || role,
+        isActive: userData.isActive,
+        permissions: userData.permissions || [],
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
+      logout();
     }
   };
 

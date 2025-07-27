@@ -347,37 +347,37 @@ export const updateAdmin = async (req, res) => {
             }
         }
 
-        
-        if (permissions){// Validate permissions (parse if needed)
-        const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
 
-        let parsedPermissions;
-        try {
-            parsedPermissions = typeof permissions === 'string' ? JSON.parse(permissions) : permissions;
-        } catch (err) {
-            return res.status(400).json({
-                success: false,
-                message: 'Permissions must be a valid JSON array'
-            });
+        if (permissions) {// Validate permissions (parse if needed)
+            const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
+
+            let parsedPermissions;
+            try {
+                parsedPermissions = typeof permissions === 'string' ? JSON.parse(permissions) : permissions;
+            } catch (err) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Permissions must be a valid JSON array'
+                });
+            }
+
+            if (!Array.isArray(parsedPermissions) || parsedPermissions.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Permissions must be a non-empty array'
+                });
+            }
+
+            const invalidPermissions = parsedPermissions.filter(p => !allowedPermissions.includes(p));
+            if (invalidPermissions.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid permissions: ${invalidPermissions.join(', ')}`
+                });
+            }
+
+            updateData.permissions = parsedPermissions;
         }
-
-        if (!Array.isArray(parsedPermissions) || parsedPermissions.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Permissions must be a non-empty array'
-            });
-        }
-
-        const invalidPermissions = parsedPermissions.filter(p => !allowedPermissions.includes(p));
-        if (invalidPermissions.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: `Invalid permissions: ${invalidPermissions.join(', ')}`
-            });
-        }
-
-        updateData.permissions = parsedPermissions;
-    }
 
         const admin = await Admin.findByIdAndUpdate(
             req.params.id,
@@ -459,10 +459,10 @@ export const toggleActive = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: `Admin ${admin.isActive? 'activated': 'deactivated'} successfully`
+            message: `Admin ${admin.isActive ? 'activated' : 'deactivated'} successfully`
         })
 
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({
             success: false,
             message: 'Error toggling Admin Active Status',
@@ -603,29 +603,28 @@ export const sendOTP = async (req, res) => {
 
         // Validate email
         if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide an email address'
-            });
+            return res.status(400).json({ success: false, message: 'Please provide an email address' });
         }
 
-        // Find admin by email
-        const admin = await Admin.findOne({ email });
-        if (!admin) {
-            return res.status(404).json({
-                success: false,
-                message: 'Admin not found'
-            });
+        let user = await Admin.findOne({ email });
+        let role = 'admin';
+
+        if (!user) {
+            user = await SuperAdmin.findOne({ email });
+            role = 'superadmin';
+        }
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
         // Generate OTP and expiry
         const otp = generateOTP();
         const otpExpiresAt = getOTPExpiry();
 
-        // Update admin with OTP and expiry
-        admin.otp = otp;
-        admin.otpExpires = otpExpiresAt;
-        await admin.save();
+        user.otp = otp;
+        user.otpExpires = otpExpiresAt;
+        await user.save();
 
         // Send OTP via email
         await sendOTPEmail({
@@ -637,7 +636,7 @@ export const sendOTP = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'OTP sent successfully'
+            message: `OTP sent successfully to ${role}`
         });
     } catch (error) {
         console.error('Error sending OTP:', error);
@@ -655,19 +654,84 @@ export const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const lowercaseEmail = email.toLowerCase();
-        const admin = await Admin.findOne({ email: lowercaseEmail });
 
-        if (!admin) {
-            return res.status(404).json({ error: "Admin not found" });
+        let user = await Admin.findOne({ email: lowercaseEmail });
+        if (!user) user = await SuperAdmin.findOne({ email: lowercaseEmail });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
 
-        if (!verifyOTPMatch(admin, otp)) {
-            return res.status(401).json({ error: "Invalid OTP" });
+        if (!user.otp || user.otp !== otp || new Date(user.otpExpires) < new Date()) {
+            return res.status(401).json({ error: "Invalid or expired OTP" });
         }
 
         res.status(200).json({ message: "OTP correct!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc Changing Password after sending OTP
+// @route POST /api/admin/reset-password
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword, confirmNewPassword } = req.body;
+
+        // Validation
+        if (!email || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide new password and confirm new password'
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters'
+            });
+        }
+
+        let user = await Admin.findOne({ email }).select('+password');
+        if (!user) user = await SuperAdmin.findOne({ email }).select('+password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const isPasswordMatch = newPassword === confirmNewPassword;
+        if (!isPasswordMatch) {
+            return res.status(400).json({
+                success: false,
+                message: 'New Password and the confirm do not match'
+            });
+        }
+
+        const isNewPasswordSame = await user.comparePassword(newPassword);
+        if (isNewPasswordSame) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be different from current password'
+            });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error changing password',
+            error: error.message
+        });
     }
 };
 
@@ -692,17 +756,17 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        // Get admin with password
-        const admin = await Admin.findOne({ email }).select('+password');
-        if (!admin) {
+        let user = await Admin.findOne({ email }).select('+password');
+        if (!user) user = await SuperAdmin.findOne({ email }).select('+password');
+
+        if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'Admin not found'
+                message: 'User not found'
             });
         }
 
-        // Check if current password matches
-        const isCurrentPasswordMatch = await admin.comparePassword(currentPassword);
+        const isCurrentPasswordMatch = await user.comparePassword(currentPassword);
         if (!isCurrentPasswordMatch) {
             return res.status(400).json({
                 success: false,
@@ -710,8 +774,7 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        // Check if new password is same as current password
-        const isNewPasswordSame = await admin.comparePassword(newPassword);
+        const isNewPasswordSame = await user.comparePassword(newPassword);
         if (isNewPasswordSame) {
             return res.status(400).json({
                 success: false,
@@ -719,9 +782,8 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        // Update password
-        admin.password = newPassword;
-        await admin.save();
+        user.password = newPassword;
+        await user.save();
 
         res.status(200).json({
             success: true,

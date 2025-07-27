@@ -248,7 +248,7 @@ const ContactUsLayer = () => {
                 show={showUpdateModal}
                 handleClose={() => setShowUpdateModal(false)}
                 quotation={selectedContact}
-                fetchContacts={fetchContacts}
+                fetchContactUs={fetchContacts}
             />
 
             <DeleteModal

@@ -13,6 +13,7 @@ import QuotationPage from "./pages/QuotationPage";
 import FileCenterPage from "./pages/FileCenterPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import ForgotPasswordLayer from "./components/ForgotPasswordLayer";
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from "./components/ProtectedRoutes";
 
@@ -25,6 +26,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordLayer />} />
 
         {/* Protected Route for Admins and SuperAdmins */}
         <Route

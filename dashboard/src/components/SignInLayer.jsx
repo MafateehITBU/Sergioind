@@ -2,6 +2,8 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../axiosConfig";
+import { toast, ToastContainer } from "react-toastify";
 
 const SignInLayer = () => {
   const [email, setEmail] = useState("");
@@ -27,8 +29,13 @@ const SignInLayer = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <section className="auth min-vh-100 d-flex">
+      <ToastContainer />
       {/* Wrapper with container class to support Bootstrap's grid */}
       <div className="container-fluid p-0 d-flex min-vh-100">
         <div className="row no-gutters w-100"> {/* Ensuring no gap between columns */}
@@ -102,6 +109,16 @@ const SignInLayer = () => {
                   >
                     <Icon icon={showPassword ? "mdi:eye-off" : "mdi:eye"} />
                   </span>
+                </div>
+
+                <div className="d-flex justify-content-end mt-2">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="btn btn-link text-decoration-none p-0 text-sm text-secondary-light"
+                  >
+                    Forgot Password?
+                  </button>
                 </div>
 
                 {/* Sign In Button */}

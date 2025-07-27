@@ -17,6 +17,7 @@ const StatusHistoryModal = ({ show, handleClose, history = [] }) => {
                             <tr>
                                 <th>#</th>
                                 <th>Status</th>
+                                <th>Changed By</th>
                                 <th>Changed At</th>
                             </tr>
                         </thead>
@@ -25,6 +26,7 @@ const StatusHistoryModal = ({ show, handleClose, history = [] }) => {
                                 <tr key={item._id || index}>
                                     <td>{index + 1}</td>
                                     <td>{item.status}</td>
+                                    <td>{item.changedBy?.name}</td>
                                     <td>{dayjs(item.changedAt).format('YYYY-MM-DD HH:mm')}</td>
                                 </tr>
                             ))}
