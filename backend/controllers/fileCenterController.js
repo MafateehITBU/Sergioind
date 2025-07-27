@@ -53,7 +53,8 @@ export const createFileCenter = async (req, res) => {
         folder: 'sergioind/files',
         resource_type: 'auto',
         use_filename: true,
-        unique_filename: true
+        unique_filename: true,
+        type: 'upload'
       });
 
       // Update file center with file info
