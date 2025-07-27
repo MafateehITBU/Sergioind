@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Product description cannot exceed 1000 characters']
   },
-  image: {
+  image: [{
     public_id: {
       type: String,
       default: null
@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
       type: String,
       default: null
     }
-  },
+  }],
   flavors: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Flavor'

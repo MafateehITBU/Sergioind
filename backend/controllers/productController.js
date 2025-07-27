@@ -103,29 +103,31 @@ export const createProduct = async (req, res) => {
     });
 
     // Handle image upload if provided
-    if (req.file) {
-      try {
-        // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: 'sergioind/products',
-          width: 500,
-          crop: 'scale'
-        });
-        // Update product with Cloudinary image info
-        product.image = {
-          public_id: result.public_id,
-          url: result.secure_url
-        };
-        await product.save();
-        // Delete file from server
-        fs.unlinkSync(req.file.path);
-      } catch (uploadError) {
-        if (req.file) {
-          fs.unlinkSync(req.file.path);
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = [];
+
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'sergioind/products',
+            width: 500,
+            crop: 'scale'
+          });
+
+          uploadedImages.push({
+            public_id: result.public_id,
+            url: result.secure_url
+          });
+
+          fs.unlinkSync(file.path);
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          fs.unlinkSync(file.path); // clean up on error
         }
-        console.error('Image upload error:', uploadError);
-        // Continue without image if upload fails
       }
+
+      product.image = uploadedImages;
+      await product.save();
     }
 
     // Populate category info
@@ -154,18 +156,18 @@ export const createProduct = async (req, res) => {
 // @access  Public
 export const getAllProducts = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
-      category, 
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      category,
       active,
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
 
     const query = {};
-    
+
     // Search functionality
     if (search) {
       query.$or = [
@@ -226,7 +228,7 @@ export const getProductById = async (req, res) => {
       .populate('category', 'name description isActive')
       .populate('flavors', 'name description color isActive')
       .populate('sizes', 'name description isActive');
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -252,16 +254,16 @@ export const getProductById = async (req, res) => {
 // @access  Public
 export const getProductsByCategory = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
       sortBy = 'createdAt',
       sortOrder = 'desc'
     } = req.query;
 
     const query = { category: req.params.categoryId };
-    
+
     // Search functionality
     if (search) {
       query.$or = [
@@ -426,33 +428,31 @@ export const updateProduct = async (req, res) => {
     }
 
     // Handle image upload if provided
-    if (req.file) {
-      try {
-        // Delete old image from Cloudinary if exists
-        if (product.image.public_id) {
-          await cloudinary.uploader.destroy(product.image.public_id);
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = [];
+
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'sergioind/products',
+            width: 500,
+            crop: 'scale'
+          });
+
+          uploadedImages.push({
+            public_id: result.public_id,
+            url: result.secure_url
+          });
+
+          fs.unlinkSync(file.path);
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          fs.unlinkSync(file.path); // clean up on error
         }
-        // Upload new image to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: 'sergioind/products',
-          width: 500,
-          crop: 'scale'
-        });
-        // Update product with new Cloudinary image info
-        product.image = {
-          public_id: result.public_id,
-          url: result.secure_url
-        };
-        await product.save();
-        // Delete file from server
-        fs.unlinkSync(req.file.path);
-      } catch (uploadError) {
-        if (req.file) {
-          fs.unlinkSync(req.file.path);
-        }
-        console.error('Image upload error:', uploadError);
-        // Continue without image if upload fails
       }
+
+      product.image = uploadedImages;
+      await product.save();
     }
 
     // Populate category info
@@ -521,7 +521,7 @@ export const deleteProductImage = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -555,7 +555,7 @@ export const deleteProduct = async (req, res) => {
 export const toggleProductStatus = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,

@@ -10,7 +10,7 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('');
     const [stock, setStock] = useState('');
-    const [image, setImage] = useState(null);
+    const [images, setImages] = useState([]);
 
     const [flavors, setFlavors] = useState([]);
     const [sizes, setSizes] = useState([]);
@@ -49,7 +49,7 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
         setPrice('');
         setCategory('');
         setStock('');
-        setImage(null);
+        setImages([]);
         setSelectedFlavors([]);
         setSelectedSizes([]);
     };
@@ -87,8 +87,10 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
             selectedFlavors.forEach((flavor) => formData.append('flavors', flavor));
             selectedSizes.forEach((size) => formData.append('sizes', size));
 
-            if (image) {
-                formData.append('image', image);
+            if (images.length > 0) {
+                images.forEach((file) => {
+                    formData.append('images', file);
+                });
             }
 
             await axiosInstance.post('/products', formData);
@@ -203,13 +205,26 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                     </Row>
 
                     <Form.Group className="mb-3" controlId="productImage">
-                        <Form.Label>Image</Form.Label>
+                        <Form.Label>Images</Form.Label>
                         <Form.Control
                             type="file"
                             accept="image/*"
-                            onChange={(e) => setImage(e.target.files[0])}
+                            multiple
+                            onChange={(e) => setImages([...e.target.files])}
                         />
                     </Form.Group>
+                    <div className="d-flex flex-wrap gap-2 mt-2">
+                        {images.map((img, idx) => (
+                            <img
+                                key={idx}
+                                src={URL.createObjectURL(img)}
+                                alt="preview"
+                                width={60}
+                                height={60}
+                                style={{ objectFit: 'cover', borderRadius: '5px' }}
+                            />
+                        ))}
+                    </div>
 
                     <Form.Group className="mb-3" controlId="productFlavors">
                         <Form.Label>Flavors</Form.Label>

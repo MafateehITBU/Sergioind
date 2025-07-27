@@ -11,7 +11,7 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('');
     const [stock, setStock] = useState('');
-    const [image, setImage] = useState(null);
+    const [images, setImages] = useState([]);
 
     // Options
     const [flavors, setFlavors] = useState([]);
@@ -76,7 +76,7 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
         setPrice('');
         setCategory('');
         setStock('');
-        setImage(null);
+        setImages([]);
         setSelectedFlavors([]);
         setSelectedSizes([]);
     };
@@ -117,8 +117,8 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
             // Append sizes (multiple)
             selectedSizes.forEach(sizeId => formData.append('sizes', sizeId));
 
-            if (image) {
-                formData.append('image', image);
+            if (images.length > 0) {
+                images.forEach(file => formData.append('images', file));
             }
 
             await axiosInstance.put(`/products/${productId}`, formData);
@@ -243,14 +243,12 @@ const UpdateProductModal = ({ show, handleClose, productId, fetchProducts }) => 
                             </Col>
                         </Row>
 
-                        <Form.Group className="mb-3" controlId="productImage">
-                            <Form.Label>Image</Form.Label>
-                            <Form.Control
-                                type="file"
-                                accept="image/*"
-                                onChange={e => setImage(e.target.files[0])}
-                            />
-                        </Form.Group>
+                        <Form.Control
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={e => setImages([...e.target.files])}
+                        />
 
                         <Form.Group className="mb-3" controlId="productFlavors">
                             <Form.Label>Flavors</Form.Label>

@@ -118,8 +118,8 @@ router.use(protect);
 router.use(authorize('superadmin', 'admin'));
 router.use(permissions('Products'));
 
-router.post('/', upload.single('image'), productValidation, validate, createProduct);
-router.put('/:id', upload.single('image'), updateProductValidation, validate, updateProduct);
+router.post('/', upload.array('images', 5), productValidation, validate, createProduct);
+router.put('/:id', upload.array('images', 5), updateProductValidation, validate, updateProduct);
 router.delete('/:id/delete-image', deleteProductImage);
 router.delete('/:id', deleteProduct);
 router.patch('/:id/toggle-status', toggleProductStatus);
