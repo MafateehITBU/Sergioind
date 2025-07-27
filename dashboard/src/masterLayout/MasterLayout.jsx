@@ -165,7 +165,7 @@ const MasterLayout = ({ children }) => {
               className='dark-logo mx-auto'
             />
             <img
-              src='/assets/images/freelancer/no-bg.png'
+              src='/assets/images/Sergio_logo.png'
               alt='site logo'
               className='logo-icon'
             />
