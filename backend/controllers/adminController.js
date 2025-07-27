@@ -1,5 +1,6 @@
 import Admin from "../models/Admin.js";
 import SuperAdmin from "../models/SuperAdmin.js";
+import User from "../models/User.js";
 import cloudinary from '../config/cloudinary.js';
 import fs from 'fs';
 import path from 'path';
@@ -86,20 +87,23 @@ export const registerAdmin = async (req, res) => {
             });
         }
 
-        // Check for existing email or phoneNumber in Admin
+        // Check for existing email or phoneNumber across all user types
         const existingAdmin = await Admin.findOne({
             $or: [{ email }, { phoneNumber }]
         });
 
-        // Check for existing email or phoneNumber in SuperAdmin
         const existingSuperAdmin = await SuperAdmin.findOne({
             $or: [{ email }, { phoneNumber }]
         });
 
-        if (existingAdmin || existingSuperAdmin) {
+        const existingUser = await User.findOne({
+            $or: [{ email }, { phoneNumber }]
+        });
+
+        if (existingAdmin || existingSuperAdmin || existingUser) {
             return res.status(400).json({
                 success: false,
-                message: 'Email or phone number is already in use'
+                message: 'Email or phone number is already in use by another account'
             });
         }
 
@@ -326,16 +330,19 @@ export const updateAdmin = async (req, res) => {
             updateData.phoneNumber = phoneNumber;
         }
 
-        // Check if email is being updated and if it already exists
+        // Check if email is being updated and if it already exists across all user types
         if (email) {
             const existingAdmin = await Admin.findOne({
                 email,
                 _id: { $ne: req.params.id }
             });
-            if (existingAdmin) {
+            const existingSuperAdmin = await SuperAdmin.findOne({ email });
+            const existingUser = await User.findOne({ email });
+
+            if (existingAdmin || existingSuperAdmin || existingUser) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Email already exists'
+                    message: 'Email is already in use by another account'
                 });
             }
         }

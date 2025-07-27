@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Admin from "../models/Admin.js";
+import SuperAdmin from "../models/SuperAdmin.js";
 import cloudinary from '../config/cloudinary.js';
 import fs from 'fs';
 import path from 'path';
@@ -56,10 +58,16 @@ export const registerUser = async (req, res) => {
             });
         }
 
-        // Check if user already exists
+        // Check for existing email across all user types
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+        const existingAdmin = await Admin.findOne({ email });
+        const existingSuperAdmin = await SuperAdmin.findOne({ email });
+
+        if (existingUser || existingAdmin || existingSuperAdmin) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email is already in use by another account' 
+            });
         }
 
         // Create new user
@@ -282,16 +290,19 @@ export const updateUser = async (req, res) => {
             updateData.phoneNumber = phoneNumber;
         }
 
-        // Check if email is being updated and if it already exists
+        // Check if email is being updated and if it already exists across all user types
         if (email) {
             const existingUser = await User.findOne({
                 email,
                 _id: { $ne: req.params.id }
             });
-            if (existingUser) {
+            const existingAdmin = await Admin.findOne({ email });
+            const existingSuperAdmin = await SuperAdmin.findOne({ email });
+
+            if (existingUser || existingAdmin || existingSuperAdmin) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Email already exists'
+                    message: 'Email is already in use by another account'
                 });
             }
         }
