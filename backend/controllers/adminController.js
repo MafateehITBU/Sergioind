@@ -60,7 +60,7 @@ export const registerAdmin = async (req, res) => {
         }
 
         // Validate permissions (parse if needed)
-        const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
+        const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us', 'Gallery'];
 
         let parsedPermissions;
         try {
@@ -349,7 +349,7 @@ export const updateAdmin = async (req, res) => {
 
 
         if (permissions) {// Validate permissions (parse if needed)
-            const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us'];
+            const allowedPermissions = ['Users', 'Categories', 'Files', 'Sizes', 'Flavors', 'Products', 'Quotations', 'Contact-us', 'Gallery'];
 
             let parsedPermissions;
             try {

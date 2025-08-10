@@ -89,13 +89,13 @@ export const createFileCenter = async (req, res) => {
           width: 400,
           crop: 'scale'
         });
-        
+
         fileCenter.image = {
           public_id: result.public_id,
           url: result.secure_url
         };
         await fileCenter.save();
-        
+
         // Delete temporary image file
         fs.unlinkSync(image.path);
       } catch (imageUploadError) {
@@ -138,10 +138,10 @@ export const createFileCenter = async (req, res) => {
 // @access  Public
 export const getAllFileCenter = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
       category,
       active,
       sortBy = 'createdAt',
@@ -149,7 +149,7 @@ export const getAllFileCenter = async (req, res) => {
     } = req.query;
 
     const query = {};
-    
+
     // Search functionality
     if (search) {
       query.$or = [
@@ -214,7 +214,7 @@ export const getAllFileCenter = async (req, res) => {
 export const getFileCenterById = async (req, res) => {
   try {
     const fileCenter = await FileCenter.findById(req.params.id);
-    
+
     if (!fileCenter) {
       return res.status(404).json({
         success: false,
@@ -245,7 +245,7 @@ export const getFileCenterById = async (req, res) => {
 export const downloadFile = async (req, res) => {
   try {
     const fileCenter = await FileCenter.findById(req.params.id);
-    
+
     if (!fileCenter) {
       return res.status(404).json({
         success: false,
@@ -281,7 +281,7 @@ export const downloadFile = async (req, res) => {
 export const viewFile = async (req, res) => {
   try {
     const fileCenter = await FileCenter.findById(req.params.id);
-    
+
     if (!fileCenter) {
       return res.status(404).json({
         success: false,
@@ -366,13 +366,13 @@ export const updateFileCenter = async (req, res) => {
         if (fileCenter.file.public_id) {
           // Determine resource type based on file type
           let resourceType = 'raw'; // default for documents, archives, etc.
-          
+
           if (fileCenter.file.fileType && fileCenter.file.fileType.startsWith('image/')) {
             resourceType = 'image';
           } else if (fileCenter.file.fileType && fileCenter.file.fileType.startsWith('video/')) {
             resourceType = 'video';
           }
-          
+
           await cloudinary.uploader.destroy(fileCenter.file.public_id, {
             resource_type: resourceType
           });
@@ -383,7 +383,8 @@ export const updateFileCenter = async (req, res) => {
           folder: 'sergioind/files',
           resource_type: 'auto',
           use_filename: true,
-          unique_filename: true
+          unique_filename: true,
+          type: 'upload'
         });
 
         // Update file center with new file info
@@ -513,7 +514,7 @@ export const deleteFileCenterImage = async (req, res) => {
 export const deleteFileCenter = async (req, res) => {
   try {
     const fileCenter = await FileCenter.findById(req.params.id);
-    
+
     if (!fileCenter) {
       return res.status(404).json({
         success: false,
@@ -525,13 +526,13 @@ export const deleteFileCenter = async (req, res) => {
     if (fileCenter.file.public_id) {
       // Determine resource type based on file type
       let resourceType = 'raw'; // default for documents, archives, etc.
-      
+
       if (fileCenter.file.fileType && fileCenter.file.fileType.startsWith('image/')) {
         resourceType = 'image';
       } else if (fileCenter.file.fileType && fileCenter.file.fileType.startsWith('video/')) {
         resourceType = 'video';
       }
-      
+
       await cloudinary.uploader.destroy(fileCenter.file.public_id, {
         resource_type: resourceType
       });
@@ -563,7 +564,7 @@ export const deleteFileCenter = async (req, res) => {
 export const toggleFileCenterStatus = async (req, res) => {
   try {
     const fileCenter = await FileCenter.findById(req.params.id);
-    
+
     if (!fileCenter) {
       return res.status(404).json({
         success: false,

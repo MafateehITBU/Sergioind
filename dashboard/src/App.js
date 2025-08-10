@@ -12,6 +12,7 @@ import ProductsPage from "./pages/ProductsPage";
 import QuotationPage from "./pages/QuotationPage";
 import FileCenterPage from "./pages/FileCenterPage";
 import ContactUsPage from "./pages/ContactUsPage";
+import GalleryPage from "./pages/GalleryPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ForgotPasswordLayer from "./components/ForgotPasswordLayer";
 import { useAuth } from './context/AuthContext';
@@ -120,6 +121,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
               <ContactUsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/gallery"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
+              <GalleryPage />
             </ProtectedRoute>
           }
         />

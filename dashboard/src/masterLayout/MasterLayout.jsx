@@ -3,7 +3,6 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useAuth } from '../context/AuthContext';
-import { parseISO } from "date-fns";
 
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
@@ -22,6 +21,7 @@ const MasterLayout = ({ children }) => {
     { path: '/quotations', label: 'Quotations', icon: 'line-md:briefcase-twotone' },
     { path: '/files', label: 'Files Center', icon: 'line-md:folder-settings-twotone' },
     { path: '/contact-us', label: 'Contact Us', icon: 'line-md:chat-twotone' },
+    { path: '/gallery', label: 'Gallery', icon: 'line-md:image-twotone' },
   ];
 
 
@@ -105,32 +105,6 @@ const MasterLayout = ({ children }) => {
   const handleLogout = () => {
     logout();
     navigate('/sign-in');
-  };
-
-  // Helper function to calculate time difference
-  const timeAgo = (date) => {
-    const now = new Date();
-    const createdAt = parseISO(date);
-
-    if (isNaN(createdAt)) {
-      return "Invalid date";
-    }
-
-    const timeDifference = now - createdAt;
-    const seconds = Math.floor(timeDifference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (seconds < 60) {
-      return "Just now";
-    } else if (minutes < 60) {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    } else if (hours < 24) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    }
   };
 
   return (
