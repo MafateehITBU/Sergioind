@@ -1,3 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Itim&family=Roboto:wght@400;700&display=swap");
+@import "tailwindcss";
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+/* custom CSS */
+
+/* Custom Colors */
+.text-primary {
+  @apply text-[#59CB00];
+}
+.text-secondary {
+  @apply text-[#63A331];
+}
+.bg-primary {
+  @apply bg-[#59CB00];
+}
+.bg-secondary {
+  @apply bg-[#63A331];
+}
+.bg-background {
+  @apply bg-[#F9F9F9];
+}
+.bg-background-secondary {
+  @apply bg-[#E4E4E4];
+}
+.text-text {
+  @apply text-[#2E3A26];
+}
+.text-text-secondary {
+  @apply text-[#7B7D7D];
+}
+
+/* Fonts */
+.font-itim {
+  font-family: "Itim", cursive;
+  font-weight: 400;
+  font-size: 24px;
+}
+
+/* Headings */
+.text-h1 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+}
+
+.text-h2 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+}
+
+.text-h3 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.text-h4 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+}
+
+/*-------------------------------------------*/
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+  background-color: #f9f9f9;
+  color: #2e3a26;
+}
+
+.container {
+  margin-left: 80px;
+  margin-right: 80px;
+}
+
+.logo-img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/*-----------------Signin-----------------*/
+.green-bg {
+  background-color: #59cb00;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.circle {
+  position: absolute;
+  background-color: #42b32f;
+  border-radius: 50%;
+  z-index: 0;
+  animation: magnetMotion 2s infinite cubic-bezier(0.52, -0.01, 0.48, 1.03);
+}
+
+.circle-top-right {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  right: -100px;
+}
+
+.circle-bottom-left {
+  width: 400px;
+  height: 400px;
+  bottom: -120px;
+  left: -120px;
+  animation-delay: 1s;
+}
+
+@keyframes magnetMotion {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-25px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
