@@ -3,7 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import axiosInstance from "../../../axiosConfig";
 import { toast } from "react-toastify";
 
-const CreateProductModal = ({ show, handleClose, fetchGalleries }) => {
+const CreateGalleryModal = ({ show, handleClose, fetchGalleries }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]); // array of File objects
@@ -178,4 +178,4 @@ const CreateProductModal = ({ show, handleClose, fetchGalleries }) => {
   );
 };
 
-export default CreateProductModal;
+export default CreateGalleryModal;

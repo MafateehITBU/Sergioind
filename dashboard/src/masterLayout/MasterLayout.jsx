@@ -22,6 +22,7 @@ const MasterLayout = ({ children }) => {
     { path: '/files', label: 'Files Center', icon: 'line-md:folder-settings-twotone' },
     { path: '/contact-us', label: 'Contact Us', icon: 'line-md:chat-twotone' },
     { path: '/gallery', label: 'Gallery', icon: 'line-md:image-twotone' },
+    { path: '/videoGallery', label: 'Video Gallery', icon: 'line-md:image-twotone' },
   ];
 
 
