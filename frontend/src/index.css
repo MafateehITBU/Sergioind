@@ -1,66 +1,77 @@
 @import url("https://fonts.googleapis.com/css2?family=Itim&family=Roboto:wght@400;700&display=swap");
 @import "tailwindcss";
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
 
-/* custom CSS */
-
+/*----------@utility rules----------*/
 /* Custom Colors */
-.text-primary {
-  @apply text-[#59CB00];
+@utility bg-primary {
+  background-color: #59cb00;
 }
-.text-secondary {
-  @apply text-[#63A331];
+@utility bg-secondary {
+  background-color: #63a331;
 }
-.bg-primary {
-  @apply bg-[#59CB00];
+@utility bg-background {
+  background-color: #f9f9f9;
 }
-.bg-secondary {
-  @apply bg-[#63A331];
+@utility bg-background-secondary {
+  background-color: #e4e4e4;
 }
-.bg-background {
-  @apply bg-[#F9F9F9];
+@utility text-primary {
+  color: #59cb00;
 }
-.bg-background-secondary {
-  @apply bg-[#E4E4E4];
+@utility text-secondary {
+  color: #63a331;
 }
-.text-text {
-  @apply text-[#2E3A26];
+@utility text-text {
+  color: #2e3a26;
 }
-.text-text-secondary {
-  @apply text-[#7B7D7D];
+@utility text-text-secondary {
+  color: #7b7d7d;
 }
 
-/* Fonts */
-.font-itim {
+/* Custom fonts  */
+@utility font-itim {
   font-family: "Itim", cursive;
   font-weight: 400;
   font-size: 24px;
 }
-
-/* Headings */
-.text-h1 {
+@utility text-h1 {
   font-family: "Roboto", sans-serif;
   font-weight: 700;
   font-size: 40px;
 }
-
-.text-h2 {
+@utility text-h2 {
   font-family: "Roboto", sans-serif;
   font-weight: 700;
   font-size: 30px;
 }
-
-.text-h3 {
+@utility text-h3 {
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-size: 20px;
 }
-
-.text-h4 {
+@utility text-h4 {
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-size: 18px;
+}
+@utility container {
+  margin-left: 80px;
+  margin-right: 80px;
+}
+@utility logo-img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* For auto filled forms */
+@layer utilities {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #e4e4e4 inset !important;
+    box-shadow: 0 0 0px 1000px #e4e4e4 inset !important;
+    -webkit-text-fill-color: #000;
+  }
 }
 
 /*-------------------------------------------*/
@@ -71,18 +82,6 @@ body {
   font-family: "Roboto", sans-serif;
   background-color: #f9f9f9;
   color: #2e3a26;
-}
-
-.container {
-  margin-left: 80px;
-  margin-right: 80px;
-}
-
-.logo-img {
-  height: 60px;
-  width: auto;
-  object-fit: contain;
-  display: block;
 }
 
 /*-----------------Signin-----------------*/

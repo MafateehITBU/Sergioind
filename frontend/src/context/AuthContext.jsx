@@ -128,11 +128,41 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const register = async (name, email, password, phone) => {
+    try {
+      const response = await axiosInstance.post("/user/register", {
+        name,
+        email,
+        password,
+        phoneNumber: phone,
+      });
+
+      const token = response.data.token;
+
+      if (!token || typeof token !== "string") {
+        throw new Error("Invalid token received");
+      }
+
+      Cookie.set("token", token, { expires: 1 });
+
+      const decoded = jwtDecode(token);
+      const { id } = decoded;
+
+      await fetchUserData(id);
+
+      return response.data;
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
+  }
+
   const value = {
     user,
     loading,
     login,
     logout,
+    register,
     isAuthenticated: !!user?.id,
     updateUser: (newUserData) => {
       setUser((prev) => ({

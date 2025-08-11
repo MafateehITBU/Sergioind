@@ -12,6 +12,7 @@ import {
     getAvatarOptions,
     sendOTP,
     verifyOTP,
+    resetPassword,
     changePassword
 } from '../controllers/userController.js';
 import { protect, authorize, permissions } from '../middleware/auth.js';
@@ -93,6 +94,7 @@ router.post('/register', upload.single('image'), registerValidation, validate, r
 router.post('/login', loginValidation, validate, loginUser);
 router.put('/send-otp', sendOTP);
 router.post('/verify-otp',  verifyOTP);
+router.post('/reset-password', resetPassword);
 
 // Protected routes (user must be logged in)
 router.use(protect);

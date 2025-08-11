@@ -29,7 +29,7 @@ const SignIn = () => {
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   const handleForgotPassword = () => {
@@ -40,15 +40,13 @@ const SignIn = () => {
     <section className="min-h-screen flex">
       <div className="flex flex-1 min-h-screen">
         {/* Left Side */}
-        <div className="relative hidden md:flex md:flex-col md:justify-center md:items-center md:w-2/5 bg-[#59CB00] text-white text-center overflow-hidden !p-6">
+        <div className="relative hidden md:flex md:flex-col md:justify-center md:items-center md:w-2/5 bg-[#59CB00] text-white text-center overflow-hidden p-6">
           <div className="green-bg absolute inset-0 -z-10 overflow-hidden">
             <div className="circle circle-top-right"></div>
             <div className="circle circle-bottom-left"></div>
           </div>
-          <div className="relative w-[400px] z-10 !px-3 flex flex-col justify-center items-center">
-            <h2 className="font-bold !mb-13 !text-5xl font-itim">
-              Welcome back!
-            </h2>
+          <div className="relative w-[400px] z-10 px-3 flex flex-col justify-center items-center">
+            <h2 className="font-bold mb-13 text-5xl font-itim">Welcome back</h2>
             <p>
               Please sign in to manage your account, track orders, or request
               quotations
@@ -59,7 +57,7 @@ const SignIn = () => {
         {/* Right Side */}
         <div className="flex flex-col justify-center items-center flex-1 py-10 px-6 md:px-12">
           <div className="max-w-[464px] w-full">
-            <h4 className="!mb-12 text-center !text-4xl font-semibold font-itim">
+            <h4 className="mb-12 text-center text-4xl font-semibold font-itim">
               Sign in
             </h4>
 
@@ -82,16 +80,16 @@ const SignIn = () => {
               )}
 
               {/* Email Field */}
-              <div className="!mb-4">
+              <div className="mb-4">
                 <label
                   htmlFor="email"
-                  className="block !mb-2 font-semibold !text-gray-700 text-sm"
+                  className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
                   Email Address
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
-                  <span className="text-gray-400 !ml-3 pointer-events-none">
+                  <span className="text-gray-400 ml-3 pointer-events-none">
                     <Icon icon="mage:email" width={20} height={20} />
                   </span>
 
@@ -102,22 +100,22 @@ const SignIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="Email"
-                    className="flex-grow bg-transparent border-none text-base outline-none !px-3"
+                    className="flex-grow bg-transparent border-none text-base outline-none px-3"
                   />
                 </div>
               </div>
 
               {/* Password Field */}
-              <div className="relative !mb-5">
+              <div className="relative mb-5">
                 <label
                   htmlFor="password"
-                  className="block !mb-2 font-semibold text-gray-700 text-sm"
+                  className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
                   Password
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
-                  <span className="text-gray-400 !ml-3 pointer-events-none">
+                  <span className="text-gray-400 ml-3 pointer-events-none">
                     <Icon
                       icon="solar:lock-password-outline"
                       width={20}
@@ -132,13 +130,13 @@ const SignIn = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="Password"
-                    className="flex-grow bg-transparent border-none text-base outline-none !px-3"
+                    className="flex-grow bg-transparent border-none text-base outline-none px-3"
                   />
 
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="text-gray-400 hover:text-gray-700 focus:outline-none !mr-3"
+                    className="text-gray-400 hover:text-gray-700 focus:outline-none mr-3"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
@@ -154,24 +152,24 @@ const SignIn = () => {
               </div>
 
               {/* Forgot Password */}
-              <div className="flex justify-end !mb-6">
+              <div className="flex justify-end mb-6">
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="!text-sm !text-gray-500 !hover:text-gray-700 focus:outline-none"
+                  className="text-sm text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
                 >
                   Forgot Password?
                 </button>
               </div>
 
               {/* Don't have an account (sign up link) */}
-              <div className="text-center !mb-6">
-                <span className="!text-sm text-gray-500">
+              <div className="text-center mb-6">
+                <span className="text-sm text-gray-500">
                   Don't have an account?{" "}
                 </span>
                 <a
                   href="/register"
-                  className="!text-sm !text-[#59CB00] hover:underline"
+                  className="text-sm text-[#59CB00] hover:underline"
                 >
                   Sign Up
                 </a>
@@ -180,7 +178,7 @@ const SignIn = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full h-14 bg-primary text-white text-sm font-semibold !rounded-xl hover:bg-[#5faf22] transition-colors cursor-pointer"
+                className="w-full h-14 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-secondary transition-colors duration-200 cursor-pointer"
               >
                 Sign In
               </button>
