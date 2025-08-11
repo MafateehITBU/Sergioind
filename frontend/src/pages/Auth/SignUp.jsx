@@ -18,12 +18,50 @@ const SignUp = () => {
   const handleSingUp = async (e) => {
     e.preventDefault();
     setError("");
+
+    // --- FRONTEND VALIDATIONS ---
+    if (!name || !email || !password || !phone) {
+      setError(
+        "Please provide all required fields: name, email, password, phoneNumber"
+      );
+      return;
+    }
+
+    if (name.length < 2 || name.length > 50) {
+      setError("Name must be between 2 and 50 characters");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email");
+      return;
+    }
+
+    const phoneRegex =
+      /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
+    if (!phoneRegex.test(phone)) {
+      setError("Please enter a valid phone number");
+      return;
+    }
+
+    // --- API CALL ---
     try {
       await register(name, email, password, phone);
       navigate("/");
     } catch (err) {
       console.error(
-        "Login failed:",
+        "Registration failed:",
         err.response?.data?.message || err.message
       );
       setError(
@@ -35,6 +73,7 @@ const SignUp = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
+  
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
@@ -130,7 +169,10 @@ const SignUp = () => {
                     type="tel"
                     id="phone"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // remove all non-digits
+                      setPhone(value);
+                    }}
                     required
                     placeholder="e.g. 0795894444"
                     className="flex-grow bg-transparent border-none text-base outline-none px-3"
