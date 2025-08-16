@@ -1,5 +1,6 @@
-import MainLayout from "../components/MainLayout";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Bg from "../assets/imgs/about/bg.png";
 import TextBg from "../assets/imgs/about/text-bg.png";
 import Img1 from "../assets/imgs/about/img1.png";
@@ -36,11 +37,13 @@ const About = () => {
   ];
 
   return (
-    <MainLayout>
-      {/* Hero Section */}
-      <section className="mx-[-5vw]">
+    <>
+      <Header />
+      
+      {/* Hero Section - Full Width */}
+      <section className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] pt-16">
         <div
-          className="relative w-full h-[60vh] bg-cover bg-center"
+          className="relative w-full h-[60vh] bxg-cover bg-center"
           style={{ backgroundImage: `url(${Bg})` }}
         >
           {/* Dark Overlay */}
@@ -74,7 +77,7 @@ const About = () => {
       </section>
 
       {/* Content Section */}
-      <section className="py-16 mx-[-5vw] md:mx-0">
+      <section className="py-16 max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start gap-8">
           {/* Text */}
           <div
@@ -92,7 +95,7 @@ const About = () => {
               recipes with modern production techniques to create delicious and
               safe products for everyone. With a commitment to food safety,
               innovation, and global standards, our products are trusted in over
-              10 countries. Whether it’s crispy potato chips or flavorful corn
+              10 countries. Whether it's crispy potato chips or flavorful corn
               snacks, Sergio ensures taste and quality in every pack. We believe
               in building long-term partnerships, sustainability, and delivering
               excellence through every product we craft.
@@ -146,8 +149,8 @@ const About = () => {
         </div>
       </section>
 
-      {/* Banner */}
-      <section className="bg-primary text-white py-1 px-8 mx-[-5vw] md:px-16 flex flex-col md:flex-row items-center justify-between">
+      {/* CTA Banner - Full Width */}
+      <section className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] bg-primary text-white py-1 px-8 md:px-16 flex flex-col md:flex-row items-center justify-between">
         {/* Left Side - Text & Buttons */}
         <div className="max-w-xl pt-2 md:pt-0">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim mb-4 text-center">
@@ -185,8 +188,8 @@ const About = () => {
       </section>
 
       {/* Countries Section */}
-      <section className="py-16 pb-100 md:pb-30">
-        <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8 mx-[-50px] md:mx-0">
+      <section className="py-16 pb-100 md:pb-30 max-w-7xl mx-auto px-6">
+        <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8">
           Currently exported to several countries, <br /> including
         </h2>
 
@@ -199,7 +202,7 @@ const About = () => {
           />
 
           {/* Countries list on top */}
-          <div className="absolute inset-0 flex justify-start items-start p-8 mx-[-5vw] md:mx-0">
+          <div className="absolute inset-0 flex justify-start items-start p-8">
             <div className="grid grid-cols-3 gap-20 md:gap-15 text-text text-md">
               {/* Column 1 (7 countries) */}
               <div className="space-y-5">
@@ -223,7 +226,9 @@ const About = () => {
           </div>
         </div>
       </section>
-    </MainLayout>
+
+      <Footer />
+    </>
   );
 };
 

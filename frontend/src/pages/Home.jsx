@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow } from "swiper/modules";
 import { Icon } from "@iconify/react";
-import MainLayout from "../components/MainLayout";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Chips1 from "../assets/imgs/products/Chips_1.png";
 import Chips2 from "../assets/imgs/products/Chips_2.png";
 import Chips3 from "../assets/imgs/products/Chips_3.png";
@@ -21,9 +22,11 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <MainLayout>
+    <>
+      <Header />
+      
       {/* Hero Section */}
-      <section className="min-h-[100vh] bg-[#12131a] mx-[-5vw] text-white py-[200px] flex items-center">
+      <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white py-[200px] flex items-center pt-16">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-18">
           {/* LEFT TEXT */}
           <div className="flex flex-col w-full md:w-auto">
@@ -94,87 +97,48 @@ const Home = () => {
       </section>
 
       {/* Why Us Section */}
-      <section className="min-h-[100vh] md:mx-[-5vw] py-[100px] flex items-center">
+      <section className="min-h-[100vh] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] py-[100px] flex items-center">
         <div className="container mx-auto px-4 pb-9 flex flex-col md:flex-row items-center justify-between gap-12">
           {/* LEFT TEXT */}
           <div
+            className="flex flex-col w-full md:w-1/2 text-center md:text-left"
             style={{
               backgroundImage: `url(${WhyUsBg})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
-            className="w-full md:w-1/2 py-8 md:py-12"
           >
-            <div className="flex flex-col items-start">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl text-primary font-itim leading-tight m-0 why-underline">
-                Why Us
-              </h2>
-              <p className="mt-4 text-text w-full sm:w-[90%] text-[24px] leading-relaxed">
-                Sergio is committed to delivering high-quality snacks made from
-                carefully selected ingredients. With a focus on innovation, food
-                safety, and international standards, our products are trusted
-                and enjoyed in over 10 countries. We combine tradition with
-                modern techniques to bring you irresistible taste in every bite.
-              </p>
-
-              <ul className="mt-6 flex flex-col gap-4 text-gray-400 text-[20px]">
-                <li className="flex items-center gap-2">
-                  <Icon
-                    icon="material-symbols:check-rounded"
-                    color="#59cb00"
-                    width="20"
-                    height="20"
-                  />
-                  Premium, healthy ingredients
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon
-                    icon="material-symbols:check-rounded"
-                    color="#59cb00"
-                    width="20"
-                    height="20"
-                  />
-                  Modern production facilities
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon
-                    icon="material-symbols:check-rounded"
-                    color="#59cb00"
-                    width="20"
-                    height="20"
-                  />
-                  Competitive pricing worldwide
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon
-                    icon="material-symbols:check-rounded"
-                    color="#59cb00"
-                    width="20"
-                    height="20"
-                  />
-                  Trusted by global partners
-                </li>
-              </ul>
-              <button
-                className="mt-6 px-5 py-2 sm:px-6 sm:py-3 cursor-pointer bg-primary hover:scale-105 transition duration-400 text-white rounded-lg font-semibold w-[50%] sm:w-[40%] md:w-[30%]"
-                onClick={() => navigate("/about")}
-              >
-                Learn More
-              </button>
-            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim leading-tight text-white mb-6">
+              Why Choose Us?
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg mb-8">
+              We are committed to providing the highest quality snacks with
+              innovative flavors that delight our customers worldwide.
+            </p>
+            <button
+              className="px-6 py-3 cursor-pointer bg-primary hover:bg-white hover:text-primary transition duration-400 text-white rounded-lg font-semibold w-full sm:w-auto"
+              onClick={() => navigate("/about")}
+            >
+              Learn More
+            </button>
           </div>
 
           {/* RIGHT IMAGE */}
-          <div className="flex justify-center items-center mt-8 md:mt-0">
+          <div className="flex-1 flex justify-center items-center w-full md:w-auto">
             <img
               src={Question}
-              alt="Chips"
-              className="w-[180px] sm:w-[220px] md:w-[250px] float-animation"
+              alt="Why Choose Us"
+              className="w-full max-w-[400px] rounded-xl"
             />
           </div>
         </div>
       </section>
-    </MainLayout>
+
+      {/* Additional sections can be added here */}
+      
+      <Footer />
+    </>
   );
 };
+
 export default Home;
