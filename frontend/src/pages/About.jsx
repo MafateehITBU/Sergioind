@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import HeroBadge from "../components/HeroBadge";
 import Bg from "../assets/imgs/about/bg.png";
 import TextBg from "../assets/imgs/about/text-bg.png";
 import Img1 from "../assets/imgs/about/img1.png";
@@ -41,41 +42,8 @@ const About = () => {
       <Header />
       
       {/* Hero Section - Full Width */}
-      <section className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] pt-16">
-        <div
-          className="relative w-full h-[60vh] bxg-cover bg-center"
-          style={{ backgroundImage: `url(${Bg})` }}
-        >
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-black/60"></div>
-
-          {/* Green Badge */}
-          <div className="absolute ms-[80px] left-0 bottom-[-40px]">
-            {/* White background layer */}
-            <div
-              className="absolute inset-0 translate-x-4"
-              style={{
-                backgroundColor: "white",
-                clipPath: "polygon(0 0, 100% 0, 80% 100%, 0% 100%)",
-                zIndex: 0,
-              }}
-            ></div>
-
-            {/* Green foreground layer */}
-            <div
-              className="relative text-white font-itim text-3xl px-12 py-7"
-              style={{
-                backgroundColor: "#59cb00",
-                clipPath: "polygon(0 0, 100% 0, 80% 100%, 0% 100%)",
-                zIndex: 1,
-              }}
-            >
-              About Us
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <HeroBadge bgImage={Bg} badgeText='About Us' /> 
+      
       {/* Content Section */}
       <section className="py-16 max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start gap-8">
