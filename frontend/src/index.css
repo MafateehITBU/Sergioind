@@ -55,8 +55,8 @@
   font-size: 18px;
 }
 @utility container {
-  margin-left: 80px;
-  margin-right: 80px;
+  padding-left: 5vw;
+  padding-right: 5vw;
 }
 @utility logo-img {
   height: 60px;
@@ -82,6 +82,107 @@ body {
   font-family: "Roboto", sans-serif;
   background-color: #f9f9f9;
   color: #2e3a26;
+}
+
+.animated-underline {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+/* Fixed base line on the left */
+.animated-underline::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 20px;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+/* Animated highlight bar */
+.animated-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  height: 3px;
+  width: 0;
+  background-color: #fff;
+  border-radius: 2px;
+  animation-delay: 0s !important;
+  animation: highlight-grow-shrink 5s linear infinite;
+}
+
+@keyframes highlight-grow-shrink {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: calc(100% - 20px);
+  }
+  100% {
+    width: 0;
+  }
+}
+
+/*-----------Home Page-----------*/
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+/* Swiper styles */
+.swiper-slide img {
+  width: 100%;
+  height: 90%;
+  object-fit: cover;
+}
+
+/* Special style for active slide */
+.swiper-slide-active img {
+  transform: scale(1.3);
+  transition: transform 0.5s ease-in-out;
+}
+.swiper {
+  width: 100%;
+  height: 500px;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mySwiper {
+  width: 100%;
+  max-width: 900px;
+  overflow: hidden;
+}
+
+.why-underline {
+  position: relative;
+}
+
+.why-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px; 
+  height: 5px;
+  border-radius: 4px;
+  background-color: #59cb00;
 }
 
 /*-----------------Signin-----------------*/

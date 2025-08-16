@@ -1,9 +1,9 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
 import FrogotPassword from "./pages/Auth/ForgotPassword";
+import About from "./pages/About";
 
 const App = () => {
   const location = useLocation();
@@ -12,13 +12,13 @@ const App = () => {
   );
   return (
     <>
-      {!isAuthPages && <Navbar isArabic={false} />}
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/forgot-password" element={<FrogotPassword />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </>
   );

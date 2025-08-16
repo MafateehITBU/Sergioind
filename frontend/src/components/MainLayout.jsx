@@ -1,0 +1,472 @@
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  ChevronDown,
+  Menu,
+  X,
+  User,
+  Instagram,
+  Facebook,
+  Linkedin,
+} from "lucide-react";
+import DarkLogo from "../assets/imgs/Sergio.svg";
+import LightLogo from "../assets/imgs/Sergio_logo_white.png";
+import { Icon } from "@iconify/react";
+import { useAuth } from "../context/AuthContext";
+
+const MainLayout = ({ children }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [language, setLanguage] = useState("EN");
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // for user dropdown
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+  const { user, logout } = useAuth();
+  const isLoggedIn = user && user.id && user.id !== null;
+
+  const isArabic = language === "AR";
+
+  const toggleLanguage = () => {
+    setLanguage(isArabic ? "EN" : "AR");
+    setGalleryOpen(false);
+  };
+
+  const navItems = [
+    { name: isArabic ? "الرئيسية" : "Home", path: "/" },
+    { name: isArabic ? "من نحن" : "About Us", path: "/about" },
+    { name: isArabic ? "منتجاتنا" : "Products", path: "/products" },
+    { name: isArabic ? "اتصل بنا" : "Contact Us", path: "/contact" },
+    { name: isArabic ? "الشهادات" : "Certificate", path: "/certificate" },
+    {
+      name: isArabic ? "المعرض" : "Gallery",
+      path: "#",
+      dropdown: [
+        { name: isArabic ? "صور" : "Photos", path: "/gallery/photos" },
+        { name: isArabic ? "فيديو" : "Videos", path: "/gallery/videos" },
+      ],
+    },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+  const isGalleryActive = () => location.pathname.startsWith("/gallery/");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY;
+      const ninetyVh = window.innerHeight * 0.9;
+      setIsScrolled(scrollPos > ninetyVh);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const els = document.querySelectorAll(".animated-underline::after");
+    els.forEach((el) => {
+      el.style.animationPlayState = "running";
+    });
+  }, []);
+
+  // Logout handler
+  const handleLogout = () => {
+    logout();
+    setUserMenuOpen(false);
+  };
+
+  return (
+    <section>
+      {/* Header */}
+      <header
+        className={`w-full font-itim fixed top-0 z-50 transition-colors duration-300 ${
+          isHomePage
+            ? isScrolled
+              ? `bg-white text-text shadow-md ${isArabic ? "rtl" : ""}`
+              : `bg-transparent ${isArabic ? "rtl" : ""}`
+            : `bg-white text-text shadow-md ${isArabic ? "rtl" : ""}`
+        }`}
+        dir={isArabic ? "rtl" : "ltr"}
+      >
+        <div className="flex items-center justify-between gap-4 px-6 py-3 max-w-[1400px] mx-auto">
+          {/* Logo */}
+          <div>
+            <img
+              src={isHomePage && !isScrolled ? LightLogo : DarkLogo}
+              alt="Logo"
+              className="logo-img"
+            />
+          </div>
+
+          {/* Desktop Menu */}
+          <nav
+            className={`hidden lg:flex items-center gap-10 ${
+              isHomePage
+                ? isScrolled
+                  ? "text-text"
+                  : "text-white"
+                : "text-text"
+            } text-[16px] font-roboto-regular`}
+          >
+            {navItems.map((item, idx) =>
+              item.dropdown ? (
+                <div
+                  key={idx}
+                  className="relative"
+                  onMouseEnter={() => setGalleryOpen(true)}
+                  onMouseLeave={() => setGalleryOpen(false)}
+                >
+                  <button
+                    className={`flex items-center gap-1 hover:text-primary transition ${
+                      isGalleryActive() ? "text-primary font-bold" : ""
+                    }`}
+                  >
+                    {item.name}
+                    <ChevronDown size={16} />
+                  </button>
+                  {galleryOpen && (
+                    <div className="absolute top-full left-0 bg-white text-text shadow-md py-2 w-40 z-50">
+                      {item.dropdown.map((sub, subIdx) => (
+                        <Link
+                          key={subIdx}
+                          to={sub.path}
+                          className={`block px-4 py-2 hover:bg-gray-100 ${
+                            isActive(sub.path) ? "text-primary font-bold" : ""
+                          }`}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={idx}
+                  to={item.path}
+                  className={`${
+                    isActive(item.path) ? "text-primary font-bold" : ""
+                  } hover:text-primary transition`}
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
+
+            {/* User Menu */}
+            {isLoggedIn ? (
+              <div
+                className="relative"
+                onMouseEnter={() => setUserMenuOpen(true)}
+                onMouseLeave={() => setUserMenuOpen(false)}
+              >
+                <button className="flex items-center gap-1 hover:text-primary transition focus:outline-none">
+                  <User size={20} />
+                  <ChevronDown size={16} />
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 bg-white shadow-md py-2 w-40 z-50 rounded-md">
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 hover:bg-gray-100 text-text"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      {isArabic ? "الملف الشخصي" : "Profile"}
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-text"
+                    >
+                      {isArabic ? "تسجيل خروج" : "Logout"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className={`hover:text-primary transition ${
+                  isActive("/login") ? "text-primary font-bold" : ""
+                }`}
+              >
+                {isArabic ? "تسجيل الدخول" : "Login"}
+              </Link>
+            )}
+
+            {/* Language Switch + CTA */}
+            <button
+              onClick={toggleLanguage}
+              className="text-sm font-bold hover:text-primary"
+            >
+              {isArabic ? "EN" : "AR"}
+            </button>
+            <Link
+              to="/quotations"
+              className="bg-primary text-white px-5 py-2 rounded-md font-bold text-sm"
+            >
+              {isArabic ? "عرض الأسعار" : "Quotations"}
+            </Link>
+          </nav>
+
+          {/* Mobile Menu Icon */}
+          <button
+            className="lg:hidden z-50"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+
+        {/* Mobile Slide-in Menu */}
+        <div
+          className={`fixed top-0 ${
+            isArabic ? "left-0" : "right-0"
+          } h-full w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out z-40 ${
+            mobileOpen
+              ? "translate-x-0"
+              : isArabic
+              ? "-translate-x-full"
+              : "translate-x-full"
+          } px-5 pt-20 pb-6 space-y-4 text-text text-sm font-roboto-regular`}
+        >
+          {navItems.map((item, idx) =>
+            item.dropdown ? (
+              <details key={idx} className="group" open={isGalleryActive()}>
+                <summary
+                  className={`flex items-center justify-between cursor-pointer ${
+                    isGalleryActive() ? "text-primary font-bold" : ""
+                  }`}
+                >
+                  {item.name} <ChevronDown size={16} />
+                </summary>
+                <div className="ml-4 mt-2 space-y-2">
+                  {item.dropdown.map((sub, subIdx) => (
+                    <Link
+                      key={subIdx}
+                      to={sub.path}
+                      className={`block ${
+                        isActive(sub.path) ? "text-primary font-bold" : ""
+                      }`}
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            ) : (
+              <Link
+                key={idx}
+                to={item.path}
+                className={`block ${
+                  isActive(item.path) ? "text-primary font-bold" : ""
+                }`}
+              >
+                {item.name}
+              </Link>
+            )
+          )}
+
+          {/* User Menu in Mobile */}
+          {isLoggedIn ? (
+            <details className="group">
+              <summary className="flex items-center justify-between cursor-pointer">
+                <User size={20} />
+                <ChevronDown size={16} />
+              </summary>
+              <div className="ml-4 mt-2 space-y-2">
+                <Link
+                  to="/profile"
+                  className="block"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {isArabic ? "الملف الشخصي" : "Profile"}
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileOpen(false);
+                  }}
+                  className="block text-left w-full"
+                >
+                  {isArabic ? "تسجيل خروج" : "Logout"}
+                </button>
+              </div>
+            </details>
+          ) : (
+            <Link
+              to="/login"
+              className={`block ${
+                isActive("/login") ? "text-primary font-bold" : ""
+              }`}
+            >
+              {isArabic ? "تسجيل الدخول" : "Login"}
+            </Link>
+          )}
+
+          <Link
+            to="/quotations"
+            className="block bg-primary text-white px-4 py-2 rounded-md text-center font-bold"
+          >
+            {isArabic ? "عرض الأسعار" : "Quotations"}
+          </Link>
+
+          <button
+            onClick={toggleLanguage}
+            className="block text-sm font-bold hover:text-primary text-center w-full mt-4"
+          >
+            {isArabic ? "EN" : "AR"}
+          </button>
+        </div>
+
+        {/* Mobile Overlay */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-30"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+      </header>
+
+      <div className="container">{children}</div>
+
+      {/* Footer */}
+      <div className="relative">
+        {/* Wave */}
+        <svg
+          className="absolute bottom-full left-0 w-full h-16 sm:h-24"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+        >
+          <path
+            fill="#59cb00"
+            fillOpacity="1"
+            d="M0,192L40,176C80,160,160,128,240,144C320,160,400,224,480,208C560,192,640,96,720,96C800,96,880,192,960,234.7C1040,277,1120,267,1200,234.7C1280,203,1360,149,1400,122.7L1440,96L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"
+          />
+        </svg>
+
+        <footer className="relative font-roboto-regular text-white">
+          <div className="bg-primary">
+            {/* Footer content */}
+            <div className="max-w-7xl mx-auto px-6 pt-8 pb-12 flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-16">
+              {/* Logo */}
+              <div className="flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left -mt-5 w-full md:w-auto">
+                <img
+                  src={LightLogo}
+                  alt="Sergio Logo"
+                  className="h-32 sm:h-40 md:h-52"
+                />
+              </div>
+
+              {/* Links */}
+              <div>
+                <h4 className="font-itim mb-3 animated-underline pb-1 relative">
+                  Links
+                </h4>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link to="/">Home</Link>
+                  </li>
+                  <li>
+                    <Link to="/about">About Us</Link>
+                  </li>
+                  <li>
+                    <Link to="/products">Products</Link>
+                  </li>
+                  <li>
+                    <Link to="/contact">Contact Us</Link>
+                  </li>
+                  <li>
+                    <Link to="/certificate">Certificate</Link>
+                  </li>
+                  <li>
+                    <Link to="/gallery">Gallery</Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contact Us */}
+              <div>
+                <h4 className="font-itim mb-3 animated-underline pb-1 relative">
+                  Contact Us
+                </h4>
+                <p className="text-sm">
+                  <strong>Email:</strong>{" "}
+                  <a href="mailto:info@sergio-ind.com" className="underline">
+                    info@sergio-ind.com
+                  </a>
+                </p>
+                <p className="text-sm mt-1">
+                  <strong>Tel:</strong> +962 7 9120 1150
+                </p>
+              </div>
+
+              {/* Support */}
+              <div>
+                <h4 className="font-itim mb-3 animated-underline pb-1 relative">
+                  Support
+                </h4>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link to="/faq">FAQ</Link>
+                  </li>
+                  <li>
+                    <Link to="/privacy">Privacy Policy</Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Follow Us */}
+              <div>
+                <h4 className="font-itim mb-3 animated-underline pb-1 relative">
+                  Follow Us
+                </h4>
+                <div className="flex gap-3">
+                  <a
+                    href="https://www.instagram.com/sergio.industries/"
+                    target="_blank"
+                    aria-label="Instagram"
+                    className="hover:opacity-80"
+                  >
+                    <Icon icon="mdi:instagram" width="25" height="25" />
+                  </a>
+                  <a
+                    href="https://www.facebook.com/sergio.ind/"
+                    target="_blank"
+                    aria-label="Facebook"
+                    className="hover:opacity-80"
+                  >
+                    <Icon icon="mdi:facebook" width="25" height="25" />
+                  </a>
+                  <a
+                    href="#"
+                    target="_blank"
+                    aria-label="LinkedIn"
+                    className="hover:opacity-80"
+                  >
+                    <Icon icon="mdi:linkedin" width="25" height="25" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="bg-primary border-t border-white text-center py-3 text-xs sm:text-sm">
+            Sergio-ind 2019 © All Rights Reserved | Project by :{" "}
+            <a
+              href="https://mafateehgroup.com"
+              className="underline font-semibold"
+            >
+              Mafateeh Group
+            </a>
+          </div>
+        </footer>
+      </div>
+    </section>
+  );
+};
+
+export default MainLayout;
