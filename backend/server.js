@@ -22,6 +22,8 @@ import contactRoutes from './routes/contact.js';
 import upload from './middleware/upload.js';
 import gallery from './routes/gallery.js';
 import videoGallery from './routes/videoGallery.js';
+import postRoutes from './routes/post.js';
+import applicantRoutes from './routes/applicant.js';
 
 dotenv.config();
 
@@ -103,6 +105,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/contact-us', contactRoutes);
 app.use('/api/gallery', gallery);
 app.use('/api/video-gallery', videoGallery);
+app.use('/api/post', postRoutes);
+app.use('/api/applicant', applicantRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

@@ -264,7 +264,7 @@ const Contact = () => {
             </div>
 
             {/* Contact Form */}
-            <div className="bg-primary rounded-xl shadow-lg p-15">
+            <div className="bg-primary rounded-xl shadow-lg md:p-15 p-6">
               <h2 className="text-3xl font-itim text-white mb-2">
                 Send us a Message
               </h2>
