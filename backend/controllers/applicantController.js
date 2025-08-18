@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Applicant from "../models/Applicant.js";
 import Post from "../models/Post.js";
 import cloudinary from "../config/cloudinary.js";
@@ -189,18 +190,27 @@ export const createApplicant = async (req, res) => {
 // @access  Private
 export const getAllApplicants = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "", status } = req.query;
+    const { page = 1, limit = 10, search = "", postId, status } = req.query;
 
     const query = {};
 
-    // Optional search
+    // Always filter by postId if provided
+    if (postId && mongoose.Types.ObjectId.isValid(postId)) {
+      query.postId = postId;
+    }
+
     if (search) {
-      query.$or = [
+      const orConditions = [
         { name: { $regex: search, $options: "i" } },
         { speciality: { $regex: search, $options: "i" } },
-        { experienceYears: { $regex: search, $options: "i" } },
         { gender: { $regex: search, $options: "i" } },
       ];
+
+      if (!isNaN(search)) {
+        orConditions.push({ experienceYears: Number(search) });
+      }
+
+      query.$or = orConditions;
     }
 
     const applicants = await Applicant.find(query)

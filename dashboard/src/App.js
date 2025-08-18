@@ -14,6 +14,7 @@ import FileCenterPage from "./pages/FileCenterPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import GalleryPage from "./pages/GalleryPage";
 import VideoGalleryPage from "./pages/VideoGalleryPage";
+import PostsPage from "./pages/PostsPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ForgotPasswordLayer from "./components/ForgotPasswordLayer";
 import { useAuth } from './context/AuthContext';
@@ -140,6 +141,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
               <VideoGalleryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/posts"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
+              <PostsPage />
             </ProtectedRoute>
           }
         />

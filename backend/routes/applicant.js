@@ -16,7 +16,7 @@ router.post("/", upload.single("cv"), createApplicant);
 // Protected routes
 router.use(protect);
 router.use(authorize("superadmin", "admin"));
-router.use(permissions("Applicants"));
+router.use(permissions("Posts"));
 
 router.get('/', getAllApplicants);
 router.get('/:id', getApplicantById);
