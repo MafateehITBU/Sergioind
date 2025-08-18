@@ -24,7 +24,8 @@ const CITY = [
 // @access  Public
 export const createApplicant = async (req, res) => {
   try {
-    const { postId, name, speciality, experienceYears, gender } = req.body;
+    const { postId, name, speciality, experienceYears, gender, email } =
+      req.body;
 
     const address = req.body.address ? JSON.parse(req.body.address) : undefined;
 
@@ -35,6 +36,7 @@ export const createApplicant = async (req, res) => {
       !speciality ||
       experienceYears === undefined ||
       !gender ||
+      !email ||
       !address ||
       !address.city
     ) {
@@ -50,6 +52,23 @@ export const createApplicant = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Post not found",
+      });
+    }
+
+    // Check if job expired
+    if (new Date() > post.endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Job application is closed. End date has passed.",
+      });
+    }
+
+    // Check if applicant with same email already applied to this post
+    const existingApplicant = await Applicant.findOne({ postId, email });
+    if (existingApplicant) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already applied to this job with this email.",
       });
     }
 
@@ -106,6 +125,7 @@ export const createApplicant = async (req, res) => {
     const applicant = await Applicant.create({
       postId,
       name,
+      email,
       speciality,
       experienceYears: exp,
       gender,
