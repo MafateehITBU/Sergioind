@@ -494,6 +494,8 @@ export const updateProduct = async (req, res) => {
 // @access  Private - SuperAdmin Only
 export const deleteProductImage = async (req, res) => {
   try {
+    const { imageId, public_id } = req.body;
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({
@@ -502,16 +504,35 @@ export const deleteProductImage = async (req, res) => {
       });
     }
 
-    // Delete image from Cloudinary if exists
-    if (product.image.public_id) {
-      await cloudinary.uploader.destroy(product.image.public_id);
+    if (!product.image || product.image.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No images to delete",
+      });
     }
 
-    // Remove image info from product
-    product.image = {
-      public_id: null,
-      url: null,
-    };
+    // Find the image to delete
+    const imgIndex = product.image.findIndex(
+      (img) => img._id.toString() === imageId || img.public_id === public_id
+    );
+
+    if (imgIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Image not found",
+      });
+    }
+
+    const imgToDelete = product.image[imgIndex];
+
+    // Delete image from Cloudinary
+    if (imgToDelete.public_id) {
+      await cloudinary.uploader.destroy(imgToDelete.public_id);
+    }
+
+    // Remove from array
+    product.image.splice(imgIndex, 1);
+
     await product.save();
 
     res.status(200).json({
