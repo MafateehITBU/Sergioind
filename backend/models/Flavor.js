@@ -8,10 +8,18 @@ const flavorSchema = new mongoose.Schema({
     maxlength: [100, 'Flavor name cannot exceed 100 characters'],
     unique: true
   },
+  nameAr: {
+    type: String,
+    trim: true,
+  },
   description: {
     type: String,
     trim: true,
     maxlength: [500, 'Flavor description cannot exceed 500 characters']
+  },
+  descriptionAr: {
+    type: String,
+    trim: true,
   },
   color: {
     type: String,
@@ -27,6 +35,6 @@ const flavorSchema = new mongoose.Schema({
 });
 
 // Index for better search performance
-flavorSchema.index({ name: 'text', description: 'text' });
+flavorSchema.index({ name: 'text', nameAr: 'text', description: 'text', descriptionAr: 'text' });
 
 export default mongoose.model('Flavor', flavorSchema); 

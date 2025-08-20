@@ -1,68 +1,103 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Product name is required'],
-    trim: true,
-    maxlength: [200, 'Product name cannot exceed 200 characters']
-  },
-  sku: {
-    type: String,
-    required: [true, 'SKU is required'],
-    trim: true,
-    unique: true,
-    maxlength: [100, 'SKU cannot exceed 100 characters']
-  },
-  description: {
-    type: String,
-    required: [true, 'Product description is required'],
-    trim: true,
-    maxlength: [1000, 'Product description cannot exceed 1000 characters']
-  },
-  image: [{
-    public_id: {
+const productSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      default: null
+      required: [true, "Product name is required"],
+      trim: true,
+      maxlength: [200, "Product name cannot exceed 200 characters"],
     },
-    url: {
+    nameAr: { type: String, trim: true },
+    sku: {
       type: String,
-      default: null
-    }
-  }],
-  flavors: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Flavor'
-  }],
-  sizes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Size'
-  }],
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    required: [true, 'Product category is required']
+      required: [true, "SKU is required"],
+      trim: true,
+      unique: true,
+      maxlength: [100, "SKU cannot exceed 100 characters"],
+    },
+    description: {
+      type: String,
+      required: [true, "Product description is required"],
+      trim: true,
+      maxlength: [1000, "Product description cannot exceed 1000 characters"],
+    },
+    descriptionAr: { type: String, trim: true },
+    details: [
+      {
+        type: String,
+        trim: true,
+        maxlength: [300, "Each detail cannot exceed 300 characters"],
+      },
+    ],
+    detailsAr: [{ type: String, trim: true }],
+    image: [
+      {
+        public_id: {
+          type: String,
+          default: null,
+        },
+        url: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
+    flavors: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Flavor",
+      },
+    ],
+    sizes: [
+      {
+        name: {
+          type: String,
+          required: [true, "Size name is required"],
+          trim: true,
+          maxlength: [50, "Size name cannot exceed 50 characters"],
+        },
+        weight: {
+          value: {
+            type: Number,
+            required: [true, "Weight value is required"],
+            min: [0, "Weight must be greater than 0"],
+          },
+          unit: {
+            type: String,
+            enum: ["g", "kg"],
+            required: [true, "Weight unit is required"],
+          },
+        },
+      },
+    ],
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: [true, "Product category is required"],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: [0, "Stock cannot be negative"],
+    },
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  stock: {
-    type: Number,
-    default: 0,
-    min: [0, 'Stock cannot be negative']
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 // Index for better search performance
-productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ name: "text", description: "text" });
 productSchema.index({ category: 1 });
 
 
 // Ensure virtual fields are serialized
-productSchema.set('toJSON', { virtuals: true });
-productSchema.set('toObject', { virtuals: true });
+productSchema.set("toJSON", { virtuals: true });
+productSchema.set("toObject", { virtuals: true });
 
-export default mongoose.model('Product', productSchema); 
+export default mongoose.model("Product", productSchema);

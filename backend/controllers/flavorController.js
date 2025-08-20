@@ -1,4 +1,5 @@
 import Flavor from '../models/Flavor.js';
+import { translateText } from "../utils/translate.js";
 
 // @desc    Create Flavor
 // @route   POST /api/flavors
@@ -31,10 +32,18 @@ export const createFlavor = async (req, res) => {
       });
     }
 
+    const nameAr = await translateText(name, "ar");
+    let descriptionAr;
+    if (description) {
+      descriptionAr = await translateText(description, "ar");
+    }
+
     // Create flavor
     const flavor = await Flavor.create({
       name,
+      nameAr,
       description,
+      descriptionAr,
       color
     });
 
@@ -65,7 +74,9 @@ export const getAllFlavors = async (req, res) => {
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { nameAr: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { descriptionAr: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -135,6 +146,8 @@ export const updateFlavor = async (req, res) => {
     const { name, description, color } = req.body;
     const updateData = {};
 
+    let nameAr, descriptionAr;
+
     // Validation for provided fields
     if (name) {
       if (name.length < 2 || name.length > 100) {
@@ -144,10 +157,12 @@ export const updateFlavor = async (req, res) => {
         });
       }
       updateData.name = name;
+      updateData.nameAr = await translateText(name, "ar");
     }
 
     if (description !== undefined) {
       updateData.description = description;
+      updateData.descriptionAr = await translateText(description, "ar");
     }
 
     if (color !== undefined) {

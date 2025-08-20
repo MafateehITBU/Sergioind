@@ -31,11 +31,6 @@ const productValidation = [
     .withMessage('Product description is required')
     .isLength({ min: 10, max: 1000 })
     .withMessage('Product description must be between 10 and 1000 characters'),
-  body('price')
-    .notEmpty()
-    .withMessage('Product price is required')
-    .isFloat({ min: 0, max: 999999.99 })
-    .withMessage('Price must be between 0 and 999,999.99'),
   body('category')
     .notEmpty()
     .withMessage('Product category is required')
@@ -72,10 +67,6 @@ const updateProductValidation = [
     .trim()
     .isLength({ min: 10, max: 1000 })
     .withMessage('Product description must be between 10 and 1000 characters'),
-  body('price')
-    .optional()
-    .isFloat({ min: 0, max: 999999.99 })
-    .withMessage('Price must be between 0 and 999,999.99'),
   body('category')
     .optional()
     .isMongoId()

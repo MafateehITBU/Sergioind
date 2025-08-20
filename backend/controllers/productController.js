@@ -1,152 +1,163 @@
-import Product from '../models/Product.js';
-import Category from '../models/Category.js';
-import cloudinary from '../config/cloudinary.js';
-import fs from 'fs';
+import Product from "../models/Product.js";
+import Category from "../models/Category.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+import { translateText } from "../utils/translate.js";
 
 // @desc    Create Product
 // @route   POST /api/products
 // @access  Private - SuperAdmin Only
 export const createProduct = async (req, res) => {
   try {
-    const { name, sku, description, category, stock } = req.body;
+    let { name, sku, description, category, stock, details, flavors, sizes } =
+      req.body;
+
+    // Parse JSON strings if sent as strings
+    if (sizes && typeof sizes === "string") {
+      try {
+        sizes = JSON.parse(sizes);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Sizes must be a valid JSON array",
+        });
+      }
+    }
+
+    if (details && typeof details === "string") {
+      try {
+        details = JSON.parse(details);
+      } catch {
+        details = [details];
+      }
+    }
 
     // Validation
     if (!name || !sku || !description || !category) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, sku, description, and category'
+        message: "Please provide name, sku, description, and category",
       });
     }
 
     if (name.length < 2 || name.length > 200) {
       return res.status(400).json({
         success: false,
-        message: 'Name must be between 2 and 200 characters'
+        message: "Name must be between 2 and 200 characters",
       });
     }
 
     if (sku.length < 2 || sku.length > 100) {
       return res.status(400).json({
         success: false,
-        message: 'SKU must be between 2 and 100 characters'
+        message: "SKU must be between 2 and 100 characters",
       });
     }
 
-    // Check if SKU already exists
     const existingSKU = await Product.findOne({ sku });
     if (existingSKU) {
       return res.status(400).json({
         success: false,
-        message: 'SKU must be unique. This SKU already exists.'
+        message: "SKU must be unique. This SKU already exists.",
       });
     }
 
     if (description.length < 10 || description.length > 1000) {
       return res.status(400).json({
         success: false,
-        message: 'Description must be between 10 and 1000 characters'
+        message: "Description must be between 10 and 1000 characters",
       });
     }
 
-    // Check if category exists and is active
+    // Check category
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'Category not found'
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Category not found" });
     }
-
     if (!categoryExists.isActive) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot create product in inactive category'
+        message: "Cannot create product in inactive category",
       });
     }
 
-    // Validate flavors and sizes if provided
-    if (req.body.flavors) {
-      const Flavor = (await import('../models/Flavor.js')).default;
-      const flavorIds = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
-      const validFlavors = await Flavor.find({ _id: { $in: flavorIds }, isActive: true });
+    // Validate flavors
+    if (flavors) {
+      const Flavor = (await import("../models/Flavor.js")).default;
+      const flavorIds = Array.isArray(flavors) ? flavors : [flavors];
+      const validFlavors = await Flavor.find({
+        _id: { $in: flavorIds },
+        isActive: true,
+      });
       if (validFlavors.length !== flavorIds.length) {
         return res.status(400).json({
           success: false,
-          message: 'One or more flavors are invalid or inactive',
-          debug: { provided: flavorIds, found: validFlavors.map(f => f._id.toString()) }
+          message: "One or more flavors are invalid or inactive",
         });
       }
     }
 
-    if (req.body.sizes) {
-      const Size = (await import('../models/Size.js')).default;
-      const sizeIds = Array.isArray(req.body.sizes) ? req.body.sizes : [req.body.sizes];
-      const validSizes = await Size.find({ _id: { $in: sizeIds }, isActive: true });
-      if (validSizes.length !== sizeIds.length) {
-        return res.status(400).json({
-          success: false,
-          message: 'One or more sizes are invalid or inactive',
-          debug: { provided: sizeIds, found: validSizes.map(s => s._id.toString()) }
-        });
-      }
-    }
+    // Translate fields to Arabic
+    const nameAr = await translateText(name, "ar");
+    const descriptionAr = await translateText(description, "ar");
+    const detailsAr = details
+      ? await Promise.all(details.map((d) => translateText(d, "ar")))
+      : [];
 
     // Create product
     const product = await Product.create({
       name,
+      nameAr,
       sku,
       description,
+      descriptionAr,
+      details: Array.isArray(details) ? details : [],
+      detailsAr,
       category,
       stock: stock ? parseInt(stock) : 0,
-      flavors: Array.isArray(req.body.flavors) ? req.body.flavors : (req.body.flavors ? [req.body.flavors] : []),
-      sizes: Array.isArray(req.body.sizes) ? req.body.sizes : (req.body.sizes ? [req.body.sizes] : [])
+      flavors: Array.isArray(flavors) ? flavors : flavors ? [flavors] : [],
+      sizes: Array.isArray(sizes) ? sizes : [],
     });
 
-    // Handle image upload if provided
+    // Handle image upload
     if (req.files && req.files.length > 0) {
       const uploadedImages = [];
-
       for (const file of req.files) {
         try {
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'sergioind/products',
+            folder: "sergioind/products",
             width: 500,
-            crop: 'scale'
+            crop: "scale",
           });
-
           uploadedImages.push({
             public_id: result.public_id,
-            url: result.secure_url
+            url: result.secure_url,
           });
-
           fs.unlinkSync(file.path);
         } catch (uploadError) {
-          console.error('Image upload error:', uploadError);
-          fs.unlinkSync(file.path); // clean up on error
+          console.error("Image upload error:", uploadError);
+          fs.unlinkSync(file.path);
         }
       }
-
       product.image = uploadedImages;
       await product.save();
     }
 
-    // Populate category info
-    await product.populate('category', 'name');
+    await product.populate("category", "name");
 
     res.status(201).json({
       success: true,
-      message: 'Product created successfully',
-      data: product
+      message: "Product created successfully",
+      data: product,
     });
   } catch (error) {
-    // Delete uploaded file if error occurs
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
+    if (req.file) fs.unlinkSync(req.file.path);
     res.status(500).json({
       success: false,
-      message: 'Error creating product',
-      error: error.message
+      message: "Error creating product",
+      error: error.message,
     });
   }
 };
@@ -159,11 +170,11 @@ export const getAllProducts = async (req, res) => {
     const {
       page = 1,
       limit = 10,
-      search = '',
+      search = "",
       category,
       active,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     const query = {};
@@ -171,29 +182,19 @@ export const getAllProducts = async (req, res) => {
     // Search functionality
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
+    if (category) query.category = category;
+    if (active !== undefined) query.isActive = active === "true";
 
-    // Filter by category
-    if (category) {
-      query.category = category;
-    }
-
-    // Filter by active status
-    if (active !== undefined) {
-      query.isActive = active === 'true';
-    }
-
-    // Sort options
     const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
 
     const products = await Product.find(query)
-      .populate('category', 'name isActive')
-      .populate('flavors', 'name description color isActive')
-      .populate('sizes', 'name description isActive')
+      .populate("category", "name isActive")
+      .populate("flavors", "name description color isActive")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort(sortOptions);
@@ -207,14 +208,14 @@ export const getAllProducts = async (req, res) => {
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / limit),
         totalItems: total,
-        itemsPerPage: parseInt(limit)
-      }
+        itemsPerPage: parseInt(limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching products',
-      error: error.message
+      message: "Error fetching products",
+      error: error.message,
     });
   }
 };
@@ -225,26 +226,21 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
-      .populate('category', 'name description isActive')
-      .populate('flavors', 'name description color isActive')
-      .populate('sizes', 'name description isActive');
+      .populate("category", "name description isActive")
+      .populate("flavors", "name description color isActive");
 
     if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
 
-    res.status(200).json({
-      success: true,
-      data: product
-    });
+    res.status(200).json({ success: true, data: product });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching product',
-      error: error.message
+      message: "Error fetching product",
+      error: error.message,
     });
   }
 };
@@ -257,9 +253,9 @@ export const getProductsByCategory = async (req, res) => {
     const {
       page = 1,
       limit = 10,
-      search = '',
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      search = "",
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     const query = { category: req.params.categoryId };
@@ -267,19 +263,19 @@ export const getProductsByCategory = async (req, res) => {
     // Search functionality
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 
     // Sort options
     const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
 
     const products = await Product.find(query)
-      .populate('category', 'name')
-      .populate('flavors', 'name description color isActive')
-      .populate('sizes', 'name description isActive')
+      .populate("category", "name")
+      .populate("flavors", "name description color isActive")
+      .populate("sizes", "name description isActive")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort(sortOptions);
@@ -293,14 +289,14 @@ export const getProductsByCategory = async (req, res) => {
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / limit),
         totalItems: total,
-        itemsPerPage: parseInt(limit)
-      }
+        itemsPerPage: parseInt(limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching products by category',
-      error: error.message
+      message: "Error fetching products by category",
+      error: error.message,
     });
   }
 };
@@ -310,33 +306,59 @@ export const getProductsByCategory = async (req, res) => {
 // @access  Private - SuperAdmin Only
 export const updateProduct = async (req, res) => {
   try {
-    const { name, sku, description, category, stock } = req.body;
+    let { name, sku, description, category, stock, details, flavors, sizes } =
+      req.body;
     const updateData = {};
 
-    // Validation for provided fields
+    // Parse JSON strings if sent as strings
+    if (sizes && typeof sizes === "string") {
+      try {
+        sizes = JSON.parse(sizes);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Sizes must be a valid JSON array",
+        });
+      }
+    }
+
+    if (details && typeof details === "string") {
+      try {
+        details = JSON.parse(details);
+      } catch {
+        // If single string, wrap in array
+        details = [details];
+      }
+    }
+
+    // FIELD VALIDATIONS + TRANSLATIONS
+
     if (name) {
       if (name.length < 2 || name.length > 200) {
         return res.status(400).json({
           success: false,
-          message: 'Name must be between 2 and 200 characters'
+          message: "Name must be between 2 and 200 characters",
         });
       }
       updateData.name = name;
+      updateData.nameAr = await translateText(name);
     }
 
     if (sku) {
       if (sku.length < 2 || sku.length > 100) {
         return res.status(400).json({
           success: false,
-          message: 'SKU must be between 2 and 100 characters'
+          message: "SKU must be between 2 and 100 characters",
         });
       }
-      // Check if SKU is being updated and if it already exists
-      const existingSKU = await Product.findOne({ sku, _id: { $ne: req.params.id } });
+      const existingSKU = await Product.findOne({
+        sku,
+        _id: { $ne: req.params.id },
+      });
       if (existingSKU) {
         return res.status(400).json({
           success: false,
-          message: 'SKU must be unique. This SKU already exists.'
+          message: "SKU must be unique. This SKU already exists.",
         });
       }
       updateData.sku = sku;
@@ -346,132 +368,123 @@ export const updateProduct = async (req, res) => {
       if (description.length < 10 || description.length > 1000) {
         return res.status(400).json({
           success: false,
-          message: 'Description must be between 10 and 1000 characters'
+          message: "Description must be between 10 and 1000 characters",
         });
       }
       updateData.description = description;
+      updateData.descriptionAr = await translateText(description);
     }
 
     if (stock !== undefined) {
-      if (stock < 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Stock cannot be negative'
-        });
-      }
+      if (stock < 0)
+        return res
+          .status(400)
+          .json({ success: false, message: "Stock cannot be negative" });
       updateData.stock = parseInt(stock);
     }
-    if (req.body.flavors) {
-      updateData.flavors = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
-    }
-    if (req.body.sizes) {
-      updateData.sizes = Array.isArray(req.body.sizes) ? req.body.sizes : [req.body.sizes];
+
+    if (details) {
+      updateData.details = [];
+      for (const d of Array.isArray(details) ? details : [details]) {
+        updateData.details.push(d);
+        updateData.detailsAr.push(await translateText(d));
+      }
     }
 
-    // Validate flavors and sizes if being updated
-    if (req.body.flavors) {
-      const Flavor = (await import('../models/Flavor.js')).default;
-      const flavorIds = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
-      const validFlavors = await Flavor.find({ _id: { $in: flavorIds }, isActive: true });
+    if (flavors) {
+      updateData.flavors = Array.isArray(flavors) ? flavors : [flavors];
+    }
+
+    if (sizes) {
+      updateData.sizes = [];
+      for (const s of sizes) {
+        updateData.sizes.push({
+          name: s.name,
+          weight: s.weight,
+        });
+      }
+    }
+
+    // VALIDATE FLAVORS
+    if (flavors) {
+      const Flavor = (await import("../models/Flavor.js")).default;
+      const flavorIds = Array.isArray(flavors) ? flavors : [flavors];
+      const validFlavors = await Flavor.find({
+        _id: { $in: flavorIds },
+        isActive: true,
+      });
       if (validFlavors.length !== flavorIds.length) {
         return res.status(400).json({
           success: false,
-          message: 'One or more flavors are invalid or inactive',
-          debug: { provided: flavorIds, found: validFlavors.map(f => f._id.toString()) }
+          message: "One or more flavors are invalid or inactive",
         });
       }
     }
 
-    if (req.body.sizes) {
-      const Size = (await import('../models/Size.js')).default;
-      const sizeIds = Array.isArray(req.body.sizes) ? req.body.sizes : [req.body.sizes];
-      const validSizes = await Size.find({ _id: { $in: sizeIds }, isActive: true });
-      if (validSizes.length !== sizeIds.length) {
-        return res.status(400).json({
-          success: false,
-          message: 'One or more sizes are invalid or inactive',
-          debug: { provided: sizeIds, found: validSizes.map(s => s._id.toString()) }
-        });
-      }
-    }
-
-    // Check if category is being updated and if it exists and is active
+    // VALIDATE CATEGORY
     if (category) {
       const categoryExists = await Category.findById(category);
-      if (!categoryExists) {
-        return res.status(400).json({
-          success: false,
-          message: 'Category not found'
-        });
-      }
-
+      if (!categoryExists)
+        return res
+          .status(400)
+          .json({ success: false, message: "Category not found" });
       if (!categoryExists.isActive) {
         return res.status(400).json({
           success: false,
-          message: 'Cannot assign product to inactive category'
+          message: "Cannot assign product to inactive category",
         });
       }
       updateData.category = category;
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    // UPDATE PRODUCT
+    const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    // Handle image upload if provided
+    // HANDLE IMAGES
     if (req.files && req.files.length > 0) {
       const uploadedImages = [];
-
       for (const file of req.files) {
         try {
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'sergioind/products',
+            folder: "sergioind/products",
             width: 500,
-            crop: 'scale'
+            crop: "scale",
           });
 
           uploadedImages.push({
             public_id: result.public_id,
-            url: result.secure_url
+            url: result.secure_url,
           });
-
           fs.unlinkSync(file.path);
         } catch (uploadError) {
-          console.error('Image upload error:', uploadError);
-          fs.unlinkSync(file.path); // clean up on error
+          console.error("Image upload error:", uploadError);
+          fs.unlinkSync(file.path);
         }
       }
-
-      product.image = uploadedImages;
+      product.image.push(...uploadedImages);
       await product.save();
     }
 
-    // Populate category info
-    await product.populate('category', 'name');
+    await product.populate("category", "name");
 
     res.status(200).json({
       success: true,
-      message: 'Product updated successfully',
-      data: product
+      message: "Product updated successfully",
+      data: product,
     });
   } catch (error) {
-    // Delete uploaded file if error occurs
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
+    if (req.file) fs.unlinkSync(req.file.path);
     res.status(500).json({
       success: false,
-      message: 'Error updating product',
-      error: error.message
+      message: "Error updating product",
+      error: error.message,
     });
   }
 };
@@ -485,7 +498,7 @@ export const deleteProductImage = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
 
@@ -497,20 +510,20 @@ export const deleteProductImage = async (req, res) => {
     // Remove image info from product
     product.image = {
       public_id: null,
-      url: null
+      url: null,
     };
     await product.save();
 
     res.status(200).json({
       success: true,
-      message: 'Product image deleted successfully',
-      data: product
+      message: "Product image deleted successfully",
+      data: product,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting product image',
-      error: error.message
+      message: "Error deleting product image",
+      error: error.message,
     });
   }
 };
@@ -525,7 +538,7 @@ export const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
 
@@ -538,13 +551,13 @@ export const deleteProduct = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Product deleted successfully'
+      message: "Product deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting product',
-      error: error.message
+      message: "Error deleting product",
+      error: error.message,
     });
   }
 };
@@ -559,7 +572,7 @@ export const toggleProductStatus = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
 
@@ -568,14 +581,16 @@ export const toggleProductStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Product ${product.isActive ? 'activated' : 'deactivated'} successfully`,
-      data: product
+      message: `Product ${
+        product.isActive ? "activated" : "deactivated"
+      } successfully`,
+      data: product,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error toggling product status',
-      error: error.message
+      message: "Error toggling product status",
+      error: error.message,
     });
   }
 };
@@ -590,7 +605,7 @@ export const updateProductStock = async (req, res) => {
     if (stock === undefined || stock < 0) {
       return res.status(400).json({
         success: false,
-        message: 'Stock must be a non-negative number'
+        message: "Stock must be a non-negative number",
       });
     }
 
@@ -603,20 +618,20 @@ export const updateProductStock = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Product stock updated successfully',
-      data: product
+      message: "Product stock updated successfully",
+      data: product,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating product stock',
-      error: error.message
+      message: "Error updating product stock",
+      error: error.message,
     });
   }
-}; 
+};

@@ -1,6 +1,7 @@
 import Gallery from "../models/Gallery.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
+import { translateText } from "../utils/translate.js";
 
 // @desc    Create Gallery
 // @route   POST /api/gallery
@@ -23,9 +24,14 @@ export const createGallery = async (req, res) => {
       });
     }
 
+    const titleAr = await translateText(title, "ar");
+    const descriptionAr = await translateText(description, "ar");
+
     const gallery = await Gallery.create({
       title: title.trim(),
+      titleAr,
       description,
+      descriptionAr,
     });
 
     // Handle image upload if provided
@@ -190,6 +196,7 @@ export const getGalleryById = async (req, res) => {
 export const updateGallery = async (req, res) => {
   try {
     const { id } = req.params;
+    const { title, description } = req.body;
 
     // Validate ObjectId
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -207,12 +214,15 @@ export const updateGallery = async (req, res) => {
     }
 
     // Update only provided fields
-    const updatableFields = ["title", "description"];
-    updatableFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        gallery[field] = req.body[field];
-      }
-    });
+    if (title) {
+      gallery.title = title;
+      gallery.titleAr = await translateText(title, "ar");
+    }
+
+    if (description) {
+      gallery.description = description;
+      gallery.descriptionAr = await translateText(description, "ar");
+    }
 
     // Handle deleted images
     if (req.body.deleteImages && Array.isArray(req.body.deleteImages)) {

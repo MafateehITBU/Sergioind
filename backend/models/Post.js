@@ -12,7 +12,6 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: [true, "Description is required"],
       trim: true,
-      maxlength: [500, "Job description cannot exceed 500 characters"],
     },
     employmentType: {
       type: String,

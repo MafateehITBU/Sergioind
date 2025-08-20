@@ -1,9 +1,6 @@
 import QuotationRequest from '../models/QuotationRequest.js';
 import Product from '../models/Product.js';
-import Size from '../models/Size.js';
 import Flavor from '../models/Flavor.js';
-import Admin from '../models/Admin.js';
-import SuperAdmin from '../models/SuperAdmin.js';
 import { successResponse, errorResponse } from '../utils/responseHandler.js';
 
 // Create a new quotation request (public endpoint)
@@ -33,22 +30,17 @@ const createQuotationRequest = async (req, res) => {
       }
     }
 
-    // Validate that all products, sizes, and flavors exist
+    // Validate that all products and flavors exist
     const productIds = items.map(item => item.product);
-    const sizeIds = items.map(item => item.size);
     const flavorIds = items.map(item => item.flavor);
 
-    const [products, sizes, flavors] = await Promise.all([
+    const [products, flavors] = await Promise.all([
       Product.find({ _id: { $in: productIds } }),
-      Size.find({ _id: { $in: sizeIds } }),
       Flavor.find({ _id: { $in: flavorIds } })
     ]);
 
     if (products.length !== productIds.length) {
       return errorResponse(res, 400, 'One or more products not found');
-    }
-    if (sizes.length !== sizeIds.length) {
-      return errorResponse(res, 400, 'One or more sizes not found');
     }
     if (flavors.length !== flavorIds.length) {
       return errorResponse(res, 400, 'One or more flavors not found');
@@ -69,7 +61,6 @@ const createQuotationRequest = async (req, res) => {
     // Populate the items for response
     await quotationRequest.populate([
       { path: 'items.product', select: 'name sku price' },
-      { path: 'items.size', select: 'name' },
       { path: 'items.flavor', select: 'name' }
     ]);
 
@@ -106,7 +97,6 @@ const getAllQuotationRequests = async (req, res) => {
       QuotationRequest.find(filter)
         .populate([
           { path: 'items.product', select: 'name sku price' },
-          { path: 'items.size', select: 'name' },
           { path: 'items.flavor', select: 'name' },
           {
             path: 'statusHistory.changedBy',
@@ -144,7 +134,6 @@ const getQuotationRequestById = async (req, res) => {
     const quotationRequest = await QuotationRequest.findById(id)
       .populate([
         { path: 'items.product', select: 'name sku price description' },
-        { path: 'items.size', select: 'name' },
         { path: 'items.flavor', select: 'name' },
         { path: 'statusHistory.changedBy', select: 'name email' }
       ]);
@@ -196,7 +185,6 @@ const updateQuotationRequestStatus = async (req, res) => {
     // Populate fields for response
     await quotationRequest.populate([
       { path: 'items.product', select: 'name sku price' },
-      { path: 'items.size', select: 'name' },
       { path: 'items.flavor', select: 'name' },
       { path: 'statusHistory.changedBy', select: 'name email' }
     ]);
@@ -274,7 +262,6 @@ const getQuotationRequestsByEmail = async (req, res) => {
       QuotationRequest.find({ email: email.toLowerCase() })
         .populate([
           { path: 'items.product', select: 'name sku price' },
-          { path: 'items.size', select: 'name' },
           { path: 'items.flavor', select: 'name' }
         ])
         .sort({ createdAt: -1 })

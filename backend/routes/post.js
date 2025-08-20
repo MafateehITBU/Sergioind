@@ -24,9 +24,7 @@ const postValidation = [
   body("description")
     .trim()
     .notEmpty()
-    .withMessage("Post description is required")
-    .isLength({ max: 500 })
-    .withMessage("Post description cannot exceed 500 characters"),
+    .withMessage("Post description is required"),
 
   body("endDate").trim().notEmpty().withMessage("End Date is required"),
 ];
@@ -37,12 +35,6 @@ const updatePostValidation = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage("Post title must be between 2 and 100 characters"),
-
-  body("description")
-    .optional()
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage("Post description cannot exceed 500 characters"),
 
   body("endDate")
     .optional()
