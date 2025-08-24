@@ -10,9 +10,7 @@ const categorySchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Category description is required'],
     trim: true,
-    maxlength: [500, 'Category description cannot exceed 500 characters']
   },
   image: {
     public_id: {

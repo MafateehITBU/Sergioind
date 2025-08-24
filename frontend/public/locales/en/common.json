@@ -1,0 +1,34 @@
+{
+  "navbar": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "contact": "Contact Us",
+    "certificate": "Certificate",
+    "gallery": "Gallery",
+    "photos": "Photos",
+    "videos": "Videos",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "quotations": "Quotations"
+  },
+  "footer": {
+    "links": {
+      "links": "Links",
+      "home": "Home",
+      "about": "About Us",
+      "products": "Products",
+      "contact": "Contact Us",
+      "certificate": "Certificate",
+      "gallery": "Gallery"
+    },
+    "contactUs": "Contact Us",
+    "support": {
+      "support": "Support",
+      "faq": "FAQ",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "followUs": "Follow Us"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "navbar": {
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "products": "منتجاتنا",
+    "contact": "اتصل بنا",
+    "certificate": "الشهادات",
+    "gallery": "المعرض",
+    "photos": "صور",
+    "videos": "فيديو",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل خروج",
+    "login": "تسجيل الدخول",
+    "quotations": "عرض الأسعار"
+  },
+  "footer": {
+    "links": {
+      "links": "الروابط",
+      "home": "الرئيسية",
+      "about": "من نحن",
+      "products": "منتجاتنا",
+      "contact": "اتصل بنا",
+      "certificate": "الشهادات",
+      "gallery": "المعرض"
+    },
+    "contactUs": "تواصل معنا",
+    "support": {
+      "support": "الدعم",
+      "faq": "الأسئلة الشائعة",
+      "privacyPolicy": "سياسة الخصوصية"
+    },
+    "followUs": "تابعنا"
+  }
+}

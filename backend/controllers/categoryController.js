@@ -10,10 +10,10 @@ export const createCategory = async (req, res) => {
     const { name, description } = req.body;
 
     // Validation
-    if (!name || !description) {
+    if (!name) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name and description'
+        message: 'Please provide name'
       });
     }
 
@@ -21,13 +21,6 @@ export const createCategory = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Name must be between 2 and 100 characters'
-      });
-    }
-
-    if (description.length < 10 || description.length > 500) {
-      return res.status(400).json({
-        success: false,
-        message: 'Description must be between 10 and 500 characters'
       });
     }
 

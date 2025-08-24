@@ -1,6 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const HeroBadge = ({ bgImage, badgeText }) => {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir() === "rtl";
+
   return (
     <section className="w-full relative pt-11">
       <div
@@ -11,13 +15,21 @@ const HeroBadge = ({ bgImage, badgeText }) => {
         <div className="absolute inset-0 bg-black/60"></div>
 
         {/* Green Badge */}
-        <div className="absolute ms-[80px] left-0 bottom-[-40px]">
+        <div
+          className="absolute bottom-[-40px]"
+          style={{
+            [isRTL ? "right" : "left"]: "80px",
+          }}
+        >
           {/* White background layer */}
           <div
-            className="absolute inset-0 translate-x-4"
+            className={`absolute inset-0`}
             style={{
               backgroundColor: "white",
-              clipPath: "polygon(0 0, 100% 0, 80% 100%, 0% 100%)",
+              clipPath: isRTL
+                ? "polygon(20% 0, 100% 0, 100% 100%, 0 100%)"
+                : "polygon(0 0, 100% 0, 80% 100%, 0 100%)",
+              transform: isRTL ? "translateX(-1rem)" : "translateX(1rem)", // flip translation
               zIndex: 0,
             }}
           ></div>
@@ -27,7 +39,9 @@ const HeroBadge = ({ bgImage, badgeText }) => {
             className="relative text-white font-itim text-3xl px-12 py-7"
             style={{
               backgroundColor: "#59cb00",
-              clipPath: "polygon(0 0, 100% 0, 80% 100%, 0% 100%)",
+              clipPath: isRTL
+                ? "polygon(20% 0, 100% 0, 100% 100%, 0 100%)"
+                : "polygon(0 0, 100% 0, 80% 100%, 0 100%)",
               zIndex: 1,
             }}
           >

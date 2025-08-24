@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import LightLogo from "../assets/imgs/Sergio_logo_white.png";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation("common");
+
   return (
     <div className="relative">
       {/* Wave */}
@@ -34,26 +37,26 @@ const Footer = () => {
             {/* Links */}
             <div>
               <h4 className="font-itim mb-3 animated-underline pb-1 relative">
-                Links
+                {t("footer.links.links")}
               </h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/">Home</Link>
+                  <Link to="/">{t("footer.links.home")}</Link>
                 </li>
                 <li>
-                  <Link to="/about">About Us</Link>
+                  <Link to="/about">{t("footer.links.about")}</Link>
                 </li>
                 <li>
-                  <Link to="/products">Products</Link>
+                  <Link to="/products">{t("footer.links.products")}</Link>
                 </li>
                 <li>
-                  <Link to="/contact">Contact Us</Link>
+                  <Link to="/contact">{t("footer.links.contact")}</Link>
                 </li>
                 <li>
-                  <Link to="/certificate">Certificate</Link>
+                  <Link to="/certificate">{t("footer.links.certificate")}</Link>
                 </li>
                 <li>
-                  <Link to="/gallery">Gallery</Link>
+                  <Link to="/gallery">{t("footer.links.gallery")}</Link>
                 </li>
               </ul>
             </div>
@@ -61,7 +64,7 @@ const Footer = () => {
             {/* Contact Us */}
             <div>
               <h4 className="font-itim mb-3 animated-underline pb-1 relative">
-                Contact Us
+                {t("footer.contactUs")}
               </h4>
               <p className="text-sm">
                 <strong>Email:</strong>{" "}
@@ -77,14 +80,14 @@ const Footer = () => {
             {/* Support */}
             <div>
               <h4 className="font-itim mb-3 animated-underline pb-1 relative">
-                Support
+                {t("footer.support.support")}
               </h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/faq">FAQ</Link>
+                  <Link to="/faq">{t("footer.support.faq")}</Link>
                 </li>
                 <li>
-                  <Link to="/privacy">Privacy Policy</Link>
+                  <Link to="/privacy">{t("footer.support.privacyPolicy")}</Link>
                 </li>
               </ul>
             </div>
@@ -92,7 +95,7 @@ const Footer = () => {
             {/* Follow Us */}
             <div>
               <h4 className="font-itim mb-3 animated-underline pb-1 relative">
-                Follow Us
+                {t("footer.followUs")}
               </h4>
               <div className="flex gap-3">
                 <a

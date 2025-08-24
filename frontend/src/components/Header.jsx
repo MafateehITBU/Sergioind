@@ -1,47 +1,42 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  ChevronDown,
-  Menu,
-  X,
-  User,
-} from "lucide-react";
+import { ChevronDown, Menu, X, User } from "lucide-react";
 import DarkLogo from "../assets/imgs/Sergio.svg";
 import LightLogo from "../assets/imgs/Sergio_logo_white.png";
-import { Icon } from "@iconify/react";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [language, setLanguage] = useState("EN");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
 
   const { user, logout } = useAuth();
-  const isLoggedIn = user && user.id && user.id !== null;
+  const isLoggedIn = user && user.id;
 
-  const isArabic = language === "AR";
+  const { t, i18n } = useTranslation("common");
+  const isArabic = i18n.language === "ar";
 
   const toggleLanguage = () => {
-    setLanguage(isArabic ? "EN" : "AR");
+    i18n.changeLanguage(isArabic ? "en" : "ar");
     setGalleryOpen(false);
   };
 
   const navItems = [
-    { name: isArabic ? "الرئيسية" : "Home", path: "/" },
-    { name: isArabic ? "من نحن" : "About Us", path: "/about" },
-    { name: isArabic ? "منتجاتنا" : "Products", path: "/products" },
-    { name: isArabic ? "اتصل بنا" : "Contact Us", path: "/contact" },
-    { name: isArabic ? "الشهادات" : "Certificate", path: "/certificate" },
+    { name: t("navbar.home"), path: "/" },
+    { name: t("navbar.about"), path: "/about" },
+    { name: t("navbar.products"), path: "/products" },
+    { name: t("navbar.contact"), path: "/contact" },
+    { name: t("navbar.certificate"), path: "/certificate" },
     {
-      name: isArabic ? "المعرض" : "Gallery",
+      name: t("navbar.gallery"),
       path: "#",
       dropdown: [
-        { name: isArabic ? "صور" : "Photos", path: "/gallery/photos" },
-        { name: isArabic ? "فيديو" : "Videos", path: "/gallery/videos" },
+        { name: t("navbar.photos"), path: "/gallery/photos" },
+        { name: t("navbar.videos"), path: "/gallery/videos" },
       ],
     },
   ];
@@ -55,17 +50,9 @@ const Header = () => {
       const ninetyVh = window.innerHeight * 0.9;
       setIsScrolled(scrollPos > ninetyVh);
     };
-
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const els = document.querySelectorAll(".animated-underline::after");
-    els.forEach((el) => {
-      el.style.animationPlayState = "running";
-    });
   }, []);
 
   const handleLogout = () => {
@@ -73,16 +60,20 @@ const Header = () => {
     setUserMenuOpen(false);
   };
 
+  // Update HTML dir for RTL/LTR
+  useEffect(() => {
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
   return (
     <header
       className={`w-full font-itim fixed top-0 z-50 transition-colors duration-300 ${
         isHomePage
           ? isScrolled
-            ? `bg-white text-text shadow-md ${isArabic ? "rtl" : ""}`
-            : `bg-transparent ${isArabic ? "rtl" : ""}`
-          : `bg-white text-text shadow-md ${isArabic ? "rtl" : ""}`
+            ? `bg-white text-text shadow-md`
+            : `bg-transparent text-white`
+          : `bg-white text-text shadow-md`
       }`}
-      dir={isArabic ? "rtl" : "ltr"}
     >
       <div className="flex items-center justify-between gap-4 px-6 py-3 max-w-[1400px] mx-auto">
         {/* Logo */}
@@ -96,13 +87,7 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <nav
-          className={`hidden lg:flex items-center gap-10 ${
-            isHomePage
-              ? isScrolled
-                ? "text-text"
-                : "text-white"
-              : "text-text"
-          } text-[16px] font-roboto-regular`}
+          className={`hidden lg:flex items-center gap-10 text-[16px] font-roboto-regular`}
         >
           {navItems.map((item, idx) =>
             item.dropdown ? (
@@ -117,8 +102,7 @@ const Header = () => {
                     isGalleryActive() ? "text-primary font-bold" : ""
                   }`}
                 >
-                  {item.name}
-                  <ChevronDown size={16} />
+                  {item.name} <ChevronDown size={16} />
                 </button>
                 {galleryOpen && (
                   <div className="absolute top-full left-0 bg-white text-text shadow-md py-2 w-40 z-50">
@@ -167,13 +151,13 @@ const Header = () => {
                     className="block px-4 py-2 hover:bg-gray-100 text-text"
                     onClick={() => setUserMenuOpen(false)}
                   >
-                    {isArabic ? "الملف الشخصي" : "Profile"}
+                    {t("navbar.profile")}
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-text"
                   >
-                    {isArabic ? "تسجيل خروج" : "Logout"}
+                    {t("navbar.logout")}
                   </button>
                 </div>
               )}
@@ -185,7 +169,7 @@ const Header = () => {
                 isActive("/login") ? "text-primary font-bold" : ""
               }`}
             >
-              {isArabic ? "تسجيل الدخول" : "Login"}
+              {t("navbar.login")}
             </Link>
           )}
 
@@ -200,7 +184,7 @@ const Header = () => {
             to="/quotations"
             className="bg-primary text-white px-5 py-2 rounded-md font-bold text-sm"
           >
-            {isArabic ? "عرض الأسعار" : "Quotations"}
+            {t("navbar.quotations")}
           </Link>
         </nav>
 
@@ -275,7 +259,7 @@ const Header = () => {
                 className="block"
                 onClick={() => setMobileOpen(false)}
               >
-                {isArabic ? "الملف الشخصي" : "Profile"}
+                {t("navbar.profile")}
               </Link>
               <button
                 onClick={() => {
@@ -284,7 +268,7 @@ const Header = () => {
                 }}
                 className="block text-left w-full"
               >
-                {isArabic ? "تسجيل خروج" : "Logout"}
+                {t("navbar.logout")}
               </button>
             </div>
           </details>
@@ -295,7 +279,7 @@ const Header = () => {
               isActive("/login") ? "text-primary font-bold" : ""
             }`}
           >
-            {isArabic ? "تسجيل الدخول" : "Login"}
+            {t("navbar.login")}
           </Link>
         )}
 
@@ -303,7 +287,7 @@ const Header = () => {
           to="/quotations"
           className="block bg-primary text-white px-4 py-2 rounded-md text-center font-bold"
         >
-          {isArabic ? "عرض الأسعار" : "Quotations"}
+          {t("navbar.quotations")}
         </Link>
 
         <button

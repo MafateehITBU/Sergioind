@@ -8,42 +8,20 @@ import Img1 from "../assets/imgs/about/img1.png";
 import Img2 from "../assets/imgs/about/img2.png";
 import Chips from "../assets/imgs/about/chips2.png";
 import CountriesBg from "../assets/imgs/about/countries-bg.png";
+import { useTranslation } from "react-i18next";
 
 const About = () => {
+  const { t } = useTranslation("about");
   const navigate = useNavigate();
-  const countries = [
-    "BAHRAIN",
-    "EGYPT",
-    "IRAQ",
-    "KUWAIT",
-    "LIBYA",
-    "LEBANON",
-    "MORROCO",
-    "PALESTINE",
-    "QATAR",
-    "SAUDI ARABIA KSA",
-    "SULTANATE OF OMAN",
-    "SUDAN",
-    "TUNASIA",
-    "UAE",
-    "YEMEN",
-    "BELGIUM",
-    "DENMARK",
-    "GEMANY",
-    "INDIA",
-    "KOSOVO",
-    "SWEDEN",
-    "UNITED KINGDOM",
-    "TURKEY",
-  ];
+  const countries = t("export.countries", { returnObjects: true });
 
   return (
     <>
       <Header />
-      
+
       {/* Hero Section - Full Width */}
-      <HeroBadge bgImage={Bg} badgeText='About Us' /> 
-      
+      <HeroBadge bgImage={Bg} badgeText={t("title")} />
+
       {/* Content Section */}
       <section className="py-16 max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start gap-8">
@@ -56,55 +34,30 @@ const About = () => {
             }}
             className="flex-1 p-6 md:p-0"
           >
-            <p className="text-text mb-8 text-[20px]">
-              At Sergio Food Industries, we are passionate about delivering
-              high-quality snacks made from the finest ingredients. Founded with
-              a vision to bring joy to every bite, we combine traditional
-              recipes with modern production techniques to create delicious and
-              safe products for everyone. With a commitment to food safety,
-              innovation, and global standards, our products are trusted in over
-              10 countries. Whether it's crispy potato chips or flavorful corn
-              snacks, Sergio ensures taste and quality in every pack. We believe
-              in building long-term partnerships, sustainability, and delivering
-              excellence through every product we craft.
-            </p>
+            <p className="text-text mb-8 text-[20px]">{t("intro")}</p>
 
             <div>
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
-                Vision
+                {t("vision.title")}
               </h2>
-              <p className="text-text mt-5 mb-8 text-[20px]">
-                Create quality food products made from the most innovative and
-                healthful ingredients available at most competitive prices based
-                on the principle of continuous development.
+              <p className="text-text mt-5 mb-8 text-[20px]">{t("vision.p")}</p>
+            </div>
+
+            <div>
+              <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
+                {t("mission.title")}
+              </h2>
+              <p className="text-text mt-5 mb-8 text-[16px]">
+                {t("mission.p")}
               </p>
             </div>
 
             <div>
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
-                Mission
+                {t("history.title")}
               </h2>
               <p className="text-text mt-5 mb-8 text-[16px]">
-                Proceed in worldwide expansion and deliver our top-quality
-                products to international market, through using the latest
-                scientific techniques and best practical experiences to provide
-                world class services to consumers.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
-                History
-              </h2>
-              <p className="text-text mt-5 mb-8 text-[16px]">
-                Sergio Food Industries is a Jordan-based snack manufacturer
-                specialized in crispy and roasted corn snacks since 1975. With
-                over 40 years of experience, we proudly produce 100% natural,
-                gluten-free, non-GMO snacks from Spanish corn. Our brands —
-                GOCORN, Le Rexana, and Le Duxana — are trusted across the Middle
-                East, with exports to over 8 countries. Backed by ISO 22000:2005
-                and HACCP certifications, we are committed to quality,
-                innovation, and flavor.
+                {t("history.p")}
               </p>
             </div>
           </div>
@@ -122,12 +75,9 @@ const About = () => {
         {/* Left Side - Text & Buttons */}
         <div className="max-w-xl pt-2 md:pt-0">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim mb-4 text-center">
-            Crispy Moments Start Here!
+            {t("banner.header")}
           </h2>
-          <p className="text-lg mb-6">
-            Lorem ipsum dolor sit amet consectetur. Felis nullam donec erat
-            sodales orci est justo auctor viverra.
-          </p>
+          <p className="text-lg mb-6">{t("banner.description")}</p>
 
           {/* Buttons */}
           <div className="flex flex-row gap-15 mt-10 md:text-[20px]">
@@ -136,7 +86,7 @@ const About = () => {
               className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary transition duration-300 cursor-pointer"
               onClick={() => navigate("/quotations")}
             >
-              Quotation Request
+              {t("banner.btn1")}
             </button>
 
             {/* Solid Button */}
@@ -144,7 +94,7 @@ const About = () => {
               className="bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
               onClick={() => navigate("/products")}
             >
-              Explore Our Products
+              {t("banner.btn2")}
             </button>
           </div>
         </div>
@@ -158,7 +108,7 @@ const About = () => {
       {/* Countries Section */}
       <section className="py-16 pb-100 md:pb-30 max-w-7xl mx-auto px-6">
         <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8">
-          Currently exported to several countries, <br /> including
+          {t("export.title")}
         </h2>
 
         <div className="relative inline-block">
