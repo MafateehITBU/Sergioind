@@ -8,7 +8,7 @@ i18n
   .init({
     lng: "en",
     fallbackLng: "en",
-    ns: ["common", "about"], // namespaces
+    ns: ["common", "about", "privacyPolicy"], // namespaces
     defaultNS: "common",
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json", // path to JSON files

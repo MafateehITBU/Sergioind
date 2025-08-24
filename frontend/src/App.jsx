@@ -6,6 +6,7 @@ import FrogotPassword from "./pages/Auth/ForgotPassword";
 import About from "./pages/About";
 import Contact from './pages/Contact'
 import Certificate from "./pages/Certificate";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const App = () => {
   const location = useLocation();
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/certificate" element={<Certificate />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
       </Routes>
     </>
   );

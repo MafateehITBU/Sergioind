@@ -1,0 +1,59 @@
+{
+    "title": "Privacy Policy",
+    "point1": {
+        "title": "1. Information We Collect",
+        "content": "We may collect the following types of information:",
+        "points": [
+            "Information you provide voluntarily: such as your name, email address, phone number, and any other details you submit through contact forms or quotation requests.",
+            "Information collected automatically: such as your IP address, browser type, device information, and pages visited on our website."
+        ]
+    },
+   "point2": {
+        "title": "2. How We Use Your Information",
+        "content": "We use the information we collect to:",
+        "points": [
+            "Respond to your inquiries and quotation requests.",
+            "Improve our website, products, and services.",
+            "Send you updates or promotional materials if you have opted in.",
+            "Comply with legal obligations."
+        ]
+    },
+    "point3": {
+        "title": "3. Sharing Your Information",
+        "content": "We do not sell or rent your personal information to third parties. We may share your information only with:",
+        "points": [
+            "Service providers who help us operate our website or deliver our services.",
+            "Authorities if required by law."
+        ]
+    },
+    "point4": {
+        "title": "4. Cookies",
+        "content": "Our website uses cookies to enhance your browsing experience. You can choose to disable cookies through your browser settings, but some features of the website may not function properly."
+    },
+    "point5": {
+        "title": "5. Data Security",
+        "content": "We implement reasonable technical and organizational measures to protect your personal data from unauthorized access, loss, or misuse."
+    },
+    "point6": {
+        "title": "6. Your Rights",
+        "content":[
+            "Access and request a copy of your personal data.",
+            "Request correction or deletion of your data.",
+            "Withdraw your consent to receive marketing communications."
+        ] 
+    },
+     "point7": {
+        "title": "7. Changes to This Privacy Policy",
+        "content":[
+            "We may update this Privacy Policy from time to time. Changes will be posted on this page with the updated date."
+        ] 
+    },
+    "point8": {
+        "title": "Contact Us",
+        "content":"If you have any questions or concerns about this Privacy Policy, please contact us at:",
+        "points":[
+            "Email:  info@sergio-ind.com",
+            "Phone: +962 7 9102 1150"
+        ] 
+    }
+}
