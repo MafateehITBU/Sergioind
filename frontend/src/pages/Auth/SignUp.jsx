@@ -2,8 +2,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useTranslation } from "react-i18next";
 
 const SignUp = () => {
+  const { t } = useTranslation("auth");
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -84,7 +87,7 @@ const SignUp = () => {
         {/* Left Side */}
         <div className="flex flex-col justify-center items-center flex-1 py-10 px-6 md:px-12">
           <div className="max-w-[464px] w-full">
-            <h4 className="mb-12 text-center text-5xl  font-itim">Sign up</h4>
+            <h4 className="mb-12 text-center text-5xl  font-itim"> {t("signup.form.title")} </h4>
 
             <form onSubmit={handleSingUp} noValidate>
               {error && (
@@ -109,7 +112,7 @@ const SignUp = () => {
                   htmlFor="name"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Full Name
+                  {t("signup.form.fullName")}
                 </label>
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
                   <span className="text-gray-400 ml-3 pointer-events-none">
@@ -133,7 +136,7 @@ const SignUp = () => {
                   htmlFor="email"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Email Address
+                  {t("signup.form.email")}
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
@@ -159,7 +162,7 @@ const SignUp = () => {
                   htmlFor="phone"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Phone Number
+                  {t("signup.form.phone")}
                 </label>
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
                   <span className="text-gray-400 ml-3 pointer-events-none">
@@ -186,7 +189,7 @@ const SignUp = () => {
                   htmlFor="password"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Password
+                  {t("signup.form.pass")}
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
@@ -232,7 +235,7 @@ const SignUp = () => {
                   htmlFor="confirmPassword"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Confirm Password
+                  {t("signup.form.confirm")}
                 </label>
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
                   <span className="text-gray-400 ml-3 pointer-events-none">
@@ -274,13 +277,13 @@ const SignUp = () => {
               {/* Already have an account (sign in link) */}
               <div className="text-center mb-6">
                 <span className="text-sm text-gray-500">
-                  Already have an account?{" "}
+                  {t("signup.form.signin")}{" "}
                 </span>
                 <a
                   href="/login"
                   className="text-sm text-[#59CB00] hover:underline"
                 >
-                  Sign In
+                  {t("signup.form.signinLink")}
                 </a>
               </div>
 
@@ -289,7 +292,7 @@ const SignUp = () => {
                 type="submit"
                 className="w-full h-14 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-secondary transition-colors duration-200 cursor-pointer"
               >
-                Sign Up
+                {t("signup.form.btn")}
               </button>
             </form>
           </div>
@@ -303,11 +306,10 @@ const SignUp = () => {
           </div>
           <div className="relative w-[500px] z-10 px-3 flex flex-col justify-center items-center">
             <h2 className="font-bold mb-13 text-5xl font-itim">
-              Welcome To Sergio
+              {t("signup.welcome.title")}
             </h2>
             <p>
-              Join Sergio today and get access to premium quality snacks and
-              exclusive offers
+              {t("signup.welcome.p")}
             </p>
           </div>
         </div>

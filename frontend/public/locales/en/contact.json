@@ -1,0 +1,23 @@
+{
+    "title": "Contact Us",
+    "subtitle": "Let's get in touch",
+    "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus. Adipiscing eget habitant commodo et.",
+    "contact": {
+        "tell": "Tell:",
+        "phoneNumber": "+962 7 9120 1150",
+        "email": "Email: ",
+        "emailAddress": "info@sergio-ind.com",
+        "location": "Location: ",
+        "address": "Jordan - Amman - Sahab - King Abdullah Industrial City - Second Door."
+    },
+    "followUs": "Follow Us",
+    "form": {
+        "title": "Send Us Message",
+        "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus.",
+        "email": "Email",
+        "fullName": "Full Name",
+        "phone": "Phone",
+        "message": "Message",
+        "btn": "Send"
+    }
+}

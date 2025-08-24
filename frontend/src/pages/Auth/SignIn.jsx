@@ -2,8 +2,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useTranslation } from "react-i18next";
 
 const SignIn = () => {
+  const { t } = useTranslation("auth");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -46,10 +49,9 @@ const SignIn = () => {
             <div className="circle circle-bottom-left"></div>
           </div>
           <div className="relative w-[400px] z-10 px-3 flex flex-col justify-center items-center">
-            <h2 className="font-bold mb-13 text-5xl font-itim">Welcome back</h2>
+            <h2 className="font-bold mb-13 text-5xl font-itim"> {t("signin.welcome.title")} </h2>
             <p>
-              Please sign in to manage your account, track orders, or request
-              quotations
+              {t("signin.welcome.p")}
             </p>
           </div>
         </div>
@@ -58,7 +60,7 @@ const SignIn = () => {
         <div className="flex flex-col justify-center items-center flex-1 py-10 px-6 md:px-12">
           <div className="max-w-[464px] w-full">
             <h4 className="mb-12 text-center text-4xl font-semibold font-itim">
-              Sign in
+              {t("signin.form.title")}
             </h4>
 
             <form onSubmit={handleSingIn} noValidate>
@@ -85,7 +87,7 @@ const SignIn = () => {
                   htmlFor="email"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Email Address
+                  {t("signin.form.email")}
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
@@ -111,7 +113,7 @@ const SignIn = () => {
                   htmlFor="password"
                   className="block mb-2 font-semibold text-gray-700 text-sm"
                 >
-                  Password
+                  {t("signin.form.pass")}
                 </label>
 
                 <div className="flex items-center bg-[#e4e4e4] rounded-xl border border-[#e4e4e4] h-14">
@@ -158,20 +160,20 @@ const SignIn = () => {
                   onClick={handleForgotPassword}
                   className="text-sm text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
                 >
-                  Forgot Password?
+                  {t("signin.form.forgot")}
                 </button>
               </div>
 
               {/* Don't have an account (sign up link) */}
               <div className="text-center mb-6">
                 <span className="text-sm text-gray-500">
-                  Don't have an account?{" "}
+                  {t("signin.form.signup")}{" "}
                 </span>
                 <a
                   href="/register"
                   className="text-sm text-[#59CB00] hover:underline"
                 >
-                  Sign Up
+                  {t("signin.form.signupLink")}
                 </a>
               </div>
 
@@ -180,7 +182,7 @@ const SignIn = () => {
                 type="submit"
                 className="w-full h-14 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-secondary transition-colors duration-200 cursor-pointer"
               >
-                Sign In
+                {t("signin.form.btn")}
               </button>
             </form>
           </div>

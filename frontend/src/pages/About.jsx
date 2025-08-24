@@ -34,7 +34,7 @@ const About = () => {
             }}
             className="flex-1 p-6 md:p-0"
           >
-            <p className="text-text mb-8 text-[20px]">{t("intro")}</p>
+            <p className="text-text mb-8 text-[20px]" style={{ whiteSpace: "pre-line" }}>{t("intro")}</p>
 
             <div>
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
@@ -56,7 +56,7 @@ const About = () => {
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
                 {t("history.title")}
               </h2>
-              <p className="text-text mt-5 mb-8 text-[16px]">
+              <p className="text-text mt-5 mb-8 text-[16px]" style={{ whiteSpace: "pre-line" }}>
                 {t("history.p")}
               </p>
             </div>
@@ -107,7 +107,7 @@ const About = () => {
 
       {/* Countries Section */}
       <section className="py-16 pb-100 md:pb-30 max-w-7xl mx-auto px-6">
-        <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8">
+        <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8" style={{ whiteSpace: "pre-line" }}>
           {t("export.title")}
         </h2>
 

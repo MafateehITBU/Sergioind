@@ -1,0 +1,18 @@
+{
+  "hero": {
+    "title": "ENJOY OUR CORN CHIPS",
+    "p": "Pith flavors as rich as our history a chip or crisp flavor guaranteed to bring a smile on your face.",
+    "cta-btn": "view products"
+  },
+  "whyUs": {
+    "title": "Why Us",
+    "description": "Sergio is committed to delivering high-quality snacks made from carefully selected ingredients. With a focus on innovation, food safety, and international standards, our products are trusted and enjoyed in over 10 countries. We combine tradition with modern techniques to bring you irresistible taste in every bite.",
+    "points": [
+      "Premium, healthy ingredients",
+      "Modern production facilities",
+      "Competitive pricing worldwide",
+      "Trusted by global partners"
+    ],
+    "btn": "Learn More"
+  }
+}

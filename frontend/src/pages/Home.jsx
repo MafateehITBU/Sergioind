@@ -12,6 +12,7 @@ import Chips5 from "../assets/imgs/products/Chips_5.png";
 import CornChips from "../assets/imgs/products/corn-chips.png";
 import WhyUsBg from "../assets/imgs/Why_Us_bg.png";
 import Question from "../assets/imgs/question.png";
+import { useTranslation } from "react-i18next";
 
 // Swiper styles
 import "swiper/css";
@@ -20,19 +21,22 @@ import "swiper/css/effect-coverflow";
 const Home = () => {
   const images = [Chips1, Chips2, Chips3, Chips4, Chips5];
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.dir() === "rtl";
+  const points = t("whyUs.points", { returnObjects: true });
 
   return (
     <>
       <Header />
-      
+
       {/* Hero Section */}
-      <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white py-[200px] flex items-center pt-16">
+      <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white py-[200px] flex items-center">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-18">
           {/* LEFT TEXT */}
           <div className="flex flex-col w-full md:w-auto">
             <div className="flex items-center flex-wrap md:flex-nowrap">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-itim leading-tight m-0">
-                ENJOY OUR CORN CHIPS
+                {t("hero.title")}
               </h1>
               <img
                 src={CornChips}
@@ -42,15 +46,14 @@ const Home = () => {
             </div>
 
             <p className="mt-4 text-gray-400 text-base sm:text-lg">
-              Pith flavors as rich as our history a chip or crisp flavor
-              guaranteed to bring a smile on your face.
+              {t("hero.p")}
             </p>
 
             <button
               className="mt-6 px-6 py-3 cursor-pointer bg-primary hover:bg-white hover:text-primary transition duration-400 text-white rounded-lg font-semibold w-full sm:w-[40%]"
               onClick={() => navigate("/products")}
             >
-              view product
+              {t("hero.cta-btn")}
             </button>
           </div>
 
@@ -62,7 +65,7 @@ const Home = () => {
               effect="coverflow"
               grabCursor={true}
               centeredSlides={true}
-              slidesPerView={1} // Single slide on mobile
+              slidesPerView={1}
               breakpoints={{
                 640: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
@@ -81,8 +84,9 @@ const Home = () => {
                 slideShadows: false,
               }}
               className="mySwiper"
+              dir="ltr"
             >
-              {images.map((src, i) => (
+              {(isRTL ? [...images].reverse() : images).map((src, i) => (
                 <SwiperSlide key={i}>
                   <img
                     src={src}
@@ -101,25 +105,41 @@ const Home = () => {
         <div className="container mx-auto px-4 pb-9 flex flex-col md:flex-row items-center justify-between gap-12">
           {/* LEFT TEXT */}
           <div
-            className="flex flex-col w-full md:w-1/2 text-center md:text-left"
+            className={`flex flex-col w-full md:w-1/2 text-center ${
+              isRTL ? "md:text-right" : "md:text-left"
+            } `}
             style={{
               backgroundImage: `url(${WhyUsBg})`,
-              backgroundSize: "cover",
+              backgroundSize: "contain",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim leading-tight text-white mb-6">
-              Why Choose Us?
+            <h2 className="text-2xl sm:text-2xl md:text-6xl text-primary font-itim leading-tight why-underline mb-5">
+              {t("whyUs.title")}
             </h2>
-            <p className="text-gray-300 text-base sm:text-lg mb-8">
-              We are committed to providing the highest quality snacks with
-              innovative flavors that delight our customers worldwide.
+            <p className="text-text text-base sm:text-lg mb-8">
+              {t("whyUs.description")}
             </p>
+
+            {points.map((point, idx) => (
+              <p
+                key={idx}
+                className="flex items-center gap-2 text-secondary mb-2"
+              >
+                <Icon
+                  icon="material-symbols:check-rounded"
+                  className="text-primary"
+                />{" "}
+                {point}
+              </p>
+            ))}
+
             <button
-              className="px-6 py-3 cursor-pointer bg-primary hover:bg-white hover:text-primary transition duration-400 text-white rounded-lg font-semibold w-full sm:w-auto"
+              className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 mt-4 rounded-lg transition duration-400 cursor-pointer"
               onClick={() => navigate("/about")}
             >
-              Learn More
+              {t("whyUs.btn")}
             </button>
           </div>
 
@@ -128,14 +148,12 @@ const Home = () => {
             <img
               src={Question}
               alt="Why Choose Us"
-              className="w-full max-w-[400px] rounded-xl"
+              className="w-full max-w-[200px] rounded-xl float-animation"
             />
           </div>
         </div>
       </section>
 
-      {/* Additional sections can be added here */}
-      
       <Footer />
     </>
   );

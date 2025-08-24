@@ -1,0 +1,23 @@
+{
+    "title": "اتصل بنا",
+    "subtitle": "لنتواصل معًا",
+    "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus. Adipiscing eget habitant commodo et.",
+    "contact": {
+        "tell": "هاتف:",
+        "phoneNumber": "+962 7 9120 1150",
+        "email": "البريد الالكتروني :",
+        "emailAddress": "info@sergio-ind.com",
+        "location": "الموقع: ",
+        "address": "الأردن - عمّان - صحّاب - مدينة الملك عبد الله الصناعية - الباب الثاني."
+    },
+    "followUs": "تابعنا",
+    "form": {
+        "title": "إرسال رسالة",
+        "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus.",
+        "email": "البريد الإلكتروني",
+        "fullName": "الاسم الكامل",
+        "phone": "الهاتف",
+        "message": "الرسالة",
+        "btn": "إرسال"
+    }
+}

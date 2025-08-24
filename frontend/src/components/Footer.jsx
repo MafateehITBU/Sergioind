@@ -98,30 +98,48 @@ const Footer = () => {
                 {t("footer.followUs")}
               </h4>
               <div className="flex gap-3">
+                {/* Instagram */}
                 <a
                   href="https://www.instagram.com/sergio.industries/"
                   target="_blank"
-                  aria-label="Instagram"
-                  className="hover:opacity-80"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition"
                 >
                   <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
+                    viewBox="0 0 30 30"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full mb-2"
                   >
                     <path
                       fillRule="evenodd"
-                      d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123v-.08c0-2.643.012-2.987.06-4.043.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 0112.315 22c-1.064 0-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.08c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 0112.315 2zm-4.98 2a2.25 2.25 0 00-2.25 2.25v8.25c0 1.108.966 2.25 2.25 2.25h8.25c1.108 0 2.25-.966 2.25-2.25V6.25c0-1.108-.966-2.25-2.25-2.25H7.335z"
                       clipRule="evenodd"
+                      d="M15.5 5H9.5C7.29 5 5.5 6.79 5.5 9V15C5.5 17.21 7.29 19 9.5 19H15.5C17.71 19 19.5 17.21 19.5 15V9C19.5 6.79 17.71 5 15.5 5Z"
+                      stroke="#fff"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                     <path
                       fillRule="evenodd"
-                      d="M12 6.75a5.25 5.25 0 016.568.756l.776 2.25a.75.75 0 010 .498l-.776 2.25a5.25 5.25 0 11-9.568 0l-.776-2.25a.75.75 0 010-.498l.776-2.25A5.25 5.25 0 0112 6.75zM8.25 12a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0z"
                       clipRule="evenodd"
+                      d="M12.5 15C10.84 15 9.5 13.66 9.5 12C9.5 10.34 10.84 9 12.5 9C14.16 9 15.5 10.34 15.5 12C15.5 13.66 14.16 15 12.5 15Z"
+                      stroke="#fff"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <rect
+                      x="16"
+                      y="8"
+                      width="2"
+                      height="2"
+                      rx="1"
+                      fill="#fff"
                     />
                   </svg>
                 </a>
+                {/* Facebook */}
                 <a
                   href="https://www.facebook.com/sergio.ind/"
                   target="_blank"
@@ -141,6 +159,7 @@ const Footer = () => {
                     />
                   </svg>
                 </a>
+                {/* Linked In */}
                 <a
                   href="#"
                   target="_blank"

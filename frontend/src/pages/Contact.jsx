@@ -5,8 +5,11 @@ import HeroBadge from "../components/HeroBadge";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ContactBg from "../assets/imgs/contact-bg.png";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation("contact");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,7 +78,7 @@ const Contact = () => {
 
       <ToastContainer />
       {/* Hero Section */}
-      <HeroBadge bgImage={ContactBg} badgeText="Contact Us" />
+      <HeroBadge bgImage={ContactBg} badgeText={t("title")} />
 
       {/* Contact Content */}
       <section className="py-25 pb-40 bg-gray-50">
@@ -85,11 +88,10 @@ const Contact = () => {
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-5">
-                  Let's get in touch
+                  {t("subtitle")}
                 </h2>
                 <p className="text-lg text-secondary mb-8">
-                  Lorem ipsum dolor sit amet consectetur. A in fringilla
-                  pulvinar cursus. Adipiscing eget habitant commodo et.
+                  {t("description")}
                 </p>
               </div>
 
@@ -107,9 +109,11 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      Tell: &nbsp;
+                      {t("contact.tell")} &nbsp;
                     </span>
-                    <span className="text-gray-600">+962 7 9120 1150</span>
+                    <span className="text-gray-600">
+                      {t("contact.phoneNumber")}
+                    </span>
                   </div>
                 </div>
 
@@ -126,9 +130,11 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      Email: &nbsp;
+                      {t("contact.email")} &nbsp;
                     </span>
-                    <span className="text-text">info@sergio-ind.com</span>
+                    <span className="text-text">
+                      {t("contact.emailAddress")}
+                    </span>
                   </div>
                 </div>
 
@@ -148,12 +154,9 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      Location: &nbsp;
+                      {t("contact.location")} &nbsp;
                     </span>
-                    <span className="text-text">
-                      Jordan - Amman - Sahab - King Abdullah Industrial City -
-                      Second Door.
-                    </span>
+                    <span className="text-text">{t("contact.address")}</span>
                   </div>
                 </div>
               </div>
@@ -161,7 +164,7 @@ const Contact = () => {
               {/* Follow Us */}
               <div>
                 <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-5">
-                  Follow Us
+                  {t("followUs")}
                 </h2>
 
                 <div className="flex flex-row gap-5">
@@ -266,11 +269,10 @@ const Contact = () => {
             {/* Contact Form */}
             <div className="bg-primary rounded-xl shadow-lg md:p-15 p-6">
               <h2 className="text-3xl font-itim text-white mb-2">
-                Send us a Message
+                {t("form.title")}
               </h2>
               <p className="text-white text-[1.1rem] mb-8">
-                Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar
-                cursus.
+                {t("form.description")}
               </p>
 
               <form
@@ -283,7 +285,7 @@ const Contact = () => {
                     htmlFor="email"
                     className="block text-lg font-medium text-white mb-2"
                   >
-                    Email
+                    {t("form.email")}
                   </label>
                   <input
                     type="email"
@@ -303,7 +305,7 @@ const Contact = () => {
                       htmlFor="name"
                       className="block text-lg font-medium text-white mb-2"
                     >
-                      Full Name
+                      {t("form.fullName")}
                     </label>
                     <input
                       type="text"
@@ -321,7 +323,7 @@ const Contact = () => {
                       htmlFor="phoneNumber"
                       className="block text-lg font-medium text-white mb-2"
                     >
-                      Phone
+                      {t("form.phone")}
                     </label>
                     <input
                       type="tel"
@@ -344,7 +346,7 @@ const Contact = () => {
                     htmlFor="message"
                     className="block text-lg font-medium text-white mb-2"
                   >
-                    Message
+                    {t("form.message")}
                   </label>
                   <textarea
                     id="message"
@@ -362,7 +364,7 @@ const Contact = () => {
                   className="absolute bottom-0 right-0 bg-white text-primary text-lg px-6 py-3 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
                   type="submit"
                 >
-                  Send
+                  {t("form.btn")}
                 </button>
               </form>
             </div>

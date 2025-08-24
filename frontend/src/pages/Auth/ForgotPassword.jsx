@@ -5,8 +5,12 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import Lock from "../../assets/imgs/forgot_password.png";
+import { useTranslation } from "react-i18next";
 
 const ResetPassword = () => {
+  const { t } = useTranslation("auth");
+  const validations = t("forgot.step3.validations");
+
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -104,11 +108,10 @@ const ResetPassword = () => {
     <div className="flex flex-col items-center justify-center px-4 py-8 max-w mx-auto w-full">
       <img src={Lock} alt="Lock Icon" className="mx-auto mb-6" />
       <h3 className="text-center text-4xl mb-5 font-itim">
-        Forgot your password?
+        {t("forgot.step1.title")}
       </h3>
       <p className="text-center mb-18 text-gray-600">
-        Enter your email address and we’ll send you an OTP to reset your
-        password.
+        {t("forgot.step1.description")}
       </p>
 
       <div className="relative w-full mb-6 max-w-md">
@@ -129,7 +132,7 @@ const ResetPassword = () => {
         onClick={handleSendOtp}
         className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
       >
-        Next
+        {t("forgot.step1.btn")}
       </button>
 
       <p
@@ -137,20 +140,23 @@ const ResetPassword = () => {
         className="flex items-center gap-2 mt-12 cursor-pointer text-gray-700 hover:text-green-600 select-none"
       >
         <Icon icon="ic:baseline-arrow-back" className="text-xl" />
-        Back to login
+        {t("forgot.step1.loginLink")}
       </p>
     </div>
   );
 
   const renderStep2 = () => (
     <div className="flex flex-col items-center justify-center px-4 py-8 max-w mx-auto w-full">
-      <h2 className="text-4xl mb-5 font-itim">Enter Your Code</h2>
+      <h2 className="text-4xl mb-5 font-itim"> {t("forgot.step2.title")}</h2>
       <p className="mb-8 text-center text-gray-600 max-w-sm">
-        We've sent a 6-digit code to your email. Please enter it below to verify
-        your identity
+        {t("forgot.step2.description")}
       </p>
 
-      <div className="flex justify-center gap-3 mb-6">
+      {/* OTP inputs - force LTR */}
+      <div
+        className="flex justify-center gap-3 mb-6"
+        style={{ direction: "ltr" }} // 👈 forces LTR layout
+      >
         {otp.map((digit, index) => (
           <input
             key={index}
@@ -158,22 +164,25 @@ const ResetPassword = () => {
             value={digit}
             onChange={(e) => handleOtpChange(e, index)}
             ref={(el) => (inputRefs.current[index] = el)}
-            className="w-30 h-30 text-center rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-lg shadow-md"
+            className="w-30 h-30 text-center rounded-md border border-gray-300 
+                     focus:outline-none focus:ring-2 focus:ring-green-500 
+                     text-lg shadow-md"
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
+            style={{ direction: "ltr", textAlign: "center" }} // 👈 enforce LTR typing
           />
         ))}
       </div>
 
       <div className="flex w-[800px] justify-end">
         <div className="mb-6 text-gray-600 ">
-          Didn’t receive the code?{" "}
+          {t("forgot.step2.notRecieve")}{" "}
           <button
             onClick={handleSendOtp}
             className="text-primary hover:underline focus:outline-none"
           >
-            Resend
+            {t("forgot.step2.notRecieveLink")}
           </button>
         </div>
       </div>
@@ -182,7 +191,7 @@ const ResetPassword = () => {
         className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
         onClick={handleVerifyOtp}
       >
-        Next
+        {t("forgot.step2.btn")}
       </button>
     </div>
   );
@@ -194,14 +203,16 @@ const ResetPassword = () => {
     return (
       <div className="flex flex-col items-center px-4 py-8 max-w mx-auto w-full">
         <div className="flex flex-col items-center w-full">
-          <h2 className="text-4xl mb-3 font-itim">Create a New Password</h2>
+          <h2 className="text-4xl mb-3 font-itim">{t("forgot.step3.title")}</h2>
           <p className="mb-8 text-center text-gray-600">
-            Please enter a new password for your account.
+            {t("forgot.step3.description")}
           </p>
 
           {/* New Password */}
           <div className="relative w-full max-w-md">
-            <label className="block mb-2 font-semibold">New Password</label>
+            <label className="block mb-2 font-semibold">
+              {t("forgot.step3.newPass")}
+            </label>
             <div className="flex items-center w-full mb-6 max-w-md border bg-[#e4e4e4] border-[#e4e4e4] rounded-lg focus-within:ring-2 focus-within:ring-green-500">
               <Icon
                 icon="mdi:lock-outline"
@@ -225,7 +236,7 @@ const ResetPassword = () => {
           {/* Confirm Password */}
           <div className="relative w-full mb-6 max-w-md ">
             <label className="block mb-2 font-semibold">
-              Confirm New Password
+              {t("forgot.step3.confirmPass")}
             </label>
             <div className="flex items-center w-full max-w-md border bg-[#e4e4e4] border-[#e4e4e4] rounded-lg focus-within:ring-2 focus-within:ring-green-500">
               <Icon
@@ -255,10 +266,11 @@ const ResetPassword = () => {
         {/* Password validation hint */}
         {password && !isPasswordValid && (
           <div className="self-center text-left text-sm max-w-md mb-5 mt-5">
-            <p>The password must contain:</p>
+            <p>{t("forgot.step3.validationTitle")}</p>
             <ul className="list-disc list-inside text-gray-600">
-              <li>At least 8 characters</li>
-              <li>A capital letter, number, or symbol</li>
+              {validations.map((v, idx) => (
+                <li key={idx}>{v}</li>
+              ))}
             </ul>
           </div>
         )}
@@ -267,7 +279,7 @@ const ResetPassword = () => {
           className="mt-4 self-center w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
           onClick={handleResetPassword}
         >
-          Next
+          {t("forgot.step3.btn")}
         </button>
       </div>
     );

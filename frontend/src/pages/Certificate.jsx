@@ -6,8 +6,11 @@ import CertificateCard from "../components/CertificateCard";
 import Bg from "../assets/imgs/certificate-bg.png";
 import axiosInstance from "../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 function Certificate() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir() === "rtl";
   const [certificates, setCertificates] = useState([]);
 
   const fetchCertifactes = async () => {
@@ -32,14 +35,14 @@ function Certificate() {
       <Header />
 
       <ToastContainer />
-      <HeroBadge bgImage={Bg} badgeText="Certificate" />
+      <HeroBadge bgImage={Bg} badgeText={isRTL ? `شهادات` : `Certificate`} />
 
       {/* Main Content */}
       <section className="pt-16 min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="text-start">
             <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-5">
-              Our Quality Certifications
+             {isRTL? `شهادات الجودة الخاصة بنا` :` Our Quality Certifications`}
             </h2>
           </div>
 
