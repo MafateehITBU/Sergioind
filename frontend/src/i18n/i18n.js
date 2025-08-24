@@ -11,7 +11,7 @@ i18n
   .init({
     lng: savedLanguage,
     fallbackLng: "en",
-    ns: ["common", "about", "privacyPolicy", "contact", "auth"], // namespaces
+    ns: ["common", "about", "privacyPolicy", "contact", "auth", "faq"], // namespaces
     defaultNS: "common",
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json", // path to JSON files

@@ -1,0 +1,27 @@
+{
+  "title": "Fequently \n asked questions",
+  "questions": {
+    "q1": {
+      "title": " What products does Sergio offer?",
+      "content": "We produce a variety of high-quality snacks, including corn chips, potato chips, and mixed snacks under brands like Le Rexona, Le Duxana, DoradoCorn, and GoCorn."
+    },
+    "q2": {
+      "title": "Where are Sergio products made?",
+      "content": "All our products are proudly made in Jordan, following international quality and safety standards."
+    },
+    "q3": {
+      "title": "Are Sregio products Halal certified?",
+      "content": "Yes, all our products are 100% Halal certified, meeting the standards of the Jordan Halal Certification."
+    },
+    "q4": {
+      "title": "Do you export internationally?",
+      "content": "Yes, we export to several countries in the Middle East and beyond. For more details, please contact our sales team."
+    }
+  },
+
+  "rightBox": {
+    "title": "Do you have more questions?",
+    "description": "End-to-end payments and financial management in a single solution. Meet the right platform to help realize.",
+    "btn": "Shoot a Direct Mail"
+  }
+}
