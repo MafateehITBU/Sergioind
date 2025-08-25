@@ -13,7 +13,6 @@ import superAdminRoutes from './routes/superAdmin.js';
 import categoryRoutes from './routes/category.js';
 import productRoutes from './routes/product.js';
 import fileCenterRoutes from './routes/fileCenter.js';
-import flavorRoutes from './routes/flavor.js';
 import quotationRequestRoutes from './routes/quotationRequest.js';
 import userRoutes from './routes/user.js';
 import adminRoutes from './routes/admin.js';
@@ -96,7 +95,6 @@ app.use('/api/superadmin', superAdminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/filecenter', fileCenterRoutes);
-app.use('/api/flavors', flavorRoutes);
 app.use('/api/quotation-requests', quotationRequestRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
@@ -116,7 +114,6 @@ app.get('/', (req, res) => {
       categories: '/api/categories',
       products: '/api/products',
       filecenter: '/api/filecenter',
-      flavors: '/api/flavors',
       quotationRequests: '/api/quotation-requests',
       user: '/api/user',
       admin: '/api/admin'

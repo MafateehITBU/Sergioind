@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Card } from "react-bootstrap";
 import axiosInstance from "../../../axiosConfig";
 import { toast } from "react-toastify";
+
+const Section = ({ title, children }) => (
+  <Card className="mb-3 shadow-sm border-0">
+    <Card.Body>
+      <h6 className="mb-3 text-muted">{title}</h6>
+      {children}
+    </Card.Body>
+  </Card>
+);
 
 const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   const [name, setName] = useState("");
@@ -10,33 +19,24 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
-  const [flavors, setFlavors] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  const [selectedFlavors, setSelectedFlavors] = useState([]);
+  const [selectedFlavors, setSelectedFlavors] = useState([{ name: "" }]);
   const [selectedSizes, setSelectedSizes] = useState([
     { name: "", weight: { value: "", unit: "g" } },
   ]);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // fetch categories
   useEffect(() => {
     if (!show) return;
-
-    const fetchOptions = async () => {
+    (async () => {
       try {
-        const [flavorRes, categoryRes] = await Promise.all([
-          axiosInstance.get("/flavors"),
-          axiosInstance.get("/categories"),
-        ]);
-        setFlavors(flavorRes.data.data || []);
-        setCategories(categoryRes.data.data || []);
+        const res = await axiosInstance.get("/categories");
+        setCategories(res.data.data || []);
       } catch {
-        toast.error("Failed to load options");
+        toast.error("Failed to load categories");
       }
-    };
-
-    fetchOptions();
+    })();
   }, [show]);
 
   const resetForm = () => {
@@ -46,74 +46,69 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
     setCategory("");
     setStock("");
     setImages([]);
-    setSelectedFlavors([]);
+    setSelectedFlavors([{ name: "" }]);
     setSelectedSizes([{ name: "", weight: { value: "", unit: "g" } }]);
   };
 
-  const toggleFlavor = (id) => {
-    setSelectedFlavors((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
-  };
-
-  // Add new selected images
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages((prev) => [...prev, ...files]);
   };
 
-  // Remove image by index
   const handleRemoveImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleSizeChange = (i, f, v) => {
+    const newSizes = [...selectedSizes];
+    if (f === "name") newSizes[i].name = v;
+    if (f === "weightValue") newSizes[i].weight.value = v;
+    if (f === "weightUnit") newSizes[i].weight.unit = v;
+    setSelectedSizes(newSizes);
+  };
+
+  const addSize = () =>
+    setSelectedSizes([
+      ...selectedSizes,
+      { name: "", weight: { value: "", unit: "g" } },
+    ]);
+  const removeSize = (i) =>
+    setSelectedSizes(selectedSizes.filter((_, idx) => idx !== i));
+
+  const handleFlavorChange = (i, v) => {
+    const newFlavors = [...selectedFlavors];
+    newFlavors[i].name = v;
+    setSelectedFlavors(newFlavors);
+  };
+  const addFlavor = () =>
+    setSelectedFlavors([...selectedFlavors, { name: "" }]);
+  const removeFlavor = (i) =>
+    setSelectedFlavors(selectedFlavors.filter((_, idx) => idx !== i));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!name || !sku || !description  || !category) {
-      toast.error("Please fill all required fields");
-      return;
-    }
-
     setIsSubmitting(true);
 
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("sku", sku);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("stock", stock);
+    formData.append("flavors", JSON.stringify(selectedFlavors));
+    formData.append("sizes", JSON.stringify(selectedSizes));
+    images.forEach((img) => {
+      if (img instanceof File) formData.append("images", img);
+    });
+
     try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("sku", sku);
-      formData.append("description", description);
-      formData.append("category", category);
-      formData.append("stock", stock);
-
-      selectedFlavors.forEach((flavor) => formData.append("flavors", flavor));
-
-      if (selectedSizes.length > 0) {
-        formData.append("sizes", JSON.stringify(selectedSizes));
-      }
-
-      if (images.length > 0) {
-        images.forEach((file) => {
-          formData.append("images", file);
-        });
-      }
-
-      await axiosInstance.post("/products", formData);
-
-      toast.success("Product created successfully");
+      await axiosInstance.post(`/products`, formData);
+      toast.success("Product created");
       fetchProducts?.();
-      resetForm();
       handleClose();
+      resetForm();
     } catch (err) {
-      if (
-        err.response?.data?.errors &&
-        Array.isArray(err.response.data.errors)
-      ) {
-        err.response.data.errors.forEach((error) => {
-          toast.error(`${error.field}: ${error.message}`);
-        });
-      } else {
-        toast.error(err.response?.data?.message || "Failed to create product");
-      }
+      toast.error(err.response?.data?.message || "Failed to create");
     } finally {
       setIsSubmitting(false);
     }
@@ -130,123 +125,190 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
       size="lg"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Add New Product</Modal.Title>
+        <Modal.Title>Create Product</Modal.Title>
       </Modal.Header>
-
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           {/* Basic Info */}
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="productName">
-                <Form.Label>Name *</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </Form.Group>
-            </Col>
+          <Section title="Basic Information">
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>SKU</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Form.Group>
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Form.Group>
+          </Section>
 
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="productSku">
-                <Form.Label>SKU *</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value)}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          {/* Inventory */}
+          <Section title="Inventory">
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Category</Form.Label>
+                  <Form.Select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Stock</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          </Section>
 
-          <Form.Group className="mb-3" controlId="productDescription">
-            <Form.Label>Description *</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </Form.Group>
+          {/* Flavors */}
+          <Section title="Flavors">
+            {selectedFlavors.map((flavor, i) => (
+              <Row key={i} className="align-items-center mb-2">
+                <Col md={10}>
+                  <Form.Control
+                    type="text"
+                    value={flavor.name}
+                    placeholder="Flavor name"
+                    onChange={(e) => handleFlavorChange(i, e.target.value)}
+                  />
+                </Col>
+                <Col md={2} className="text-end">
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => removeFlavor(i)}
+                  >
+                    ×
+                  </Button>
+                </Col>
+              </Row>
+            ))}
+            <Button variant="outline-secondary" size="sm" onClick={addFlavor}>
+              + Add Flavor
+            </Button>
+          </Section>
 
-          {/* Category / Stock */}
-          <Row>
+          {/* Sizes */}
+          <Section title="Sizes">
+            {selectedSizes.map((size, i) => (
+              <Row key={i} className="align-items-center mb-2">
+                <Col md={4}>
+                  <Form.Control
+                    type="text"
+                    value={size.name}
+                    placeholder="Size name"
+                    onChange={(e) =>
+                      handleSizeChange(i, "name", e.target.value)
+                    }
+                  />
+                </Col>
+                <Col md={4}>
+                  <Form.Control
+                    type="number"
+                    value={size.weight.value}
+                    placeholder="Weight"
+                    onChange={(e) =>
+                      handleSizeChange(i, "weightValue", e.target.value)
+                    }
+                  />
+                </Col>
+                <Col md={3}>
+                  <Form.Select
+                    value={size.weight.unit}
+                    onChange={(e) =>
+                      handleSizeChange(i, "weightUnit", e.target.value)
+                    }
+                  >
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                  </Form.Select>
+                </Col>
+                <Col md={1} className="text-end">
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => removeSize(i)}
+                  >
+                    ×
+                  </Button>
+                </Col>
+              </Row>
+            ))}
+            <Button variant="outline-secondary" size="sm" onClick={addSize}>
+              + Add Size
+            </Button>
+          </Section>
 
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="productCategory">
-                <Form.Label>Category *</Form.Label>
-                <Form.Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="productStock">
-                <Form.Label>Stock</Form.Label>
-                <Form.Control
-                  type="number"
-                  min="0"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                  placeholder="0"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-
-          {/* Images with Preview & Remove */}
-          <Form.Group className="mb-3" controlId="productImages">
-            <Form.Label>Images</Form.Label>
-            <Form.Control
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-            />
-          </Form.Group>
-          {images.length > 0 && (
-            <div className="d-flex flex-wrap gap-2 mt-2">
-              {images.map((img, idx) => {
-                const url = URL.createObjectURL(img);
+          {/* Images */}
+          <Section title="Images">
+            <Form.Control type="file" multiple onChange={handleImageChange} />
+            <div className="d-flex flex-wrap gap-2 mt-3">
+              {images.map((img, i) => {
+                const url =
+                  img instanceof File ? URL.createObjectURL(img) : img.url;
                 return (
                   <div
-                    key={idx}
+                    key={i}
                     style={{
                       position: "relative",
-                      width: 80,
-                      height: 80,
+                      width: 90,
+                      height: 90,
                       borderRadius: 8,
                       overflow: "hidden",
-                      border: "1px solid #ccc",
+                      border: "1px solid #ddd",
                     }}
                   >
                     <img
                       src={url}
-                      alt={`preview-${idx}`}
+                      alt="preview"
                       style={{
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
                       }}
-                      onLoad={() => URL.revokeObjectURL(url)}
+                      onLoad={() =>
+                        img instanceof File && URL.revokeObjectURL(url)
+                      }
                     />
                     <button
                       type="button"
-                      onClick={() => handleRemoveImage(idx)}
+                      onClick={() => handleRemoveImage(i)}
                       style={{
                         position: "absolute",
                         top: 2,
@@ -255,122 +317,23 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                         color: "white",
                         border: "none",
                         borderRadius: "50%",
-                        width: 20,
-                        height: 20,
+                        width: 22,
+                        height: 22,
                         cursor: "pointer",
-                        lineHeight: "18px",
-                        fontWeight: "bold",
+                        fontSize: 14,
+                        lineHeight: "20px",
                       }}
-                      aria-label="Remove image"
                     >
-                      &times;
+                      ×
                     </button>
                   </div>
                 );
               })}
             </div>
-          )}
-
-          {/* Flavors */}
-          <Form.Group className="mb-3" controlId="productFlavors">
-            <Form.Label>Flavors</Form.Label>
-            <div className="d-flex flex-wrap gap-2">
-              {flavors.map((flavor) => (
-                <Form.Check
-                  key={flavor._id}
-                  type="checkbox"
-                  id={`flavor-${flavor._id}`}
-                >
-                  <Form.Check.Input
-                    type="checkbox"
-                    checked={selectedFlavors.includes(flavor._id)}
-                    onChange={() => toggleFlavor(flavor._id)}
-                    style={{ marginRight: "10px", marginTop: "5px" }}
-                  />
-                  <Form.Check.Label>{flavor.name}</Form.Check.Label>
-                </Form.Check>
-              ))}
-            </div>
-          </Form.Group>
-
-          {/* Sizes */}
-          <Form.Group className="mb-3" controlId="productSizes">
-            <Form.Label>Sizes</Form.Label>
-            {selectedSizes.map((size, index) => (
-              <Row key={index} className="mb-2">
-                <Col md={4}>
-                  <Form.Control
-                    type="text"
-                    placeholder="Name"
-                    value={size.name}
-                    onChange={(e) => {
-                      const newSizes = [...selectedSizes];
-                      newSizes[index].name = e.target.value;
-                      setSelectedSizes(newSizes);
-                    }}
-                  />
-                </Col>
-                <Col md={4}>
-                  <Form.Control
-                    type="number"
-                    placeholder="Weight value"
-                    value={size.weight.value}
-                    onChange={(e) => {
-                      const newSizes = [...selectedSizes];
-                      newSizes[index].weight.value = e.target.value;
-                      setSelectedSizes(newSizes);
-                    }}
-                  />
-                </Col>
-                <Col md={3}>
-                  <Form.Select
-                    value={size.weight.unit}
-                    onChange={(e) => {
-                      const newSizes = [...selectedSizes];
-                      newSizes[index].weight.unit = e.target.value;
-                      setSelectedSizes(newSizes);
-                    }}
-                  >
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                  </Form.Select>
-                </Col>
-                <Col md={1} className="d-flex align-items-center">
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() =>
-                      setSelectedSizes(
-                        selectedSizes.filter((_, i) => i !== index)
-                      )
-                    }
-                  >
-                    ×
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                setSelectedSizes([
-                  ...selectedSizes,
-                  { name: "", weight: { value: "", unit: "g" } },
-                ])
-              }
-              className="mt-2"
-            >
-              + Add Size
-            </Button>
-          </Form.Group>
+          </Section>
 
           <div className="text-center">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              style={{ width: "160px" }}
-            >
+            <Button type="submit" disabled={isSubmitting} className="px-4">
               {isSubmitting ? "Creating..." : "Create Product"}
             </Button>
           </div>

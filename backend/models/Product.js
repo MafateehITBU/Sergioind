@@ -45,8 +45,16 @@ const productSchema = new mongoose.Schema(
     ],
     flavors: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Flavor",
+        name: {
+          type: String,
+          required: [true, "Flavor name is required"],
+          trim: true,
+          maxlength: [100, "Flavor name cannot exceed 100 characters"],
+        },
+        nameAr: {
+          type: String,
+          trim: true,
+        },
       },
     ],
     sizes: [
@@ -94,7 +102,6 @@ const productSchema = new mongoose.Schema(
 // Index for better search performance
 productSchema.index({ name: "text", description: "text" });
 productSchema.index({ category: 1 });
-
 
 // Ensure virtual fields are serialized
 productSchema.set("toJSON", { virtuals: true });

@@ -6,7 +6,6 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminsPage";
 import UsersPage from "./pages/UsersPage";
 import CategoriesPage from "./pages/CategoriesPage";
-import FlavorsPage from "./pages/FlavorsPage";
 import ProductsPage from "./pages/ProductsPage";
 import QuotationPage from "./pages/QuotationPage";
 import FileCenterPage from "./pages/FileCenterPage";
@@ -68,15 +67,6 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
               <CategoriesPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/flavors"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
-              <FlavorsPage />
             </ProtectedRoute>
           }
         />

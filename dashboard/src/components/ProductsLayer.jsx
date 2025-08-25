@@ -169,17 +169,7 @@ const ProductsLayer = () => {
                     }}>
                         {value.map((flavor) => (
                             <div key={flavor._id} className="d-flex align-items-center gap-1">
-                                <span>{flavor.name}</span>
-                                <span
-                                    style={{
-                                        display: 'inline-block',
-                                        width: '12px',
-                                        height: '12px',
-                                        borderRadius: '50%',
-                                        backgroundColor: flavor.color,
-                                        border: '1px solid #ccc',
-                                    }}
-                                ></span>
+                                <span>{flavor.name}, {" "}</span>
                             </div>
                         ))}
                     </div>

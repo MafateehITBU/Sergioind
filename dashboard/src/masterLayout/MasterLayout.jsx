@@ -15,7 +15,6 @@ const MasterLayout = ({ children }) => {
     { path: '/admins', label: 'Admins', icon: 'line-md:account' },
     { path: '/users', label: 'Users', icon: 'line-md:account' },
     { path: '/categories', label: 'Categories', icon: 'material-symbols:category-rounded' },
-    { path: '/flavors', label: 'Flavors', icon: 'line-md:paint-drop-twotone' },
     { path: '/products', label: 'Products', icon: 'line-md:clipboard-list-twotone' },
     { path: '/quotations', label: 'Quotations', icon: 'line-md:briefcase-twotone' },
     { path: '/files', label: 'Files Center', icon: 'line-md:folder-settings-twotone' },

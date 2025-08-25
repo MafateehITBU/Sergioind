@@ -12,11 +12,11 @@ export const createProduct = async (req, res) => {
     let { name, sku, description, category, stock, details, flavors, sizes } =
       req.body;
 
-    // Parse JSON strings if sent as strings
+    // Parse JSON if sent as string
     if (sizes && typeof sizes === "string") {
       try {
         sizes = JSON.parse(sizes);
-      } catch (err) {
+      } catch {
         return res.status(400).json({
           success: false,
           message: "Sizes must be a valid JSON array",
@@ -29,6 +29,14 @@ export const createProduct = async (req, res) => {
         details = JSON.parse(details);
       } catch {
         details = [details];
+      }
+    }
+
+    if (flavors && typeof flavors === "string") {
+      try {
+        flavors = JSON.parse(flavors);
+      } catch {
+        flavors = [flavors];
       }
     }
 
@@ -69,7 +77,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    // Check category
+    // Validate category
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       return res
@@ -83,28 +91,62 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    // Validate flavors
-    if (flavors) {
-      const Flavor = (await import("../models/Flavor.js")).default;
-      const flavorIds = Array.isArray(flavors) ? flavors : [flavors];
-      const validFlavors = await Flavor.find({
-        _id: { $in: flavorIds },
-        isActive: true,
-      });
-      if (validFlavors.length !== flavorIds.length) {
-        return res.status(400).json({
-          success: false,
-          message: "One or more flavors are invalid or inactive",
-        });
+    // Validate & prepare flavors
+    let productFlavors = [];
+    if (flavors && Array.isArray(flavors)) {
+      for (const f of flavors) {
+        if (!f.name) {
+          return res.status(400).json({
+            success: false,
+            message: "Flavor name is required",
+          });
+        }
+        if (f.name.length < 2 || f.name.length > 100) {
+          return res.status(400).json({
+            success: false,
+            message: "Flavor name must be between 2 and 100 characters",
+          });
+        }
       }
+      // Translate all flavors in parallel
+      const translatedFlavors = await Promise.all(
+        flavors.map((f) => translateText(f.name, "ar"))
+      );
+      productFlavors = flavors.map((f, idx) => ({
+        name: f.name,
+        nameAr: translatedFlavors[idx],
+      }));
     }
 
-    // Translate fields to Arabic
-    const nameAr = await translateText(name, "ar");
-    const descriptionAr = await translateText(description, "ar");
-    const detailsAr = details
-      ? await Promise.all(details.map((d) => translateText(d, "ar")))
-      : [];
+    // Validate sizes
+    let productSizes = [];
+    if (sizes && Array.isArray(sizes)) {
+      for (const s of sizes) {
+        if (!s.name) {
+          return res.status(400).json({
+            success: false,
+            message: "Size name is required",
+          });
+        }
+        if (!s.weight || !s.weight.value || !s.weight.unit) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Each size must include name, weight.value and weight.unit",
+          });
+        }
+      }
+      productSizes = sizes;
+    }
+
+    // Translate name, description, details in parallel
+    const [nameAr, descriptionAr, detailsAr] = await Promise.all([
+      translateText(name, "ar"),
+      translateText(description, "ar"),
+      details
+        ? Promise.all(details.map((d) => translateText(d, "ar")))
+        : Promise.resolve([]),
+    ]);
 
     // Create product
     const product = await Product.create({
@@ -117,30 +159,31 @@ export const createProduct = async (req, res) => {
       detailsAr,
       category,
       stock: stock ? parseInt(stock) : 0,
-      flavors: Array.isArray(flavors) ? flavors : flavors ? [flavors] : [],
-      sizes: Array.isArray(sizes) ? sizes : [],
+      flavors: productFlavors,
+      sizes: productSizes,
     });
 
-    // Handle image upload
+    // Handle image upload in parallel
     if (req.files && req.files.length > 0) {
-      const uploadedImages = [];
-      for (const file of req.files) {
+      const uploadPromises = req.files.map(async (file) => {
         try {
           const result = await cloudinary.uploader.upload(file.path, {
             folder: "sergioind/products",
             width: 500,
             crop: "scale",
           });
-          uploadedImages.push({
-            public_id: result.public_id,
-            url: result.secure_url,
-          });
           fs.unlinkSync(file.path);
-        } catch (uploadError) {
-          console.error("Image upload error:", uploadError);
+          return { public_id: result.public_id, url: result.secure_url };
+        } catch (err) {
+          console.error("Image upload error:", err);
           fs.unlinkSync(file.path);
+          return null;
         }
-      }
+      });
+
+      const uploadedImages = (await Promise.all(uploadPromises)).filter(
+        Boolean
+      );
       product.image = uploadedImages;
       await product.save();
     }
@@ -194,7 +237,6 @@ export const getAllProducts = async (req, res) => {
 
     const products = await Product.find(query)
       .populate("category", "name isActive")
-      .populate("flavors", "name description color isActive")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort(sortOptions);
@@ -225,9 +267,10 @@ export const getAllProducts = async (req, res) => {
 // @access  Public
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate("category", "name description isActive")
-      .populate("flavors", "name description color isActive");
+    const product = await Product.findById(req.params.id).populate(
+      "category",
+      "name description isActive"
+    );
 
     if (!product) {
       return res
@@ -274,8 +317,6 @@ export const getProductsByCategory = async (req, res) => {
 
     const products = await Product.find(query)
       .populate("category", "name")
-      .populate("flavors", "name description color isActive")
-      .populate("sizes", "name description isActive")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort(sortOptions);
@@ -314,7 +355,7 @@ export const updateProduct = async (req, res) => {
     if (sizes && typeof sizes === "string") {
       try {
         sizes = JSON.parse(sizes);
-      } catch (err) {
+      } catch {
         return res.status(400).json({
           success: false,
           message: "Sizes must be a valid JSON array",
@@ -331,8 +372,15 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    // FIELD VALIDATIONS + TRANSLATIONS
+    if (flavors && typeof flavors === "string") {
+      try {
+        flavors = JSON.parse(flavors);
+      } catch {
+        flavors = [flavors];
+      }
+    }
 
+    // FIELD VALIDATIONS + TRANSLATIONS
     if (name) {
       if (name.length < 2 || name.length > 200) {
         return res.status(400).json({
@@ -341,7 +389,7 @@ export const updateProduct = async (req, res) => {
         });
       }
       updateData.name = name;
-      updateData.nameAr = await translateText(name);
+      updateData.nameAr = await translateText(name, "ar");
     }
 
     if (sku) {
@@ -372,62 +420,84 @@ export const updateProduct = async (req, res) => {
         });
       }
       updateData.description = description;
-      updateData.descriptionAr = await translateText(description);
+      updateData.descriptionAr = await translateText(description, "ar");
     }
 
     if (stock !== undefined) {
-      if (stock < 0)
+      if (stock < 0) {
         return res
           .status(400)
           .json({ success: false, message: "Stock cannot be negative" });
+      }
       updateData.stock = parseInt(stock);
     }
 
     if (details) {
       updateData.details = [];
+      updateData.detailsAr = [];
       for (const d of Array.isArray(details) ? details : [details]) {
         updateData.details.push(d);
-        updateData.detailsAr.push(await translateText(d));
+        updateData.detailsAr.push(await translateText(d, "ar"));
       }
     }
 
+    // VALIDATE & TRANSLATE FLAVORS
     if (flavors) {
-      updateData.flavors = Array.isArray(flavors) ? flavors : [flavors];
+      const flavorsArray = Array.isArray(flavors) ? flavors : [flavors];
+      const productFlavors = [];
+      for (const f of flavorsArray) {
+        if (!f.name) {
+          return res.status(400).json({
+            success: false,
+            message: "Flavor name is required",
+          });
+        }
+        if (f.name.length < 2 || f.name.length > 100) {
+          return res.status(400).json({
+            success: false,
+            message: "Flavor name must be between 2 and 100 characters",
+          });
+        }
+        const flavorAr = await translateText(f.name, "ar");
+        productFlavors.push({
+          name: f.name,
+          nameAr: flavorAr,
+        });
+      }
+      updateData.flavors = productFlavors;
     }
 
+    // VALIDATE SIZES
     if (sizes) {
-      updateData.sizes = [];
-      for (const s of sizes) {
-        updateData.sizes.push({
-          name: s.name,
-          weight: s.weight,
-        });
+      const sizesArray = Array.isArray(sizes) ? sizes : [sizes];
+      const productSizes = [];
+      for (const s of sizesArray) {
+        if (!s.name) {
+          return res.status(400).json({
+            success: false,
+            message: "Size name is required",
+          });
+        }
+        if (!s.weight || !s.weight.value || !s.weight.unit) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Each size must include name, weight.value and weight.unit",
+          });
+        }
+        productSizes.push(s);
       }
-    }
-
-    // VALIDATE FLAVORS
-    if (flavors) {
-      const Flavor = (await import("../models/Flavor.js")).default;
-      const flavorIds = Array.isArray(flavors) ? flavors : [flavors];
-      const validFlavors = await Flavor.find({
-        _id: { $in: flavorIds },
-        isActive: true,
-      });
-      if (validFlavors.length !== flavorIds.length) {
-        return res.status(400).json({
-          success: false,
-          message: "One or more flavors are invalid or inactive",
-        });
-      }
+      updateData.sizes = productSizes;
     }
 
     // VALIDATE CATEGORY
     if (category) {
       const categoryExists = await Category.findById(category);
-      if (!categoryExists)
+      if (!categoryExists) {
         return res
           .status(400)
           .json({ success: false, message: "Category not found" });
+      }
       if (!categoryExists.isActive) {
         return res.status(400).json({
           success: false,
@@ -442,10 +512,11 @@ export const updateProduct = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    if (!product)
+    if (!product) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
 
     // HANDLE IMAGES
     if (req.files && req.files.length > 0) {

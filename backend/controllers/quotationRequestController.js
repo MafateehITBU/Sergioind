@@ -1,7 +1,6 @@
-import QuotationRequest from '../models/QuotationRequest.js';
-import Product from '../models/Product.js';
-import Flavor from '../models/Flavor.js';
-import { successResponse, errorResponse } from '../utils/responseHandler.js';
+import QuotationRequest from "../models/QuotationRequest.js";
+import Product from "../models/Product.js";
+import { successResponse, errorResponse } from "../utils/responseHandler.js";
 
 // Create a new quotation request (public endpoint)
 const createQuotationRequest = async (req, res) => {
@@ -9,41 +8,72 @@ const createQuotationRequest = async (req, res) => {
     const { name, companyName, email, phoneNumber, note, items } = req.body;
 
     // Validate required fields
-    if (!name || !email || !phoneNumber || !items || !Array.isArray(items) || items.length === 0) {
-      return errorResponse(res, 400, 'Name, email, phone number, and at least one item are required');
+    if (
+      !name ||
+      !email ||
+      !phoneNumber ||
+      !items ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
+      return errorResponse(
+        res,
+        400,
+        "Name, email, phone number, and at least one item are required"
+      );
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return errorResponse(res, 400, 'Invalid email format');
+      return errorResponse(res, 400, "Invalid email format");
     }
 
     // Validate items
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (!item.product || !item.size || !item.flavor || !item.quantity) {
-        return errorResponse(res, 400, `Item ${i + 1}: product, size, flavor, and quantity are required`);
+        return errorResponse(
+          res,
+          400,
+          `Item ${i + 1}: product, size, flavor, and quantity are required`
+        );
       }
       if (item.quantity < 1) {
-        return errorResponse(res, 400, `Item ${i + 1}: quantity must be at least 1`);
+        return errorResponse(
+          res,
+          400,
+          `Item ${i + 1}: quantity must be at least 1`
+        );
       }
     }
 
-    // Validate that all products and flavors exist
-    const productIds = items.map(item => item.product);
-    const flavorIds = items.map(item => item.flavor);
-
-    const [products, flavors] = await Promise.all([
-      Product.find({ _id: { $in: productIds } }),
-      Flavor.find({ _id: { $in: flavorIds } })
-    ]);
+    // Validate that all products exist
+    const productIds = items.map((item) => item.product);
+    const products = await Product.find({ _id: { $in: productIds } });
 
     if (products.length !== productIds.length) {
-      return errorResponse(res, 400, 'One or more products not found');
+      return errorResponse(res, 400, "One or more products not found");
     }
-    if (flavors.length !== flavorIds.length) {
-      return errorResponse(res, 400, 'One or more flavors not found');
+
+    // Validate that flavors exist within each product
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const product = products.find((p) => p._id.toString() === item.product);
+      if (!product) continue;
+
+      const flavorExists = product.flavors.some(
+        (f) => f.name.toLowerCase() === item.flavor.toLowerCase()
+      );
+      if (!flavorExists) {
+        return errorResponse(
+          res,
+          400,
+          `Item ${i + 1}: flavor "${item.flavor}" not found for product "${
+            product.name
+          }"`
+        );
+      }
     }
 
     // Create the quotation request
@@ -53,76 +83,91 @@ const createQuotationRequest = async (req, res) => {
       email,
       phoneNumber,
       note,
-      items
+      items,
     });
 
     await quotationRequest.save();
 
-    // Populate the items for response
+    // Populate products for response
     await quotationRequest.populate([
-      { path: 'items.product', select: 'name sku price' },
-      { path: 'items.flavor', select: 'name' }
+      { path: "items.product", select: "name sku  flavors" },
     ]);
 
-    return successResponse(res, 201, 'Quotation request created successfully', quotationRequest);
+    return successResponse(
+      res,
+      201,
+      "Quotation request created successfully",
+      quotationRequest
+    );
   } catch (error) {
-    console.error('Error creating quotation request:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error creating quotation request:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
 // Get all quotation requests (admin only)
 const getAllQuotationRequests = async (req, res) => {
   try {
-    const { page = 1, limit = 10, status, search, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = req.query;
 
     // Build filter
     const filter = {};
-    if (status && ['closed', 'ongoing', 'sent'].includes(status)) {
+    if (status && ["closed", "ongoing", "sent"].includes(status)) {
       filter.status = status;
     }
     if (search) {
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { companyName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { companyName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
       ];
     }
 
     const sort = {};
-    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const [quotationRequests, total] = await Promise.all([
       QuotationRequest.find(filter)
         .populate([
-          { path: 'items.product', select: 'name sku price' },
-          { path: 'items.flavor', select: 'name' },
+          { path: "items.product", select: "name sku flavors" },
           {
-            path: 'statusHistory.changedBy',
-            select: 'name',
-          }
+            path: "statusHistory.changedBy",
+            select: "name",
+          },
         ])
         .sort(sort)
         .skip(skip)
         .limit(parseInt(limit)),
-      QuotationRequest.countDocuments(filter)
+      QuotationRequest.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(total / parseInt(limit));
 
-    return successResponse(res, 200, 'Quotation requests retrieved successfully', {
-      quotationRequests,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalItems: total,
-        itemsPerPage: parseInt(limit)
+    return successResponse(
+      res,
+      200,
+      "Quotation requests retrieved successfully",
+      {
+        quotationRequests,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages,
+          totalItems: total,
+          itemsPerPage: parseInt(limit),
+        },
       }
-    });
+    );
   } catch (error) {
-    console.error('Error getting quotation requests:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error getting quotation requests:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -131,21 +176,24 @@ const getQuotationRequestById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const quotationRequest = await QuotationRequest.findById(id)
-      .populate([
-        { path: 'items.product', select: 'name sku price description' },
-        { path: 'items.flavor', select: 'name' },
-        { path: 'statusHistory.changedBy', select: 'name email' }
-      ]);
+    const quotationRequest = await QuotationRequest.findById(id).populate([
+      { path: "items.product", select: "name sku description flavors" },
+      { path: "statusHistory.changedBy", select: "name email" },
+    ]);
 
     if (!quotationRequest) {
-      return errorResponse(res, 404, 'Quotation request not found');
+      return errorResponse(res, 404, "Quotation request not found");
     }
 
-    return successResponse(res, 200, 'Quotation request retrieved successfully', quotationRequest);
+    return successResponse(
+      res,
+      200,
+      "Quotation request retrieved successfully",
+      quotationRequest
+    );
   } catch (error) {
-    console.error('Error getting quotation request:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error getting quotation request:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -155,11 +203,11 @@ const updateQuotationRequestStatus = async (req, res) => {
     const { id } = req.params;
     const { status, adminResponse, totalPrice } = req.body;
     const adminId = req.user.id;
-    const adminModel = req.user.role === 'superadmin' ? 'SuperAdmin' : 'Admin';
+    const adminModel = req.user.role === "superadmin" ? "SuperAdmin" : "Admin";
 
     const quotationRequest = await QuotationRequest.findById(id);
     if (!quotationRequest) {
-      return errorResponse(res, 404, 'Quotation request not found');
+      return errorResponse(res, 404, "Quotation request not found");
     }
 
     // Store old status to compare
@@ -167,7 +215,8 @@ const updateQuotationRequestStatus = async (req, res) => {
 
     // Update fields
     if (status) quotationRequest.status = status;
-    if (adminResponse !== undefined) quotationRequest.adminResponse = adminResponse;
+    if (adminResponse !== undefined)
+      quotationRequest.adminResponse = adminResponse;
     if (totalPrice !== undefined) quotationRequest.totalPrice = totalPrice;
 
     // Only add to history if status has changed
@@ -176,7 +225,7 @@ const updateQuotationRequestStatus = async (req, res) => {
         status,
         changedAt: new Date(),
         changedBy: adminId,
-        adminModel: adminModel
+        adminModel: adminModel,
       });
     }
 
@@ -184,15 +233,19 @@ const updateQuotationRequestStatus = async (req, res) => {
 
     // Populate fields for response
     await quotationRequest.populate([
-      { path: 'items.product', select: 'name sku price' },
-      { path: 'items.flavor', select: 'name' },
-      { path: 'statusHistory.changedBy', select: 'name email' }
+      { path: "items.product", select: "name sku flavors" },
+      { path: "statusHistory.changedBy", select: "name email" },
     ]);
 
-    return successResponse(res, 200, 'Quotation request updated successfully', quotationRequest);
+    return successResponse(
+      res,
+      200,
+      "Quotation request updated successfully",
+      quotationRequest
+    );
   } catch (error) {
-    console.error('Error updating quotation request:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error updating quotation request:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -203,13 +256,13 @@ const deleteQuotationRequest = async (req, res) => {
 
     const quotationRequest = await QuotationRequest.findByIdAndDelete(id);
     if (!quotationRequest) {
-      return errorResponse(res, 404, 'Quotation request not found');
+      return errorResponse(res, 404, "Quotation request not found");
     }
 
-    return successResponse(res, 200, 'Quotation request deleted successfully');
+    return successResponse(res, 200, "Quotation request deleted successfully");
   } catch (error) {
-    console.error('Error deleting quotation request:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error deleting quotation request:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -218,30 +271,30 @@ const getQuotationRequestStats = async (req, res) => {
   try {
     const [total, closed, ongoing, sent] = await Promise.all([
       QuotationRequest.countDocuments(),
-      QuotationRequest.countDocuments({ status: 'closed' }),
-      QuotationRequest.countDocuments({ status: 'ongoing' }),
-      QuotationRequest.countDocuments({ status: 'sent' })
+      QuotationRequest.countDocuments({ status: "closed" }),
+      QuotationRequest.countDocuments({ status: "ongoing" }),
+      QuotationRequest.countDocuments({ status: "sent" }),
     ]);
 
     // Get recent requests (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const recentRequests = await QuotationRequest.countDocuments({
-      createdAt: { $gte: sevenDaysAgo }
+      createdAt: { $gte: sevenDaysAgo },
     });
 
-    return successResponse(res, 200, 'Statistics retrieved successfully', {
+    return successResponse(res, 200, "Statistics retrieved successfully", {
       total,
       byStatus: {
         closed,
         ongoing,
-        sent
+        sent,
       },
-      recentRequests
+      recentRequests,
     });
   } catch (error) {
-    console.error('Error getting statistics:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error getting statistics:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -254,36 +307,38 @@ const getQuotationRequestsByEmail = async (req, res) => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return errorResponse(res, 400, 'Invalid email format');
+      return errorResponse(res, 400, "Invalid email format");
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [quotationRequests, total] = await Promise.all([
       QuotationRequest.find({ email: email.toLowerCase() })
-        .populate([
-          { path: 'items.product', select: 'name sku price' },
-          { path: 'items.flavor', select: 'name' }
-        ])
+        .populate([{ path: "items.product", select: "name sku flavors" }])
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
-      QuotationRequest.countDocuments({ email: email.toLowerCase() })
+      QuotationRequest.countDocuments({ email: email.toLowerCase() }),
     ]);
 
     const totalPages = Math.ceil(total / parseInt(limit));
 
-    return successResponse(res, 200, 'Quotation requests retrieved successfully', {
-      quotationRequests,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalItems: total,
-        itemsPerPage: parseInt(limit)
+    return successResponse(
+      res,
+      200,
+      "Quotation requests retrieved successfully",
+      {
+        quotationRequests,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages,
+          totalItems: total,
+          itemsPerPage: parseInt(limit),
+        },
       }
-    });
+    );
   } catch (error) {
-    console.error('Error getting quotation requests by email:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    console.error("Error getting quotation requests by email:", error);
+    return errorResponse(res, 500, "Internal server error");
   }
 };
 
@@ -294,5 +349,5 @@ export {
   updateQuotationRequestStatus,
   deleteQuotationRequest,
   getQuotationRequestStats,
-  getQuotationRequestsByEmail
-}; 
+  getQuotationRequestsByEmail,
+};
