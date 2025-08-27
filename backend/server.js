@@ -22,6 +22,7 @@ import gallery from './routes/gallery.js';
 import videoGallery from './routes/videoGallery.js';
 import postRoutes from './routes/post.js';
 import applicantRoutes from './routes/applicant.js';
+import cvRoutes from './routes/cv.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/api/gallery', gallery);
 app.use('/api/video-gallery', videoGallery);
 app.use('/api/post', postRoutes);
 app.use('/api/applicant', applicantRoutes);
+app.use('/api/cv', cvRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

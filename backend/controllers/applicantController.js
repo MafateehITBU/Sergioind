@@ -157,7 +157,7 @@ export const createApplicant = async (req, res) => {
       const file = req.file;
 
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: "sergioind/cvs",
+        folder: "sergioind/applicantsCV",
         resource_type: "auto",
         use_filename: true,
         unique_filename: true,
