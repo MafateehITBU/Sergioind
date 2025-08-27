@@ -3,6 +3,7 @@ import Applicant from "../models/Applicant.js";
 import Post from "../models/Post.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
+import { sendApplicantEmail } from "../utils/sendApplicantEmail.js";
 
 const GENDER = ["Male", "Female"];
 const CITY = [
@@ -25,8 +26,15 @@ const CITY = [
 // @access  Public
 export const createApplicant = async (req, res) => {
   try {
-    const { postId, name, speciality, experienceYears, gender, email } =
-      req.body;
+    const {
+      postId,
+      name,
+      phoneNumber,
+      speciality,
+      experienceYears,
+      gender,
+      email,
+    } = req.body;
 
     const address = req.body.address ? JSON.parse(req.body.address) : undefined;
 
@@ -34,6 +42,7 @@ export const createApplicant = async (req, res) => {
     if (
       !postId ||
       !name ||
+      !phoneNumber ||
       !speciality ||
       experienceYears === undefined ||
       !gender ||
@@ -78,6 +87,15 @@ export const createApplicant = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Name must be between 2 and 50 characters",
+      });
+    }
+
+    const phoneRegex =
+      /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid phone number",
       });
     }
 
@@ -126,6 +144,7 @@ export const createApplicant = async (req, res) => {
     const applicant = await Applicant.create({
       postId,
       name,
+      phoneNumber,
       email,
       speciality,
       experienceYears: exp,
@@ -154,6 +173,23 @@ export const createApplicant = async (req, res) => {
       };
 
       await applicant.save();
+
+      try {
+        await sendApplicantEmail({
+          name,
+          email,
+          phoneNumber,
+          speciality,
+          experienceYears: exp,
+          gender,
+          address,
+          postTitle: post.title,
+          cvPath: file.path, // local CV path
+          cvOriginalName: file.originalname, // CV filename
+        });
+      } catch (emailError) {
+        console.error("Error sending applicant email:", emailError);
+      }
 
       // Delete temporary file
       fs.unlinkSync(file.path);

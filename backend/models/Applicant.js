@@ -13,6 +13,14 @@ const applicantSchema = new mongoose.Schema(
       trim: true,
       maxlength: [50, "Name cannot exceed 50 characters"],
     },
+    phoneNumber: {
+        type: String,
+        required: [true, 'Phone number is required'],
+        match: [
+            /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/,
+            'Please enter a valid phone number'
+        ]
+    },
     email: {
       type: String,
       required: [true, "Email is required"],

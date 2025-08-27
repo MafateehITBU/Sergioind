@@ -8,6 +8,8 @@ import Contact from './pages/Contact'
 import Certificate from "./pages/Certificate";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Faq from "./pages/Faq";
+import Career from "./pages/Career";
+import Apply from "./pages/Apply";
 
 const App = () => {
   const location = useLocation();
@@ -27,6 +29,8 @@ const App = () => {
         <Route path="/certificate" element={<Certificate />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/faq" element={<Faq />} />
+        <Route path="/careers" element={<Career />} />
+        <Route path="/apply" element={<Apply />} />
       </Routes>
     </>
   );

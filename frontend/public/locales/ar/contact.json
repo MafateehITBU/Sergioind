@@ -1,7 +1,7 @@
 {
     "title": "اتصل بنا",
     "subtitle": "لنتواصل معًا",
-    "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus. Adipiscing eget habitant commodo et.",
+    "description": "يسعدنا دائمًا تواصلكم معنا، يمكنكم الاتصال بنا عبر الهاتف أو البريد الإلكتروني أو من خلال النموذج أدناه.",
     "contact": {
         "tell": "هاتف:",
         "phoneNumber": "+962 7 9120 1150",
@@ -13,7 +13,7 @@
     "followUs": "تابعنا",
     "form": {
         "title": "إرسال رسالة",
-        "description": "Lorem ipsum dolor sit amet consectetur. A in fringilla pulvinar cursus.",
+        "description": "أرسل لنا رسالتك وسيقوم فريقنا بالرد عليك في أقرب وقت ممكن.",
         "email": "البريد الإلكتروني",
         "fullName": "الاسم الكامل",
         "phone": "الهاتف",
