@@ -105,7 +105,7 @@ const Header = () => {
                   {item.name} <ChevronDown size={16} />
                 </button>
                 {galleryOpen && (
-                  <div className="absolute top-full left-0 bg-white text-text shadow-md py-2 w-40 z-50">
+                  <div className="absolute top-full left-0 bg-white text-text shadow-md py-2 w-40 z-50 rounded-md">
                     {item.dropdown.map((sub, subIdx) => (
                       <Link
                         key={subIdx}
@@ -176,7 +176,7 @@ const Header = () => {
           {/* Language Switch + CTA */}
           <button
             onClick={toggleLanguage}
-            className="text-sm font-bold hover:text-primary"
+            className="text-sm font-bold hover:text-primary cursor-pointer"
           >
             {isArabic ? "EN" : "AR"}
           </button>

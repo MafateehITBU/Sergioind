@@ -24,7 +24,7 @@ const Footer = () => {
       <footer className="relative font-roboto-regular text-white">
         <div className="bg-primary">
           {/* Footer content */}
-          <div className="max-w-7xl mx-auto px-6 pt-8 pb-12 flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-16">
+          <div className="max-w-7xl mx-auto px-6 pt-8 pb-12 flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-25">
             {/* Logo */}
             <div className="flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left -mt-5 w-full md:w-auto">
               <img

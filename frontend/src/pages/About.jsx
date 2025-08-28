@@ -23,7 +23,7 @@ const About = () => {
       <HeroBadge bgImage={Bg} badgeText={t("title")} />
 
       {/* Content Section */}
-      <section className="py-16 max-w-7xl mx-auto px-6">
+      <section className="py-16 container">
         <div className="flex flex-col md:flex-row items-start gap-8">
           {/* Text */}
           <div
@@ -80,10 +80,10 @@ const About = () => {
           <p className="text-lg mb-6">{t("banner.description")}</p>
 
           {/* Buttons */}
-          <div className="flex flex-row gap-15 mt-10 md:text-[20px]">
+          <div className="flex flex-row gap-15 mt-10 md:text-[20px] text-[15px]">
             {/* Outline Button */}
             <button
-              className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary transition duration-300 cursor-pointer"
+              className="bg-transparent border-2 border-white text-white md:px-6 md:py-3 py-1.5 rounded-lg font-semibold hover:bg-white hover:text-primary transition duration-300 cursor-pointer"
               onClick={() => navigate("/quotations")}
             >
               {t("banner.btn1")}
@@ -91,7 +91,7 @@ const About = () => {
 
             {/* Solid Button */}
             <button
-              className="bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
+              className="bg-white text-primary md:px-6 md:py-3 py-1.5 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
               onClick={() => navigate("/products")}
             >
               {t("banner.btn2")}
@@ -106,7 +106,7 @@ const About = () => {
       </section>
 
       {/* Countries Section */}
-      <section className="py-16 pb-100 md:pb-30 max-w-7xl mx-auto px-6">
+      <section className="py-16 pb-100 md:pb-30 container">
         <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8" style={{ whiteSpace: "pre-line" }}>
           {t("export.title")}
         </h2>

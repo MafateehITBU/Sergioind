@@ -1,0 +1,22 @@
+{
+  "images": {
+    "title": "Gallery",
+    "desc": "Explore our factory, global exhibitions, and media highlights.",
+    "intro": {
+      "title": "OUR PRODUCTION TEAM",
+      "sub-title": "The Hands Behind Every Great Product",
+      "p": "At Sergio, our success starts with people. From engineers to machine operators, each member of our production team plays a key role in delivering high-quality snacks to customers around the world. Their dedication, skill, and precision are the heart of everything we do.",
+      "points": [
+        "Highly Skilled Technicians",
+        "Efficient and Scalable Workflow",
+        "Commitment to Quality Standards"
+      ]
+    }
+  },
+
+  "videos": {
+    "title": "Video Gallery",
+    "desc": "A brief text explaining that these are selected videos showcasing the product/service.",
+    "sub-title": "Event Highlights"
+  }
+}

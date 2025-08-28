@@ -10,6 +10,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Faq from "./pages/Faq";
 import Career from "./pages/Career";
 import Apply from "./pages/Apply";
+import GalleryPhotos from "./pages/GalleryPhotos";
+import GalleryVideos from "./pages/GalleryVideos";
 
 const App = () => {
   const location = useLocation();
@@ -31,6 +33,8 @@ const App = () => {
         <Route path="/faq" element={<Faq />} />
         <Route path="/careers" element={<Career />} />
         <Route path="/apply" element={<Apply />} />
+        <Route path="/gallery/photos" element={<GalleryPhotos />} />
+        <Route path="/gallery/videos" element={<GalleryVideos />} />
       </Routes>
     </>
   );

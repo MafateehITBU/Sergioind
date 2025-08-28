@@ -105,7 +105,7 @@ const Home = () => {
         <div className="container mx-auto px-4 pb-9 flex flex-col md:flex-row items-center justify-between gap-12">
           {/* LEFT TEXT */}
           <div
-            className={`flex flex-col w-full md:w-1/2 text-center ${
+            className={`flex flex-col w-full md:w-1/2  ${
               isRTL ? "md:text-right" : "md:text-left"
             } `}
             style={{
@@ -118,7 +118,7 @@ const Home = () => {
             <h2 className="text-2xl sm:text-2xl md:text-6xl text-primary font-itim leading-tight why-underline mb-5">
               {t("whyUs.title")}
             </h2>
-            <p className="text-text text-base sm:text-lg mb-8">
+            <p className="text-text text-base sm:text-lg mb-8 ">
               {t("whyUs.description")}
             </p>
 
