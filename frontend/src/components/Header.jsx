@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, Menu, X, User } from "lucide-react";
 import DarkLogo from "../assets/imgs/Sergio.svg";
 import LightLogo from "../assets/imgs/Sergio_logo_white.png";
@@ -12,9 +12,10 @@ const Header = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
 
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const isLoggedIn = user && user.id;
 
   const { t, i18n } = useTranslation("common");
@@ -54,6 +55,12 @@ const Header = () => {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn && location.pathname === "/profile") {
+      navigate("/", { replace: true });
+    }
+  }, [isLoggedIn, loading, location.pathname, navigate]);
 
   const handleLogout = () => {
     logout();
