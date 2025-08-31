@@ -22,6 +22,7 @@ const MasterLayout = ({ children }) => {
     { path: '/gallery', label: 'Gallery', icon: 'line-md:image-twotone' },
     { path: '/videoGallery', label: 'Video Gallery', icon: 'line-md:image-twotone' },
     { path: '/posts', label: 'Job Posts', icon: 'material-symbols:post-add-rounded' },
+    { path: '/cvs', label: 'CVs', icon: 'material-symbols:post-add-rounded' },
   ];
 
 

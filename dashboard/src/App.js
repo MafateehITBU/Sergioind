@@ -13,6 +13,7 @@ import ContactUsPage from "./pages/ContactUsPage";
 import GalleryPage from "./pages/GalleryPage";
 import VideoGalleryPage from "./pages/VideoGalleryPage";
 import PostsPage from "./pages/PostsPage";
+import CvPage from "./pages/CvPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ForgotPasswordLayer from "./components/ForgotPasswordLayer";
 import { useAuth } from './context/AuthContext';
@@ -130,6 +131,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
               <PostsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cvs"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']} >
+              <CvPage />
             </ProtectedRoute>
           }
         />

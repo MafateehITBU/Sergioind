@@ -15,7 +15,7 @@ router.post("/", upload.single("cv"), createCV);
 // Protected routes
 router.use(protect);
 router.use(authorize("superadmin", "admin"));
-router.use(permissions("Posts"));
+router.use(permissions("Cvs"));
 
 router.get('/', getAllCVs);
 router.delete('/:id', deleteCV);

@@ -51,7 +51,7 @@ const adminSchema = new mongoose.Schema({
     },
     permissions: [{
         type: String,
-        enum: ['Users', 'Categories', 'Files', 'Products', 'Quotations', 'Contact-us', 'Gallery', 'VideoGallery', 'Posts'],
+        enum: ['Users', 'Categories', 'Files', 'Products', 'Quotations', 'Contact-us', 'Gallery', 'VideoGallery', 'Posts', 'Cvs'],
         required: [true, 'Permissions are required'],
         validate: [arr => arr.length > 0, 'At least one permission is required']
     }],
