@@ -8,7 +8,6 @@ const categorySchema = new mongoose.Schema({
     maxlength: [100, 'Category name cannot exceed 100 characters'],
     unique: true
   },
-  nameAr: { type: String, trim: true },
   description: {
     type: String,
     trim: true,

@@ -133,9 +133,6 @@ export const validateQuotationRequest = (req, res, next) => {
       if (!item.size) {
         errors.push({ field: `items[${index}].size`, message: 'Size is required' });
       }
-      if (!item.flavor) {
-        errors.push({ field: `items[${index}].flavor`, message: 'Flavor is required' });
-      }
       if (!item.quantity || item.quantity < 1) {
         errors.push({ field: `items[${index}].quantity`, message: 'Quantity must be at least 1' });
       }

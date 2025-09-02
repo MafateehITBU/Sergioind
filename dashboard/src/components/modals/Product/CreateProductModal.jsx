@@ -16,12 +16,12 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   const [name, setName] = useState("");
   const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
+  const [flavor, setFlavor] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedDetails, setSelectedDetails] = useState([""]);
-  const [selectedFlavors, setSelectedFlavors] = useState([{ name: "" }]);
   const [selectedSizes, setSelectedSizes] = useState([
     { name: "", weight: { value: "", unit: "g" } },
   ]);
@@ -44,11 +44,11 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
     setName("");
     setSku("");
     setDescription("");
+    setFlavor("");
     setSelectedDetails([""]);
     setCategory("");
     setStock("");
     setImages([]);
-    setSelectedFlavors([{ name: "" }]);
     setSelectedSizes([{ name: "", weight: { value: "", unit: "g" } }]);
   };
 
@@ -68,7 +68,8 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   };
 
   const addDetail = () => setSelectedDetails([...selectedDetails, ""]);
-  const removeDetail = (i) => setSelectedDetails(selectedDetails.filter((_, idx) => idx !== i));
+  const removeDetail = (i) =>
+    setSelectedDetails(selectedDetails.filter((_, idx) => idx !== i));
 
   const handleSizeChange = (i, f, v) => {
     const newSizes = [...selectedSizes];
@@ -86,16 +87,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   const removeSize = (i) =>
     setSelectedSizes(selectedSizes.filter((_, idx) => idx !== i));
 
-  const handleFlavorChange = (i, v) => {
-    const newFlavors = [...selectedFlavors];
-    newFlavors[i].name = v;
-    setSelectedFlavors(newFlavors);
-  };
-  const addFlavor = () =>
-    setSelectedFlavors([...selectedFlavors, { name: "" }]);
-  const removeFlavor = (i) =>
-    setSelectedFlavors(selectedFlavors.filter((_, idx) => idx !== i));
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -104,10 +95,13 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
     formData.append("name", name);
     formData.append("sku", sku);
     formData.append("description", description);
-    formData.append("details", JSON.stringify(selectedDetails.filter(d => d.trim() !== "")));
+    formData.append(
+      "details",
+      JSON.stringify(selectedDetails.filter((d) => d.trim() !== ""))
+    );
     formData.append("category", category);
     formData.append("stock", stock);
-    formData.append("flavors", JSON.stringify(selectedFlavors));
+    formData.append("flavor", flavor); // single flavor field
     formData.append("sizes", JSON.stringify(selectedSizes));
     images.forEach((img) => {
       if (img instanceof File) formData.append("images", img);
@@ -174,6 +168,18 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Form.Group>
+
+            {/* Single Flavor */}
+            <Form.Group className="mt-3">
+              <Form.Label>Flavor</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter a Flavor"
+                value={flavor}
+                onChange={(e) => setFlavor(e.target.value)}
+              />
+            </Form.Group>
+
             {/* Details */}
             <Form.Group className="mt-3">
               <Form.Label>Details</Form.Label>
@@ -182,7 +188,7 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                   <Col md={10}>
                     <Form.Control
                       type="text"
-                      value={detail.name}
+                      value={detail}
                       placeholder="Enter a Detail"
                       onChange={(e) => handleDetailsChange(i, e.target.value)}
                     />
@@ -235,34 +241,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                 </Form.Group>
               </Col>
             </Row>
-          </Section>
-
-          {/* Flavors */}
-          <Section title="Flavors">
-            {selectedFlavors.map((flavor, i) => (
-              <Row key={i} className="align-items-center mb-2">
-                <Col md={10}>
-                  <Form.Control
-                    type="text"
-                    value={flavor.name}
-                    placeholder="Flavor name"
-                    onChange={(e) => handleFlavorChange(i, e.target.value)}
-                  />
-                </Col>
-                <Col md={2} className="text-end">
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => removeFlavor(i)}
-                  >
-                    ×
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="outline-secondary" size="sm" onClick={addFlavor}>
-              + Add Flavor
-            </Button>
           </Section>
 
           {/* Sizes */}

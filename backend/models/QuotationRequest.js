@@ -11,10 +11,6 @@ const quotationItemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    flavor: {
-      type: String,
-      required: true,
-    },
     quantity: {
       type: Number,
       required: true,

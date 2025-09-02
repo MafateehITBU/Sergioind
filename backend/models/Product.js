@@ -43,20 +43,12 @@ const productSchema = new mongoose.Schema(
         },
       },
     ],
-    flavors: [
-      {
-        name: {
-          type: String,
-          required: [true, "Flavor name is required"],
-          trim: true,
-          maxlength: [100, "Flavor name cannot exceed 100 characters"],
-        },
-        nameAr: {
-          type: String,
-          trim: true,
-        },
-      },
-    ],
+    flavor: {
+      type: String,
+      required: [true, "Flavor name is required"],
+      trim: true,
+      maxlength: [100, "Flavor name cannot exceed 100 characters"],
+    },
     sizes: [
       {
         name: {

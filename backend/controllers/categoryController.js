@@ -37,15 +37,11 @@ export const createCategory = async (req, res) => {
     }
 
     // Translate name, description in parallel
-    const [nameAr, descriptionAr] = await Promise.all([
-      translateText(name, "ar"),
-      translateText(description, "ar"),
-    ]);
+    const descriptionAr = await translateText(description, "ar");
 
     // Create category
     const category = await Category.create({
       name,
-      nameAr,
       description,
       descriptionAr,
     });
@@ -186,7 +182,6 @@ export const updateCategory = async (req, res) => {
         });
       }
       updateData.name = name;
-      updateData.nameAr = await translateText(name, "ar");
     }
 
     if (description) {

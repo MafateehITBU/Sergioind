@@ -9,7 +9,7 @@ import { translateText } from "../utils/translate.js";
 // @access  Private - SuperAdmin Only
 export const createProduct = async (req, res) => {
   try {
-    let { name, sku, description, category, stock, details, flavors, sizes } =
+    let { name, sku, description, category, stock, details, flavor, sizes } =
       req.body;
 
     // Parse JSON if sent as string
@@ -32,19 +32,11 @@ export const createProduct = async (req, res) => {
       }
     }
 
-    if (flavors && typeof flavors === "string") {
-      try {
-        flavors = JSON.parse(flavors);
-      } catch {
-        flavors = [flavors];
-      }
-    }
-
     // Validation
-    if (!name || !sku || !description || !category) {
+    if (!name || !sku || !description || !category || !flavor) {
       return res.status(400).json({
         success: false,
-        message: "Please provide name, sku, description, and category",
+        message: "Please provide name, sku, description, flavor, and category",
       });
     }
 
@@ -91,33 +83,6 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    // Validate & prepare flavors
-    let productFlavors = [];
-    if (flavors && Array.isArray(flavors)) {
-      for (const f of flavors) {
-        if (!f.name) {
-          return res.status(400).json({
-            success: false,
-            message: "Flavor name is required",
-          });
-        }
-        if (f.name.length < 2 || f.name.length > 100) {
-          return res.status(400).json({
-            success: false,
-            message: "Flavor name must be between 2 and 100 characters",
-          });
-        }
-      }
-      // Translate all flavors in parallel
-      const translatedFlavors = await Promise.all(
-        flavors.map((f) => translateText(f.name, "ar"))
-      );
-      productFlavors = flavors.map((f, idx) => ({
-        name: f.name,
-        nameAr: translatedFlavors[idx],
-      }));
-    }
-
     // Validate sizes
     let productSizes = [];
     if (sizes && Array.isArray(sizes)) {
@@ -159,7 +124,7 @@ export const createProduct = async (req, res) => {
       detailsAr,
       category,
       stock: stock ? parseInt(stock) : 0,
-      flavors: productFlavors,
+      flavor: flavor,
       sizes: productSizes,
     });
 
@@ -347,7 +312,7 @@ export const getProductsByCategory = async (req, res) => {
 // @access  Private - SuperAdmin Only
 export const updateProduct = async (req, res) => {
   try {
-    let { name, sku, description, category, stock, details, flavors, sizes } =
+    let { name, sku, description, category, stock, details, flavor, sizes } =
       req.body;
     const updateData = {};
 
@@ -369,14 +334,6 @@ export const updateProduct = async (req, res) => {
       } catch {
         // If single string, wrap in array
         details = [details];
-      }
-    }
-
-    if (flavors && typeof flavors === "string") {
-      try {
-        flavors = JSON.parse(flavors);
-      } catch {
-        flavors = [flavors];
       }
     }
 
@@ -423,6 +380,16 @@ export const updateProduct = async (req, res) => {
       updateData.descriptionAr = await translateText(description, "ar");
     }
 
+    if (flavor) {
+      if (flavor.length < 2 || flavor.length > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "Flavor name must be between 2 and 100 characters",
+        });
+      }
+      updateData.flavor = flavor;
+    }
+
     if (stock !== undefined) {
       if (stock < 0) {
         return res
@@ -439,32 +406,6 @@ export const updateProduct = async (req, res) => {
         updateData.details.push(d);
         updateData.detailsAr.push(await translateText(d, "ar"));
       }
-    }
-
-    // VALIDATE & TRANSLATE FLAVORS
-    if (flavors) {
-      const flavorsArray = Array.isArray(flavors) ? flavors : [flavors];
-      const productFlavors = [];
-      for (const f of flavorsArray) {
-        if (!f.name) {
-          return res.status(400).json({
-            success: false,
-            message: "Flavor name is required",
-          });
-        }
-        if (f.name.length < 2 || f.name.length > 100) {
-          return res.status(400).json({
-            success: false,
-            message: "Flavor name must be between 2 and 100 characters",
-          });
-        }
-        const flavorAr = await translateText(f.name, "ar");
-        productFlavors.push({
-          name: f.name,
-          nameAr: flavorAr,
-        });
-      }
-      updateData.flavors = productFlavors;
     }
 
     // VALIDATE SIZES

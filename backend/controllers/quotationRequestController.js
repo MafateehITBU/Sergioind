@@ -32,11 +32,11 @@ const createQuotationRequest = async (req, res) => {
     // Validate items
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      if (!item.product || !item.size || !item.flavor || !item.quantity) {
+      if (!item.product || !item.size || !item.quantity) {
         return errorResponse(
           res,
           400,
-          `Item ${i + 1}: product, size, flavor, and quantity are required`
+          `Item ${i + 1}: product, size and quantity are required`
         );
       }
       if (item.quantity < 1) {
@@ -56,26 +56,6 @@ const createQuotationRequest = async (req, res) => {
       return errorResponse(res, 400, "One or more products not found");
     }
 
-    // Validate that flavors exist within each product
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const product = products.find((p) => p._id.toString() === item.product);
-      if (!product) continue;
-
-      const flavorExists = product.flavors.some(
-        (f) => f.name.toLowerCase() === item.flavor.toLowerCase()
-      );
-      if (!flavorExists) {
-        return errorResponse(
-          res,
-          400,
-          `Item ${i + 1}: flavor "${item.flavor}" not found for product "${
-            product.name
-          }"`
-        );
-      }
-    }
-
     // Create the quotation request
     const quotationRequest = new QuotationRequest({
       name,
@@ -90,7 +70,7 @@ const createQuotationRequest = async (req, res) => {
 
     // Populate products for response
     await quotationRequest.populate([
-      { path: "items.product", select: "name sku  flavors" },
+      { path: "items.product", select: "name sku  flavor" },
     ]);
 
     return successResponse(
@@ -137,7 +117,7 @@ const getAllQuotationRequests = async (req, res) => {
     const [quotationRequests, total] = await Promise.all([
       QuotationRequest.find(filter)
         .populate([
-          { path: "items.product", select: "name sku flavors" },
+          { path: "items.product", select: "name sku flavor" },
           {
             path: "statusHistory.changedBy",
             select: "name",
@@ -177,7 +157,7 @@ const getQuotationRequestById = async (req, res) => {
     const { id } = req.params;
 
     const quotationRequest = await QuotationRequest.findById(id).populate([
-      { path: "items.product", select: "name sku description flavors" },
+      { path: "items.product", select: "name sku description flavor" },
       { path: "statusHistory.changedBy", select: "name email" },
     ]);
 
@@ -233,7 +213,7 @@ const updateQuotationRequestStatus = async (req, res) => {
 
     // Populate fields for response
     await quotationRequest.populate([
-      { path: "items.product", select: "name sku flavors" },
+      { path: "items.product", select: "name sku flavor" },
       { path: "statusHistory.changedBy", select: "name email" },
     ]);
 
@@ -313,7 +293,7 @@ const getQuotationRequestsByEmail = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [quotationRequests, total] = await Promise.all([
       QuotationRequest.find({ email: email.toLowerCase() })
-        .populate([{ path: "items.product", select: "name sku flavors" }])
+        .populate([{ path: "items.product", select: "name sku flavor" }])
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),

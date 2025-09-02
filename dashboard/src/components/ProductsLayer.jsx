@@ -177,21 +177,17 @@ const ProductsLayer = () => {
             }
         },
         {
-            Header: 'Flavors',
-            accessor: 'flavors',
+            Header: 'Flavor',
+            accessor: 'flavor',
             Cell: ({ value }) => {
-                if (!value || value.length === 0) return '-';
+                if (!value ) return '-';
                 return (
                     <div style={{
                         whiteSpace: 'normal',
                         wordWrap: 'break-word',
                         maxWidth: '200px',
                     }}>
-                        {value.map((flavor) => (
-                            <div key={flavor._id} className="d-flex align-items-center gap-1">
-                                <span>{flavor.name}, {" "}</span>
-                            </div>
-                        ))}
+                        <div>{value}</div>
                     </div>
                 );
             }
