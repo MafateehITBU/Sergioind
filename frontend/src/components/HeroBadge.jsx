@@ -6,7 +6,7 @@ const HeroBadge = ({ bgImage, badgeText }) => {
   const isRTL = i18n.dir() === "rtl";
 
   return (
-    <section className="w-full relative pt-11">
+    <section className="w-full relative pt-5">
       <div
         className="relative w-full h-[60vh] bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}

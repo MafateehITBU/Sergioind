@@ -38,7 +38,7 @@ function Certificate() {
       <HeroBadge bgImage={Bg} badgeText={isRTL ? `شهادات` : `Certificate`} />
 
       {/* Main Content */}
-      <section className="pt-16 min-h-screen bg-gray-50">
+      <section className="pt-16 pb-30 min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="text-start">
             <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-5">

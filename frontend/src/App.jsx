@@ -13,7 +13,8 @@ import Apply from "./pages/Apply";
 import GalleryPhotos from "./pages/GalleryPhotos";
 import GalleryVideos from "./pages/GalleryVideos";
 import Profile from "./pages/Profile";
-
+import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -29,6 +30,8 @@ const App = () => {
         <Route path="/login" element={<SignIn />} />
         <Route path="/forgot-password" element={<FrogotPassword />} />
         <Route path="/about" element={<About />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/product-details" element={<ProductDetails />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/certificate" element={<Certificate />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

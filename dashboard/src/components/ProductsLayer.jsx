@@ -157,6 +157,26 @@ const ProductsLayer = () => {
             )
         },
         {
+            Header: 'Details',
+            accessor: 'details',
+            Cell: ({ value }) => {
+                if (!value || value.length === 0) return '-';
+                return (
+                    <div style={{
+                        whiteSpace: 'normal',
+                        wordWrap: 'break-word',
+                        maxWidth: '200px',
+                    }}>
+                        {value.map((detail, index) => (
+                            <div key={index} className="d-flex align-items-center gap-1">
+                                <span>{detail}, {" "}</span>
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+        },
+        {
             Header: 'Flavors',
             accessor: 'flavors',
             Cell: ({ value }) => {

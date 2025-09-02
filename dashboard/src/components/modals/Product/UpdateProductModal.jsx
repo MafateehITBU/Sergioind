@@ -25,6 +25,7 @@ const UpdateProductModal = ({
   const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [selectedDetails, setSelectedDetails] = useState([]);
   const [selectedFlavors, setSelectedFlavors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([
     { name: "", weight: { value: "", unit: "g" } },
@@ -58,6 +59,9 @@ const UpdateProductModal = ({
         setDescription(product.description || "");
         setCategory(product.category?._id || "");
         setStock(product.stock || "");
+        setSelectedDetails(
+          product.details?.length ? product.details : []
+        );
         setSelectedFlavors(
           product.flavors?.map((f) =>
             typeof f === "string" ? { name: f } : { name: f.name || "" }
@@ -89,6 +93,7 @@ const UpdateProductModal = ({
     setCategory("");
     setStock("");
     setImages([]);
+    setSelectedDetails([]);
     setSelectedFlavors([]);
     setSelectedSizes([{ name: "", weight: { value: "", unit: "g" } }]);
   };
@@ -112,6 +117,14 @@ const UpdateProductModal = ({
     }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const handleDetailsChange = (i, v) => {
+    const newDetails = [...selectedDetails];
+    newDetails[i] = v;
+    setSelectedDetails(newDetails);
+  }
+  const addDetail = () => setSelectedDetails([...selectedDetails, ""]);
+  const removeDetail = (i) => setSelectedDetails(selectedDetails.filter((_, idx) => idx !== i));
 
   const handleSizeChange = (i, f, v) => {
     const newSizes = [...selectedSizes];
@@ -142,6 +155,7 @@ const UpdateProductModal = ({
     formData.append("name", name);
     formData.append("sku", sku);
     formData.append("description", description);
+    formData.append("details", JSON.stringify(selectedDetails.filter(d => d.trim() !== "")));
     formData.append("category", category);
     formData.append("stock", stock);
     formData.append("flavors", JSON.stringify(selectedFlavors));
@@ -214,6 +228,29 @@ const UpdateProductModal = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+              </Form.Group>
+              <Form.Group className="mt-3">
+                <Form.Label>Details</Form.Label>
+                {selectedDetails.map((detail, i) => (
+                  <Row key={i} className="align-items-center mb-2">
+                    <Col md={10}>
+                      <Form.Control
+                        type="text"
+                        value={detail}
+                        placeholder="Detail"
+                        onChange={(e) => handleDetailsChange(i, e.target.value)}
+                      />
+                    </Col>
+                    <Col md={2} className="text-end">
+                      <Button variant="outline-danger" size="sm" onClick={() => removeDetail(i)}>
+                        ×
+                      </Button>
+                    </Col>
+                  </Row>
+                ))}
+                <Button variant="outline-secondary" size="sm" onClick={addDetail}>
+                  + Add Detail
+                </Button>
               </Form.Group>
             </Section>
 
