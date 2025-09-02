@@ -48,11 +48,11 @@ const createQuotationRequest = async (req, res) => {
       }
     }
 
-    // Validate that all products exist
-    const productIds = items.map((item) => item.product);
-    const products = await Product.find({ _id: { $in: productIds } });
+    // Validate that all products exist (ignore duplicate IDs)
+    const uniqueProductIds = [...new Set(items.map((item) => item.product))];
+    const products = await Product.find({ _id: { $in: uniqueProductIds } });
 
-    if (products.length !== productIds.length) {
+    if (products.length !== uniqueProductIds.length) {
       return errorResponse(res, 400, "One or more products not found");
     }
 

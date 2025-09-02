@@ -65,6 +65,10 @@
   display: block;
 }
 
+@utility ring-primary {
+  --tw-ring-color: #59cb00;
+}
+
 /* For auto filled forms */
 @layer utilities {
   input:-webkit-autofill {

@@ -48,7 +48,7 @@ const QuotationsLayer = () => {
                 params: { page, limit: pageSize, search }
             });
             setQuots(res.data.data.quotationRequests || []);
-            setTotalPages(res.data.pagination?.totalPages || 1);
+            setTotalPages(res.data.data.pagination?.totalPages || 1);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);

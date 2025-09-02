@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import { useTranslation } from "react-i18next";
+import { useQuotation } from "../context/QuotationContext";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -11,6 +12,7 @@ import CornerBg from "../assets/imgs/corner-img1.png";
 import CornerBg2 from "../assets/imgs/corner-img2.png";
 
 const ProductDetails = () => {
+  const { addItem } = useQuotation();
   const { i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl";
   const location = useLocation();
@@ -58,6 +60,17 @@ const ProductDetails = () => {
         { position: "top-right" }
       );
     }
+  };
+
+  const handleQuotationRequest = () => {
+    if (!selectedSize) {
+      toast.error("Please select a size first.");
+      return;
+    }
+    addItem(productDetails._id, selectedSize.name, 1);
+    toast.success(
+      isRTL ? "تمت إضافة المنتج لطلب عرض السعر" : "Added to quotation request!"
+    );
   };
 
   useEffect(() => {
@@ -201,7 +214,10 @@ const ProductDetails = () => {
                   </div>
                 </div>
 
-                <button className="bg-primary text-white w-full px-6 py-3 rounded-lg hover:scale-105 transition duration-500 cursor-pointer">
+                <button
+                  onClick={handleQuotationRequest}
+                  className="bg-primary text-white w-full px-6 py-3 rounded-lg hover:scale-105 transition duration-500 cursor-pointer"
+                >
                   {isRTL ? "طلب عرض سعر" : "Quotation Request"}
                 </button>
 
@@ -252,7 +268,7 @@ const ProductDetails = () => {
               </h3>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-30">
               {relatedProducts.map((prod) => (
                 <ProductCard key={prod._id} product={prod} isRTL={isRTL} />
               ))}

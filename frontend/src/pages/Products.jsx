@@ -116,7 +116,7 @@ const Products = () => {
                   }`}
                 onClick={() => filterByCategory(category._id)}
               >
-                {isRTL ? category.nameAr : category.name}
+                {category.name}
               </button>
             ))}
           </div>

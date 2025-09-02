@@ -29,7 +29,7 @@ const CvLayer = ({ post }) => {
       const res = await axiosInstance.get("/cv");
 
       setCvs(res.data.data || []);
-      setTotalPages(res.data.pagination?.totalPages || 1);
+      setTotalPages(res.data.data.pagination?.totalPages || 1);
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch CVs");

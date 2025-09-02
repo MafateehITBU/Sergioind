@@ -15,6 +15,7 @@ import GalleryVideos from "./pages/GalleryVideos";
 import Profile from "./pages/Profile";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
+import Quotation from "./pages/Quotation";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/apply" element={<Apply />} />
         <Route path="/gallery/photos" element={<GalleryPhotos />} />
         <Route path="/gallery/videos" element={<GalleryVideos />} />
+        <Route path="/quotations" element={<Quotation />} />
 
         {/* Protected Profile Route */}
         <Route

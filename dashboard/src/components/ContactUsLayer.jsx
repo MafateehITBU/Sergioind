@@ -45,7 +45,7 @@ const ContactUsLayer = () => {
                 params: { page, limit: pageSize, search }
             });
             setContacts(res.data.data.contacts || []);
-            setTotalPages(res.data.pagination?.totalPages || 1);
+            setTotalPages(res.data.data.pagination?.totalPages || 1);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);

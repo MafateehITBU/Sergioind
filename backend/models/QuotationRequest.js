@@ -54,7 +54,7 @@ const quotationRequestSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["closed", "ongoing", "sent"],
-    default: "closed",
+    default: "ongoing",
   },
 
   // Admin response

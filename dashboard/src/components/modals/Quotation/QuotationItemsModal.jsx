@@ -17,7 +17,6 @@ const QuotationItemsModal = ({ show, handleClose, items }) => {
                                 <th>#</th>
                                 <th>Product</th>
                                 <th>SKU</th>
-                                <th>Price</th>
                                 <th>Flavor</th>
                                 <th>Size</th>
                                 <th>Quantity</th>
@@ -29,9 +28,8 @@ const QuotationItemsModal = ({ show, handleClose, items }) => {
                                     <td>{idx + 1}</td>
                                     <td>{item.product?.name || '-'}</td>
                                     <td>{item.product?.sku || '-'}</td>
-                                    <td>{item.product?.formattedPrice || item.product?.price || '-'}</td>
-                                    <td>{item.flavor?.name || '-'}</td>
-                                    <td>{item.size?.name || '-'}</td>
+                                    <td>{item.product?.flavor || '-'}</td>
+                                    <td>{item.size || '-'}</td>
                                     <td>{item.quantity}</td>
                                 </tr>
                             ))}
