@@ -31,10 +31,10 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white pt-[150px] flex items-center">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-5 md:gap-18">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-start gap-5 md:gap-18">
           {/* LEFT TEXT */}
-          <div className="w-full md:w-1/2 lg:w-auto flex flex-col">
-            {/* Grid for title + chip */}
+          <div className="w-full md:w-3/7 flex flex-col">
+            {" "}
             <div className="grid grid-cols-[auto_max-content] items-center gap-2">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-itim leading-tight m-0">
                 {t("hero.title")}
@@ -59,18 +59,12 @@ const Home = () => {
           </div>
 
           {/* RIGHT SLIDER */}
-          <div className="w-full md:w-1/2 lg:w-auto flex justify-center items-center mt-10 md:mt-0">
+          <div className="w-full md:w-4/7 flex justify-center items-center mt-10 md:mt-0">
+            {" "}
             <div className="relative w-full flex justify-center">
               {/* Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div
-                  className="
-                      w-[160px] h-[80px] blur-[70px]             /* mobile */
-                      sm:w-[280px] sm:h-[140px] sm:blur-[100px]  /* tablet */
-                      md:w-[520px] md:h-[260px] md:blur-[120px]  /* desktop */
-                      bg-[#59cb00] rounded-full
-                    "
-                />
+                <div className="w-[160px] h-[80px] blur-[70px] sm:w-[280px] sm:h-[140px] sm:blur-[100px] md:w-[520px] md:h-[260px] md:blur-[120px] bg-[#59cb00] rounded-full" />
               </div>
 
               {/* Swiper */}
@@ -82,10 +76,7 @@ const Home = () => {
                 slidesPerView={3}
                 spaceBetween={12}
                 loop={true}
-                autoplay={{
-                  delay: 2000,
-                  disableOnInteraction: false,
-                }}
+                autoplay={{ delay: 2000, disableOnInteraction: false }}
                 coverflowEffect={{
                   rotate: 0,
                   stretch: 0,
@@ -93,7 +84,7 @@ const Home = () => {
                   modifier: 1.5,
                   slideShadows: false,
                 }}
-                className="mySwiper relative z-10 overflow-visible max-w-full"
+                className="mySwiper relative z-10 overflow-visible w-full"
                 dir="ltr"
               >
                 {(isRTL ? [...images].reverse() : images).map((src, i) => (
@@ -101,7 +92,7 @@ const Home = () => {
                     <img
                       src={src}
                       alt={`Slide ${i}`}
-                      className="max-w-[120px] sm:max-w-[180px] md:max-w-[220px] object-contain md:mt-0 mt-15"
+                      className="w-full max-w-[220px] sm:max-w-[180px] md:max-w-[220px] object-contain mt-15 md:mt-0"
                     />
                   </SwiperSlide>
                 ))}
