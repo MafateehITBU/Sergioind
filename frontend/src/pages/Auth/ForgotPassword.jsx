@@ -130,7 +130,7 @@ const ResetPassword = () => {
 
       <button
         onClick={handleSendOtp}
-        className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
+        className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400 cursor-pointer"
       >
         {t("forgot.step1.btn")}
       </button>
@@ -180,7 +180,7 @@ const ResetPassword = () => {
           {t("forgot.step2.notRecieve")}{" "}
           <button
             onClick={handleSendOtp}
-            className="text-primary hover:underline focus:outline-none"
+            className="text-primary hover:underline focus:outline-none cursor-pointer"
           >
             {t("forgot.step2.notRecieveLink")}
           </button>
@@ -276,7 +276,7 @@ const ResetPassword = () => {
         )}
 
         <button
-          className="mt-4 self-center w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
+          className="mt-4 self-center w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400 cursor-pointer"
           onClick={handleResetPassword}
         >
           {t("forgot.step3.btn")}

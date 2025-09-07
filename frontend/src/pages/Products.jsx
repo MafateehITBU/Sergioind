@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -56,10 +57,8 @@ const Products = () => {
     fetchCategories();
   }, []);
 
-  // Filter products by category
   const filterByCategory = (categoryId) => {
     setActiveCategory(categoryId);
-
     if (categoryId === "all") {
       setFilteredProducts(products);
     } else {
@@ -79,12 +78,16 @@ const Products = () => {
       <section className="bg-white min-h-screen pt-8 pb-16 sm:pt-12 sm:pb-20">
         <div className="max-w-7xl mx-auto px-4 my-10 sm:px-6 lg:px-8">
           {/* Page Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-itim why-underline text-primary text-left">
+          <h1
+            className={`text-2xl sm:text-3xl md:text-4xl font-itim why-underline text-primary ${
+              isRTL ? "text-right" : "text-left"
+            }`}
+          >
             {isRTL ? "اختر نكهتك المفضلة" : "Choose Your favorite Taste"}
           </h1>
 
           {/* Categories */}
-          <div className="mt-6 mb-20 flex flex-wrap justify-center md:justify-center gap-3 sm:gap-4 overflow-x-auto md:overflow-visible pb-4 px-4 md:px-0 -mx-4 md:mx-0">
+          <div className="mt-6 mb-20 flex flex-wrap justify-center gap-3 sm:gap-4 overflow-x-auto md:overflow-visible pb-4 px-4 md:px-0 -mx-4 md:mx-0">
             <button
               className={`flex-shrink-0 min-w-[100px] sm:min-w-[120px] px-4 py-2 sm:py-3 rounded-xl text-center cursor-pointer transition
                           ${
@@ -137,16 +140,29 @@ const Products = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-15 mt-6 sm:mt-10">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                    onClick={handleProductClick}
-                    isRTL={isRTL}
-                  />
-                ))}
-              </div>
+              <motion.div
+                layout
+                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-15 mt-6 sm:mt-10"
+              >
+                <AnimatePresence>
+                  {filteredProducts.map((product) => (
+                    <motion.div
+                      key={product._id}
+                      layout
+                      initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: isRTL ? 50 : -50 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ProductCard
+                        product={product}
+                        onClick={handleProductClick}
+                        isRTL={isRTL}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
             )}
           </section>
         </div>

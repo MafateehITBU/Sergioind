@@ -30,18 +30,19 @@ const Home = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white py-[200px] flex items-center">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-18">
+      <section className="min-h-[100vh] bg-[#12131a] w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] text-white pt-[150px] flex items-center">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-5 md:gap-18">
           {/* LEFT TEXT */}
-          <div className="flex flex-col w-full md:w-auto">
-            <div className="flex items-center flex-wrap md:flex-nowrap">
+          <div className="w-full md:w-1/2 lg:w-auto flex flex-col">
+            {/* Grid for title + chip */}
+            <div className="grid grid-cols-[auto_max-content] items-center gap-2">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-itim leading-tight m-0">
                 {t("hero.title")}
               </h1>
               <img
                 src={CornChips}
                 alt="Corn Chips"
-                className="inline-block w-14 h-14 md:w-17 md:h-17 float-animation m-0 ml-2"
+                className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 float-animation"
               />
             </div>
 
@@ -58,44 +59,54 @@ const Home = () => {
           </div>
 
           {/* RIGHT SLIDER */}
-          <div className="relative flex-1 flex justify-center items-center w-full md:w-auto mt-10 md:mt-0">
-            <div className="absolute w-[300px] sm:w-[500px] h-[200px] sm:h-[300px] bg-[#59cb00] rounded-full blur-[150px]"></div>
-            <Swiper
-              modules={[Autoplay, EffectCoverflow]}
-              effect="coverflow"
-              grabCursor={true}
-              centeredSlides={true}
-              slidesPerView={1}
-              breakpoints={{
-                640: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
-              }}
-              spaceBetween={0}
-              loop={true}
-              autoplay={{
-                delay: 2500,
-                disableOnInteraction: false,
-              }}
-              coverflowEffect={{
-                rotate: 0,
-                stretch: 0,
-                depth: 150,
-                modifier: 1.5,
-                slideShadows: false,
-              }}
-              className="mySwiper"
-              dir="ltr"
-            >
-              {(isRTL ? [...images].reverse() : images).map((src, i) => (
-                <SwiperSlide key={i}>
-                  <img
-                    src={src}
-                    alt={`Slide ${i}`}
-                    className="w-full max-w-[450px] rounded-xl"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className="w-full md:w-1/2 lg:w-auto flex justify-center items-center mt-10 md:mt-0">
+            <div className="relative w-full flex justify-center">
+              {/* Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div
+                  className="
+                      w-[160px] h-[80px] blur-[70px]             /* mobile */
+                      sm:w-[280px] sm:h-[140px] sm:blur-[100px]  /* tablet */
+                      md:w-[520px] md:h-[260px] md:blur-[120px]  /* desktop */
+                      bg-[#59cb00] rounded-full
+                    "
+                />
+              </div>
+
+              {/* Swiper */}
+              <Swiper
+                modules={[Autoplay, EffectCoverflow]}
+                effect="coverflow"
+                grabCursor={true}
+                centeredSlides={true}
+                slidesPerView={3}
+                spaceBetween={12}
+                loop={true}
+                autoplay={{
+                  delay: 2000,
+                  disableOnInteraction: false,
+                }}
+                coverflowEffect={{
+                  rotate: 0,
+                  stretch: 0,
+                  depth: 100,
+                  modifier: 1.5,
+                  slideShadows: false,
+                }}
+                className="mySwiper relative z-10 overflow-visible max-w-full"
+                dir="ltr"
+              >
+                {(isRTL ? [...images].reverse() : images).map((src, i) => (
+                  <SwiperSlide key={i} className="flex justify-center">
+                    <img
+                      src={src}
+                      alt={`Slide ${i}`}
+                      className="max-w-[120px] sm:max-w-[180px] md:max-w-[220px] object-contain md:mt-0 mt-15"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           </div>
         </div>
       </section>
@@ -136,7 +147,7 @@ const Home = () => {
             ))}
 
             <button
-              className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 mt-4 rounded-lg transition duration-400 cursor-pointer"
+              className=" w-[40%] md:w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 mt-4 rounded-lg transition duration-400 cursor-pointer"
               onClick={() => navigate("/about")}
             >
               {t("whyUs.btn")}
@@ -144,7 +155,7 @@ const Home = () => {
           </div>
 
           {/* RIGHT IMAGE */}
-          <div className="flex-1 flex justify-center items-center w-full md:w-auto">
+          <div className="hidden md:flex flex-1 justify-center items-center w-full md:w-auto">
             <img
               src={Question}
               alt="Why Choose Us"

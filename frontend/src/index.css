@@ -161,9 +161,11 @@ html[dir="rtl"] .animated-underline::after {
 }
 /* Swiper styles */
 .swiper-slide img {
-  width: 100%;
-  height: 90%;
-  object-fit: cover;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* Special style for active slide */
@@ -171,9 +173,10 @@ html[dir="rtl"] .animated-underline::after {
   transform: scale(1.3);
   transition: transform 0.5s ease-in-out;
 }
+
 .swiper {
   width: 100%;
-  height: 500px;
+  height: 400px;
 }
 
 .swiper-slide {

@@ -34,7 +34,12 @@ const About = () => {
             }}
             className="flex-1 p-6 md:p-0"
           >
-            <p className="text-text mb-8 text-[20px]" style={{ whiteSpace: "pre-line" }}>{t("intro")}</p>
+            <p
+              className="text-text mb-8 text-[20px]"
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {t("intro")}
+            </p>
 
             <div>
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
@@ -56,14 +61,17 @@ const About = () => {
               <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline">
                 {t("history.title")}
               </h2>
-              <p className="text-text mt-5 mb-8 text-[16px]" style={{ whiteSpace: "pre-line" }}>
+              <p
+                className="text-text mt-5 mb-8 text-[16px]"
+                style={{ whiteSpace: "pre-line" }}
+              >
                 {t("history.p")}
               </p>
             </div>
           </div>
 
           {/* Images */}
-          <div className="flex flex-col gap-6 md:gap-55 flex-1 items-center">
+          <div className="hidden md:flex flex-col gap-6 md:gap-55 flex-1 items-center">
             <img src={Img1} alt="Sergio About 1" className="w-[70%]" />
             <img src={Img2} alt="Sergio About 2" className="w-[70%] md:me-50" />
           </div>
@@ -71,19 +79,19 @@ const About = () => {
       </section>
 
       {/* CTA Banner - Full Width */}
-      <section className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] bg-primary text-white py-1 px-8 md:px-16 flex flex-col md:flex-row items-center justify-between">
+      <section className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] bg-primary text-white md:py-1 py-8 px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center justify-between">
         {/* Left Side - Text & Buttons */}
-        <div className="max-w-xl pt-2 md:pt-0">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim mb-4 text-center">
+        <div className="max-w-xl text-center md:text-left">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-itim mb-4">
             {t("banner.header")}
           </h2>
           <p className="text-lg mb-6">{t("banner.description")}</p>
 
           {/* Buttons */}
-          <div className="flex flex-row gap-15 mt-10 md:text-[20px] text-[15px]">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-6 justify-center md:justify-start">
             {/* Outline Button */}
             <button
-              className="bg-transparent border-2 border-white text-white md:px-6 md:py-3 py-1.5 rounded-lg font-semibold hover:bg-white hover:text-primary transition duration-300 cursor-pointer"
+              className="bg-transparent border-2 border-white text-white py-2 px-4 sm:py-3 sm:px-6 rounded-lg font-semibold hover:bg-white hover:text-primary transition duration-300 cursor-pointer"
               onClick={() => navigate("/quotations")}
             >
               {t("banner.btn1")}
@@ -91,7 +99,7 @@ const About = () => {
 
             {/* Solid Button */}
             <button
-              className="bg-white text-primary md:px-6 md:py-3 py-1.5 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
+              className="bg-white text-primary py-2 px-4 sm:py-3 sm:px-6 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
               onClick={() => navigate("/products")}
             >
               {t("banner.btn2")}
@@ -100,14 +108,21 @@ const About = () => {
         </div>
 
         {/* Right Side - Image */}
-        <div className="mt-8 md:mt-0">
-          <img src={Chips} alt="Chips" className="max-w-full h-auto" />
+        <div className="mt-6 md:mt-0 flex justify-center md:justify-end w-full md:w-auto">
+          <img
+            src={Chips}
+            alt="Chips"
+            className="max-w-[250px] sm:max-w-[300px] md:max-w-full h-auto"
+          />
         </div>
       </section>
 
       {/* Countries Section */}
       <section className="py-16 pb-100 md:pb-30 container">
-        <h2 className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8" style={{ whiteSpace: "pre-line" }}>
+        <h2
+          className="text-2xl sm:text-2xl md:text-4xl text-primary font-itim leading-tight why-underline mb-8"
+          style={{ whiteSpace: "pre-line" }}
+        >
           {t("export.title")}
         </h2>
 
