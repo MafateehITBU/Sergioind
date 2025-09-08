@@ -1,6 +1,7 @@
 import QuotationRequest from "../models/QuotationRequest.js";
 import Product from "../models/Product.js";
 import { successResponse, errorResponse } from "../utils/responseHandler.js";
+import { transporter } from "../utils/nodemailer.js";
 
 // Create a new quotation request (public endpoint)
 const createQuotationRequest = async (req, res) => {
@@ -72,6 +73,23 @@ const createQuotationRequest = async (req, res) => {
     await quotationRequest.populate([
       { path: "items.product", select: "name sku  flavor" },
     ]);
+
+    // Send notification email to QUOT_EMAIL
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.QUOT_EMAIL,
+      subject: "New Quotation Request Received",
+      html: `<p>A new quotation request has been submitted by <strong> ${name} </strong></p>
+             <p>Company: <strong> ${companyName || "N/A"} </strong></p>
+             <p>Please log in to the admin panel to review and process this request.</p>`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending quotation request email:", error);
+      } else {
+        console.log("Quotation request email sent:", info.response);
+      }
+    });
 
     return successResponse(
       res,
