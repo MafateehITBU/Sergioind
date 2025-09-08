@@ -9,6 +9,8 @@ const cvSchema = new mongoose.Schema(
       cvType: { type: String, default: null },
       cvSize: { type: Number, default: null },
     },
+    name: { type: String, required: true },
+    specialty: { type: String, required: true },
   },
   {
     timestamps: true,

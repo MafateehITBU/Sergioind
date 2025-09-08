@@ -5,17 +5,24 @@ import Footer from "../components/Footer";
 import HeroBadge from "../components/HeroBadge";
 import PostCard from "../components/PostCard";
 import Bg from "../assets/imgs/careers-bg.png";
+import Img from "../assets/imgs/no-quotation.png";
 import { Icon } from "@iconify/react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 function Career() {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [showCount, setShowCount] = useState(5);
-  const [file, setFile] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    specialty: "",
+    file: null,
+  });
 
   // Filters state
   const [search, setSearch] = useState("");
@@ -24,6 +31,12 @@ function Career() {
   const [employmentType, setEmploymentType] = useState("All");
 
   const navigate = useNavigate();
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.9 },
+  };
 
   const fetchPosts = async () => {
     try {
@@ -45,6 +58,10 @@ function Career() {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    handleFilter();
+  }, [search, experience, location, employmentType, posts]);
 
   const handleFilter = () => {
     let temp = [...posts];
@@ -83,34 +100,33 @@ function Career() {
     if (temp.length > 0) setSelectedPost(temp[0]); // reset selection
   };
 
-  const handleSendCV = async () => {
-    if (!file) {
-      toast.error("Please upload your CV before sending.", {
+  const handleModalSubmit = async () => {
+    if (!formData.name || !formData.specialty || !formData.file) {
+      toast.error("Please fill all fields and upload your CV.", {
         position: "top-right",
       });
       return;
     }
 
     const fd = new FormData();
-    fd.append("cv", file);
+    fd.append("name", formData.name);
+    fd.append("specialty", formData.specialty);
+    fd.append("cv", formData.file);
 
     try {
       setIsSending(true);
       const res = await axiosInstance.post("/cv", fd);
-
       toast.success(res.data.message || "CV sent successfully!", {
         position: "top-right",
       });
-
-      // clear file after successful send
-      setFile(null);
+      setShowModal(false);
+      setFormData({ name: "", specialty: "", file: null });
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Something went wrong. Please try again.",
         { position: "top-right" }
       );
-      console.error(error);
     } finally {
       setIsSending(false);
     }
@@ -130,22 +146,22 @@ function Career() {
             <div className="max-w-7xl mx-auto px-6 py-16 bg-white border-white rounded-2xl flex flex-col gap-6">
               {/* Search bar */}
               <div className="flex items-center justify-center w-full">
-                <input
-                  type="text"
-                  placeholder="Search for jobs.."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-[50%] px-8 py-3  rounded-l-lg bg-[#e6e5e5] focus:outline-none"
-                />
-                <button
-                  onClick={handleFilter}
-                  className="px-6 py-3 bg-[#e6e5e5] text-text text-2xl rounded-r-lg"
-                >
+                <div className="relative w-[50%]">
+                  {/* Icon */}
                   <Icon
                     icon="material-symbols:search"
-                    className="cursor-pointer "
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl"
                   />
-                </button>
+
+                  {/* Input */}
+                  <input
+                    type="text"
+                    placeholder="Search for jobs.."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#e6e5e5] focus:outline-none"
+                  />
+                </div>
               </div>
 
               {/* Filters */}
@@ -199,99 +215,111 @@ function Career() {
                     <option value="Part-time">Part-time</option>
                   </select>
                 </div>
-
-                {/* View Jobs Button */}
-                <button
-                  onClick={handleFilter}
-                  className="px-6 py-3 bg-primary text-white rounded-lg hover:scale-105 transform  transition duration-400 self-end"
-                >
-                  View Jobs
-                </button>
               </div>
             </div>
 
             {/* Posts Layout */}
-            <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              {/* Left side: Post list */}
-              <div className="col-span-2">
-                {filteredPosts.slice(0, showCount).map((post) => (
-                  <PostCard
-                    key={post._id}
-                    post={post}
-                    isActive={selectedPost?._id === post._id}
-                    onClick={() => setSelectedPost(post)}
-                  />
-                ))}
-              </div>
+            {filteredPosts.length > 0 ? (
+              <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+                {/* Left side: Post list */}
+                <div className="col-span-2">
+                  {filteredPosts.slice(0, showCount).map((post) => (
+                    <PostCard
+                      key={post._id}
+                      post={post}
+                      isActive={selectedPost?._id === post._id}
+                      onClick={() => setSelectedPost(post)}
+                    />
+                  ))}
+                </div>
 
-              {/* Right side: Post details */}
-              <div className="col-span-2 bg-white rounded-lg p-6 shadow sticky top-20 self-start">
-                {selectedPost ? (
-                  <>
-                    {/* Title */}
-                    <h2 className="text-2xl font-semibold mb-4">
-                      {selectedPost.title}
-                    </h2>
+                {/* Right side: Post details */}
+                <div className="col-span-2 bg-white rounded-lg p-6 shadow sticky top-20 self-start">
+                  {selectedPost ? (
+                    <>
+                      {/* Title */}
+                      <h2 className="text-2xl font-semibold mb-4">
+                        {selectedPost.title}
+                      </h2>
 
-                    {/* Tags */}
-                    <div className="flex gap-9 mb-4">
-                      <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                        {selectedPost.employmentType}
-                      </span>
-                      <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                        Jordan
-                      </span>
-                      <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                        {selectedPost.location}
-                      </span>
-                    </div>
+                      {/* Tags */}
+                      <div className="flex gap-9 mb-4">
+                        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                          {selectedPost.employmentType}
+                        </span>
+                        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                          Jordan
+                        </span>
+                        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                          {selectedPost.location}
+                        </span>
+                      </div>
 
-                    {/* Description */}
-                    <p className="text-gray-700 leading-relaxed mb-6">
-                      {selectedPost.description}
+                      {/* Description */}
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        {selectedPost.description}
+                      </p>
+
+                      {/* Extra details */}
+                      <ul className="text-gray-600 space-y-4 mb-6">
+                        <li>
+                          <div className="font-semibold mb-1">
+                            Employment Type:
+                          </div>
+                          {selectedPost.employmentType}
+                        </li>
+                        <li>
+                          <div className="font-semibold mb-1">
+                            Work place Type:
+                          </div>
+                          {selectedPost.location}
+                        </li>
+                        <li>
+                          <div className="font-semibold mb-1">
+                            Experience Required:
+                          </div>
+                          {selectedPost.experienceYears} Years
+                        </li>
+                        <li>
+                          <div className="font-semibold mb-1">
+                            Job Location:
+                          </div>{" "}
+                          Jordan, Amman
+                        </li>
+                      </ul>
+
+                      {/* Apply Button */}
+                      <button
+                        className="px-6 py-3 w-full bg-primary text-white rounded-lg hover:scale-105 transition transform duration-400 cursor-pointer"
+                        onClick={() =>
+                          navigate("/apply", { state: { post: selectedPost } })
+                        }
+                      >
+                        Apply Now
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-gray-600">
+                      Select a job to view details.
                     </p>
-
-                    {/* Extra details */}
-                    <ul className="text-gray-600 space-y-4 mb-6">
-                      <li>
-                        <div className="font-semibold mb-1">
-                          Employment Type:
-                        </div>
-                        {selectedPost.employmentType}
-                      </li>
-                      <li>
-                        <div className="font-semibold mb-1">
-                          Work place Type:
-                        </div>
-                        {selectedPost.location}
-                      </li>
-                      <li>
-                        <div className="font-semibold mb-1">
-                          Experience Required:
-                        </div>
-                        {selectedPost.experienceYears} Years
-                      </li>
-                      <li>
-                        <div className="font-semibold mb-1">Job Location:</div>{" "}
-                        Jordan, Amman
-                      </li>
-                    </ul>
-
-                    {/* Apply Button */}
-                    <button
-                      className="px-6 py-3 w-full bg-primary text-white rounded-lg hover:scale-105 transition transform duration-400 cursor-pointer"
-                      onClick={() =>
-                        navigate("/apply", { state: { post: selectedPost } })
-                      }
-                    >
-                      Apply Now
-                    </button>
-                  </>
-                ) : (
-                  <p className="text-gray-600">Select a job to view details.</p>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="max-w-7xl mx-auto mt-10">
+                <div className="text-center py-16">
+                  <div className="flex items-center justify-center mx-auto mb-4">
+                    <img src={Img} alt="No items" className="w-50 h-50" />
+                  </div>
+                  <h3 className="text-4xl font-itim text-text mb-2">
+                    No Jobs Found
+                  </h3>
+                  <p className="text-gray-500">
+                    We couldn't find any job postings matching your criteria.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* View More Button */}
             {filteredPosts.length > showCount && (
@@ -318,42 +346,87 @@ function Career() {
             available.
           </p>
 
-          {/* Upload file input field */}
-          <label className="block border-2 border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition">
-            <span className="text-gray-600">
-              {file ? "File Selected" : "Choose File"}
-            </span>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setFile(e.target.files[0]);
-                }
-              }}
-            />
-          </label>
-
-          {/* Show selected file name */}
-          {file && (
-            <div className="mt-4 text-gray-700">
-              <p>
-                Selected File: <strong>{file.name}</strong>
-              </p>
-            </div>
-          )}
-
           <button
-            onClick={handleSendCV}
-            disabled={isSending}
-            className={`px-8 py-3 w-[30%] bg-primary text-white rounded-lg transform transition duration-400 cursor-pointer ${
-              isSending ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
-            }`}
+            onClick={() => setShowModal(true)}
+            className="px-8 py-3 w-[30%] bg-primary text-white rounded-lg transform transition duration-400 cursor-pointer hover:scale-105"
           >
-            {isSending ? "Sending..." : "Send CV"}
+            Apply Now
           </button>
         </section>
+
+        {/* Modal */}
+        <AnimatePresence>
+          {showModal && (
+            <motion.div
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={modalVariants}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="bg-white rounded-lg p-6 w-96">
+                <h2 className="text-xl font-semibold mb-4">Apply for Job</h2>
+
+                {/* Name */}
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="w-full border p-2 rounded mb-3"
+                />
+
+                {/* Specialty */}
+                <input
+                  type="text"
+                  placeholder="Specialty"
+                  value={formData.specialty}
+                  onChange={(e) =>
+                    setFormData({ ...formData, specialty: e.target.value })
+                  }
+                  className="w-full border p-2 rounded mb-3"
+                />
+
+                {/* CV File Upload */}
+                <label className="block border-2 border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition mb-3">
+                  <span className="text-gray-600">
+                    {formData.file ? formData.file.name : "Choose CV File"}
+                  </span>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setFormData({ ...formData, file: e.target.files[0] });
+                      }
+                    }}
+                  />
+                </label>
+
+                {/* Actions */}
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 bg-gray-300 rounded cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleModalSubmit}
+                    disabled={isSending}
+                    className="px-4 py-2 bg-primary text-white rounded cursor-pointer"
+                  >
+                    {isSending ? "Sending..." : "Send Application"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <Footer />

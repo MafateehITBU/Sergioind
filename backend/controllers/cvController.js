@@ -7,7 +7,15 @@ import fs from "fs";
 // @access  Public
 export const createCV = async (req, res) => {
   try {
-    // Validate file
+    // Validate required fields
+    const { name, specialty } = req.body;
+    if (!name || !specialty) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and Specialty are required",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -34,6 +42,8 @@ export const createCV = async (req, res) => {
         cvType: file.mimetype,
         cvSize: file.size,
       },
+      name,
+      specialty,
     });
 
     // Delete temp file

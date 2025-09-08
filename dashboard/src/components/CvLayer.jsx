@@ -3,14 +3,22 @@ import { useTable, useGlobalFilter, useSortBy } from "react-table";
 import { Icon } from "@iconify/react";
 import axiosInstance from "../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
-import { Card } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteModal from "./modals/DeleteModal";
+
+// Input component for global search
+const GlobalFilter = ({ globalFilter, setGlobalFilter }) => (
+  <input
+    className="form-control w-100"
+    value={globalFilter || ""}
+    onChange={(e) => setGlobalFilter(e.target.value)}
+    placeholder="Search CVs..."
+  />
+);
 
 const CvLayer = ({ post }) => {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedCV, setSelectedCV] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -21,13 +29,12 @@ const CvLayer = ({ post }) => {
   // Fetch cvs
   useEffect(() => {
     fetchCvs();
-  }, [post, page, search]);
+  }, [post]);
 
   const fetchCvs = async () => {
     setLoading(true);
     try {
       const res = await axiosInstance.get("/cv");
-
       setCvs(res.data.data || []);
       setTotalPages(res.data.data.pagination?.totalPages || 1);
     } catch (err) {
@@ -40,13 +47,11 @@ const CvLayer = ({ post }) => {
 
   const data = useMemo(() => cvs, [cvs]);
 
-  const handleDeleteCV = (cv) => {
-    setSelectedCV(cv);
-    setShowDeleteModal(true);
-  };
   const columns = useMemo(
     () => [
       { Header: "#", Cell: ({ row }) => (page - 1) * pageSize + row.index + 1 },
+      { Header: "Name", accessor: "name" },
+      { Header: "Specialty", accessor: "specialty" },
       {
         Header: "CV",
         Cell: ({ row }) =>
@@ -63,14 +68,15 @@ const CvLayer = ({ post }) => {
             <span className="text-gray-500">No CV</span>
           ),
       },
-
       {
         Header: "Actions",
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center">
             <button
               className="btn btn-sm btn-danger"
-              onClick={() => handleDeleteCV(row.original)}
+              onClick={() =>
+                setSelectedCV(row.original) || setShowDeleteModal(true)
+              }
             >
               <Icon icon="mdi:delete" />
             </button>
@@ -81,12 +87,14 @@ const CvLayer = ({ post }) => {
     [page]
   );
 
+  // react-table
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
     rows,
+    state: { globalFilter },
     setGlobalFilter,
   } = useTable({ columns, data }, useGlobalFilter, useSortBy);
 
@@ -103,6 +111,12 @@ const CvLayer = ({ post }) => {
           <h5 className="card-title mb-0 flex-shrink-0 w-35 w-md-100 w-sm-100">
             CVs
           </h5>
+          <div className="w-35 w-md-100 w-sm-100">
+            <GlobalFilter
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+          </div>
         </div>
 
         {/* Table + Pagination */}
