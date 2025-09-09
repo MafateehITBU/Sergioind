@@ -34,7 +34,7 @@ function App() {
         <Route
           path="/"
           element={
-            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+            <ProtectedRoute allowedRoles={['superadmin']}>
               <HomePageTen />
             </ProtectedRoute>
           }

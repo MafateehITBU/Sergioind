@@ -70,33 +70,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleIncomingNotification = (notification) => {
-    if (notification.notifID && notification.title && notification.message) {
-      setNotifications((prevNotifications) => {
-        const exists = prevNotifications.some(
-          (notif) => notif.notifID === notification.notifID
-        );
-        if (!exists) {
-          const updatedNotifications = [...prevNotifications, notification];
-          localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
-          return updatedNotifications;
-        }
-        return prevNotifications;
-      });
-
-      if (userInteracted) {
-        const notificationSound = new Audio('/notification.mp3');
-        notificationSound.play().catch((err) =>
-          console.warn('Unable to play sound:', err)
-        );
-      } else {
-        console.log('User has not interacted with the page yet. Sound skipped.');
-      }
-    } else {
-      console.log('Received invalid notification, ignoring...', notification);
-    }
-  };
-
   useEffect(() => {
     // Load saved notifications from localStorage
     const savedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];

@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axiosInstance from "../axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 
 const SignInLayer = () => {
@@ -11,17 +10,34 @@ const SignInLayer = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
 
   const handleSingIn = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      await login(email, password);
-      navigate("/");
+      const res = await login(email, password);
+      console.log("Login response:", res);
+
+      const userData = res?.data;
+
+      if (userData?.role === "admin" && userData?.permissions?.length > 0) {
+        const firstPermission =
+          userData.permissions[0].charAt(0).toLowerCase() +
+          userData.permissions[0].slice(1);
+
+        navigate(`/${firstPermission}`);
+      } else {
+        navigate("/");
+      }
     } catch (err) {
-      console.error("Login failed:", err.response?.data?.message || err.message);
-      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+      console.error(
+        "Login failed:",
+        err.response?.data?.message || err.message
+      );
+      setError(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
     }
   };
 
@@ -38,8 +54,9 @@ const SignInLayer = () => {
       <ToastContainer />
       {/* Wrapper with container class to support Bootstrap's grid */}
       <div className="container-fluid p-0 d-flex min-vh-100">
-        <div className="row no-gutters w-100"> {/* Ensuring no gap between columns */}
-
+        <div className="row no-gutters w-100">
+          {" "}
+          {/* Ensuring no gap between columns */}
           {/* Left side (1/4 of the screen) */}
           <div className="auth-left col-lg-3 col-md-4 p-0 position-relative text-white d-flex align-items-center justify-content-center text-center">
             <div className="green-bg position-absolute w-100 h-100">
@@ -51,7 +68,6 @@ const SignInLayer = () => {
               <p> Please enter your credentials</p>
             </div>
           </div>
-
           {/* Right side (3/4 of the screen) */}
           <div className="auth-right col-lg-9 col-md-8 d-flex align-items-center justify-content-center py-4 px-3">
             <div className="max-w-464-px mx-auto w-100">
@@ -61,17 +77,25 @@ const SignInLayer = () => {
 
               <form onSubmit={handleSingIn}>
                 {error && (
-                  <div className="mb-4 alert alert-danger bg-danger-100 text-danger-600 border-danger-100 px-24 py-11 mb-0 fw-semibold text-lg radius-8 d-flex align-items-center justify-content-between" role="alert">
+                  <div
+                    className="mb-4 alert alert-danger bg-danger-100 text-danger-600 border-danger-100 px-24 py-11 mb-0 fw-semibold text-lg radius-8 d-flex align-items-center justify-content-between"
+                    role="alert"
+                  >
                     {error}
                     <button className="remove-button text-danger-600 text-xxl line-height-1">
-                      <Icon icon="iconamoon:sign-times-light" className="icon" />
+                      <Icon
+                        icon="iconamoon:sign-times-light"
+                        className="icon"
+                      />
                     </button>
                   </div>
                 )}
 
                 {/* Email Field */}
                 <div className="icon-field mb-16">
-                  <label htmlFor="email" className="form-label">Email Address</label>
+                  <label htmlFor="email" className="form-label">
+                    Email Address
+                  </label>
                   <span className="icon top-50 mt-3 translate-middle-y">
                     <Icon icon="mage:email" />
                   </span>
@@ -88,7 +112,9 @@ const SignInLayer = () => {
 
                 {/* Password Field */}
                 <div className="position-relative mb-20">
-                  <label htmlFor="password" className="form-label">Password</label>
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
                   <div className="icon-field">
                     <span className="icon top-50 translate-middle-y">
                       <Icon icon="solar:lock-password-outline" />
