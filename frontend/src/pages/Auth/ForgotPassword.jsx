@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 const ResetPassword = () => {
   const { t } = useTranslation("auth");
-  const validations = t("forgot.step3.validations");
+  const validations = t("forgot.step3.validations", { returnObjects: true });
 
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -155,7 +155,7 @@ const ResetPassword = () => {
       {/* OTP inputs - force LTR */}
       <div
         className="flex justify-center gap-3 mb-6"
-        style={{ direction: "ltr" }} // 👈 forces LTR layout
+        style={{ direction: "ltr" }} // forces LTR layout
       >
         {otp.map((digit, index) => (
           <input
@@ -170,7 +170,7 @@ const ResetPassword = () => {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            style={{ direction: "ltr", textAlign: "center" }} // 👈 enforce LTR typing
+            style={{ direction: "ltr", textAlign: "center" }} // enforce LTR typing
           />
         ))}
       </div>
