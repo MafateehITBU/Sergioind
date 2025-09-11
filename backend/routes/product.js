@@ -9,7 +9,6 @@ import {
   deleteProductImage,
   deleteProduct,
   toggleProductStatus,
-  updateProductStock
 } from '../controllers/productController.js';
 import { protect, authorize, permissions } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
@@ -36,10 +35,6 @@ const productValidation = [
     .withMessage('Product category is required')
     .isMongoId()
     .withMessage('Invalid category ID'),
-  body('stock')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Stock must be a non-negative integer'),
   body('flavors')
     .optional()
     .custom((value) => {
@@ -71,10 +66,6 @@ const updateProductValidation = [
     .optional()
     .isMongoId()
     .withMessage('Invalid category ID'),
-  body('stock')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Stock must be a non-negative integer'),
   body('flavors')
     .optional()
     .custom((value) => {
@@ -89,14 +80,6 @@ const updateProductValidation = [
       return typeof value === 'string';
     })
     .withMessage('Sizes must be a string or array of strings')
-];
-
-const stockValidation = [
-  body('stock')
-    .notEmpty()
-    .withMessage('Stock is required')
-    .isInt({ min: 0 })
-    .withMessage('Stock must be a non-negative integer')
 ];
 
 // Public routes
@@ -114,6 +97,5 @@ router.put('/:id', upload.array('images', 5), updateProductValidation, validate,
 router.delete('/:id/delete-image', deleteProductImage);
 router.delete('/:id', deleteProduct);
 router.patch('/:id/toggle-status', toggleProductStatus);
-router.patch('/:id/stock', stockValidation, validate, updateProductStock);
 
 export default router; 

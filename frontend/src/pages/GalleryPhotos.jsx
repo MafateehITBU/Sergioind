@@ -27,7 +27,10 @@ const GalleryPhotos = () => {
   const fetchAlbums = async () => {
     try {
       const res = await axiosInstance.get("/gallery");
-      setAlbums(res.data.data);
+      const activeAlbums = response.data.data.filter(
+        (album) => album.isActive
+      );
+      setAlbums(activeAlbums);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

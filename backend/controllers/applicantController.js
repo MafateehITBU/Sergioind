@@ -6,7 +6,7 @@ import fs from "fs";
 import { sendApplicantEmail } from "../utils/sendApplicantEmail.js";
 
 const GENDER = ["Male", "Female"];
-const CITY = [
+const GOVERNORATE = [
   "Amman",
   "Zarqa",
   "Irbid",
@@ -48,7 +48,7 @@ export const createApplicant = async (req, res) => {
       !gender ||
       !email ||
       !address ||
-      !address.city
+      !address.governorate
     ) {
       return res.status(400).json({
         success: false,
@@ -124,11 +124,11 @@ export const createApplicant = async (req, res) => {
       });
     }
 
-    // City validation
-    if (!CITY.includes(address.city)) {
+    // governorate validation
+    if (!GOVERNORATE.includes(address.governorate)) {
       return res.status(400).json({
         success: false,
-        message: `City must be one of: ${CITY.join(", ")}`,
+        message: `Governorate must be one of: ${GOVERNORATE.join(", ")}`,
       });
     }
 

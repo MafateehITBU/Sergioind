@@ -47,7 +47,7 @@ const applicantSchema = new mongoose.Schema(
       required: [true, "Gender is required"],
     },
     address: {
-      city: {
+      governorate: {
         type: String,
         enum: [
           "Amman",
@@ -64,7 +64,7 @@ const applicantSchema = new mongoose.Schema(
           "Maan",
         ],
       },
-      street: {
+      city: {
         type: String,
       },
     },

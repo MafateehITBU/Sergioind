@@ -211,7 +211,6 @@ const ProductsLayer = () => {
             }
         },
         { Header: 'Category', accessor: 'category', Cell: ({ value }) => value?.name || '-' },
-        { Header: 'Stock', accessor: 'stock' },
         {
             Header: 'is Active',
             accessor: 'isActive',

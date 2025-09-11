@@ -24,8 +24,11 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get("/products");
-      setProducts(response.data.data);
-      setFilteredProducts(response.data.data);
+      const activeProducts = response.data.data.filter(
+        (product) => product.isActive
+      );
+      setProducts(activeProducts);
+      setFilteredProducts(activeProducts);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -38,7 +41,10 @@ const Products = () => {
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/categories");
-      setCategories(response.data.data);
+      const activeCategories = response.data.data.filter(
+        (cat) => cat.isActive
+      );
+      setCategories(activeCategories);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

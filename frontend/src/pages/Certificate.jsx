@@ -16,7 +16,10 @@ function Certificate() {
   const fetchCertifactes = async () => {
     try {
       const response = await axiosInstance.get("/filecenter");
-      setCertificates(response.data.data);
+      const activeCertificates = response.data.data.filter(
+        (certificate) => certificate.isActive
+      );
+      setCertificates(activeCertificates);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

@@ -19,7 +19,9 @@ const GalleryVideo = () => {
   const fetchVideos = async () => {
     try {
       const res = await axiosInstance.get("/video-gallery");
-      setVideos(res.data.data);
+      // Filter active videos
+      const activeVideos = res.data.data.filter((video) => video.isActive);
+      setVideos(activeVideos);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

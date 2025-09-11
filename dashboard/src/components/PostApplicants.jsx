@@ -72,8 +72,8 @@ const PostApplicants = ({ post }) => {
       {
         Header: "Address",
         accessor: (row) =>
-          row.address?.city && row.address?.street
-            ? `${row.address.city}, ${row.address.street}`
+          row.address?.governorate && row.address?.city
+            ? `${row.address.governorate}, ${row.address.city}`
             : "-",
       },
       {
