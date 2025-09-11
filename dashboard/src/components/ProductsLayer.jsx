@@ -135,7 +135,7 @@ const ProductsLayer = () => {
             },
         },
         { Header: 'Name', accessor: 'name' },
-        { Header: 'SKU', accessor: 'sku' },
+        { Header: 'SKU', accessor: row => row.sku || '-'},
         {
             Header: 'Description',
             accessor: row => row.description || '-',

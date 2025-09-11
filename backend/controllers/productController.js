@@ -33,10 +33,10 @@ export const createProduct = async (req, res) => {
     }
 
     // Validation
-    if (!name || !sku || !description || !category || !flavor) {
+    if (!name || !description || !category || !flavor) {
       return res.status(400).json({
         success: false,
-        message: "Please provide name, sku, description, flavor, and category",
+        message: "Please provide name, description, flavor, and category",
       });
     }
 
@@ -47,7 +47,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    if (sku.length < 2 || sku.length > 100) {
+    if ( sku && (sku.length < 2 || sku.length > 100)) {
       return res.status(400).json({
         success: false,
         message: "SKU must be between 2 and 100 characters",
