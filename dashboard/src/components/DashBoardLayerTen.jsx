@@ -121,7 +121,6 @@ const DashBoardLayerTen = () => {
                     <th scope="col">#</th>
                     <th scope="col">Product Name</th>
                     <th scope="col">Category</th>
-                    <th scope="col">Stock</th>
                     <th scope="col">Details</th>
                   </tr>
                 </thead>
@@ -131,7 +130,6 @@ const DashBoardLayerTen = () => {
                       <th scope="row">{index + 1}</th>
                       <td>{product.name}</td>
                       <td>{product.category?.name}</td>
-                      <td>{product.stock}</td>
                       <td>
                         <span
                           onClick={() => {
