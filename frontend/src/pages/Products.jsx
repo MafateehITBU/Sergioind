@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import ClipLoader from "react-spinners/ClipLoader";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -20,6 +21,7 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   const fetchProducts = async () => {
     try {
@@ -41,9 +43,7 @@ const Products = () => {
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/categories");
-      const activeCategories = response.data.data.filter(
-        (cat) => cat.isActive
-      );
+      const activeCategories = response.data.data.filter((cat) => cat.isActive);
       setCategories(activeCategories);
     } catch (error) {
       toast.error(
@@ -54,14 +54,18 @@ const Products = () => {
     }
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchProducts(), fetchCategories()]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
   const handleProductClick = (productId) => {
     navigate("/product-details", { state: { product: productId } });
   };
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
 
   const filterByCategory = (categoryId) => {
     setActiveCategory(categoryId);
@@ -96,11 +100,11 @@ const Products = () => {
           <div className="mt-6 mb-20 flex flex-wrap justify-center gap-3 sm:gap-4 overflow-x-auto md:overflow-visible pb-4 px-4 md:px-0 -mx-4 md:mx-0">
             <button
               className={`flex-shrink-0 min-w-[100px] sm:min-w-[120px] px-4 py-2 sm:py-3 rounded-xl text-center cursor-pointer transition
-                          ${
-                            activeCategory === "all"
-                              ? "bg-primary text-white"
-                              : "bg-white text-primary border border-primary"
-                          }`}
+                ${
+                  activeCategory === "all"
+                    ? "bg-primary text-white"
+                    : "bg-white text-primary border border-primary"
+                }`}
               onClick={() => filterByCategory("all")}
             >
               All
@@ -109,11 +113,11 @@ const Products = () => {
               <button
                 key={category._id}
                 className={`flex-shrink-0 min-w-[100px] sm:min-w-[120px] px-4 py-2 sm:py-3 rounded-xl text-center cursor-pointer transition
-                            ${
-                              activeCategory === category._id
-                                ? "bg-primary text-white"
-                                : "bg-white text-primary border border-primary"
-                            }`}
+                  ${
+                    activeCategory === category._id
+                      ? "bg-primary text-white"
+                      : "bg-white text-primary border border-primary"
+                  }`}
                 onClick={() => filterByCategory(category._id)}
               >
                 {category.name}
@@ -121,9 +125,13 @@ const Products = () => {
             ))}
           </div>
 
-          {/* Products Grid */}
+          {/* Products / Loader */}
           <section className="mt-8 sm:mt-12">
-            {filteredProducts.length === 0 ? (
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <ClipLoader size={60} color="#36d7b7" />
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
