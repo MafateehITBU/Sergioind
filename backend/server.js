@@ -48,14 +48,13 @@ app.use(morgan('combined'));
 
 // CORS middleware
 app.use(cors({
-  // Reflect the request origin to allow any origin while supporting credentials
-  origin: true,
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || 'http://localhost:3000' || 'http://localhost:5173'
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://localhost:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-// Explicitly handle preflight for all routes
-app.options('*', cors({ origin: true, credentials: true }));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
