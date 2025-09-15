@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useTranslation } from "react-i18next";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const SignUp = () => {
   const { t } = useTranslation("auth");
@@ -51,16 +52,19 @@ const SignUp = () => {
       return;
     }
 
-    const phoneRegex =
-      /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
-    if (!phoneRegex.test(phone)) {
-      setError("Please enter a valid phone number");
+    // validate phone
+    const phoneNumberObj = parsePhoneNumberFromString(phone);
+    if (!phoneNumberObj || !phoneNumberObj.isValid()) {
+      setError(
+        "Please enter a valid international phone number (include country code, e.g. +962...)"
+      );
       return;
     }
 
     // --- API CALL ---
     try {
-      await register(name, email, password, phone);
+      const formattedPhone = phoneNumberObj.number;
+      await register(name, email, password, formattedPhone);
       navigate("/");
     } catch (err) {
       console.error(
@@ -76,7 +80,7 @@ const SignUp = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-  
+
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
@@ -87,7 +91,10 @@ const SignUp = () => {
         {/* Left Side */}
         <div className="flex flex-col justify-center items-center flex-1 py-10 px-6 md:px-12">
           <div className="max-w-[464px] w-full">
-            <h4 className="mb-12 text-center text-5xl  font-itim"> {t("signup.form.title")} </h4>
+            <h4 className="mb-12 text-center text-5xl  font-itim">
+              {" "}
+              {t("signup.form.title")}{" "}
+            </h4>
 
             <form onSubmit={handleSingUp} noValidate>
               {error && (
@@ -173,11 +180,17 @@ const SignUp = () => {
                     id="phone"
                     value={phone}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, ""); // remove all non-digits
+                      let value = e.target.value;
+                      // allow digits and a leading +
+                      if (!value.startsWith("+")) {
+                        value = value.replace(/\D/g, ""); // remove non-digits if no +
+                      } else {
+                        value = "+" + value.slice(1).replace(/\D/g, ""); // keep + and digits only
+                      }
                       setPhone(value);
                     }}
                     required
-                    placeholder="e.g. 0795894444"
+                    placeholder="e.g. +962795894444"
                     className="flex-grow bg-transparent border-none text-base outline-none px-3"
                   />
                 </div>
@@ -308,9 +321,7 @@ const SignUp = () => {
             <h2 className="font-bold mb-13 text-5xl font-itim">
               {t("signup.welcome.title")}
             </h2>
-            <p>
-              {t("signup.welcome.p")}
-            </p>
+            <p>{t("signup.welcome.p")}</p>
           </div>
         </div>
       </div>
