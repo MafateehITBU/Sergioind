@@ -21,7 +21,6 @@ const DashBoardLayerTen = () => {
       ]);
       // filter the quotattion status to be only "ongoing"
       const quots = quotationsRes.data.data.quotationRequests;
-      console.log("Fetched quotations:", quots);
       const filteredQuotations = quots.filter(
         (quotation) => quotation.status === "ongoing"
       );
