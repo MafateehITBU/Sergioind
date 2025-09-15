@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axiosInstance from "../../../axiosConfig";
 import { toast } from "react-toastify";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const allPermissions = [
   "Users",
@@ -46,10 +47,12 @@ const UpdateAdminModal = ({ show, handleClose, admin, fetchAdmins }) => {
     }
 
     if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = "Phone number is required";
-    } else if (!/^07[7-9]\d{7}$/.test(phoneNumber)) {
-      newErrors.phoneNumber =
-        "Phone must start with 07 followed by 7, 8, or 9 and 7 digits";
+      newErrors.phone = "Phone number is required";
+    } else {
+      const formattedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+      if (!formattedPhoneNumber || !formattedPhoneNumber.isValid()) {
+        newErrors.phone = "Invalid phone number";
+      }
     }
 
     setErrors(newErrors);
@@ -73,7 +76,8 @@ const UpdateAdminModal = ({ show, handleClose, admin, fetchAdmins }) => {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("email", email);
-      formData.append("phoneNumber", phoneNumber);
+      const formattedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+      formData.append("phoneNumber", formattedPhoneNumber.number);
       formData.append("permissions", JSON.stringify(permissions)); // send as stringified array
       if (image) formData.append("image", image);
 

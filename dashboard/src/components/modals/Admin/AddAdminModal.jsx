@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axiosInstance from "../../../axiosConfig";
 import { toast } from "react-toastify";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const AddAdminModal = ({ show, handleClose, fetchAdmins }) => {
   const [name, setName] = useState("");
@@ -36,11 +37,14 @@ const AddAdminModal = ({ show, handleClose, fetchAdmins }) => {
     }
     if (!password || password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
+
     if (!phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^07[7-9]\d{7}$/.test(phone)) {
-      newErrors.phone =
-        "Phone must start with 07 followed by 7, 8, or 9 and 7 digits";
+    } else {
+      const phoneNumber = parsePhoneNumberFromString(phone);
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        newErrors.phone = "Invalid phone number";
+      }
     }
 
     setErrors(newErrors);
@@ -74,7 +78,8 @@ const AddAdminModal = ({ show, handleClose, fetchAdmins }) => {
       formData.append("name", name);
       formData.append("email", email);
       formData.append("password", password);
-      formData.append("phoneNumber", phone);
+      const phoneNumber = parsePhoneNumberFromString(phone);
+      formData.append("phoneNumber", phoneNumber.number);
       if (image) formData.append("image", image);
       permissions.forEach((p) => formData.append("permissions[]", p));
 
