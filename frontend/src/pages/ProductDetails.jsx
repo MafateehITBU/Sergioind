@@ -91,6 +91,7 @@ const ProductDetails = () => {
 
   const handleProductClick = (productId) => {
     navigate("/product-details", { state: { product: productId } });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
