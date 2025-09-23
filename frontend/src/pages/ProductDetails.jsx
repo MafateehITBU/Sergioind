@@ -89,6 +89,10 @@ const ProductDetails = () => {
     }
   }, [productDetails]);
 
+  const handleProductClick = (productId) => {
+    navigate("/product-details", { state: { product: productId } });
+  };
+
   return (
     <>
       <Header />
@@ -270,7 +274,7 @@ const ProductDetails = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-30">
               {relatedProducts.map((prod) => (
-                <ProductCard key={prod._id} product={prod} isRTL={isRTL} />
+                <ProductCard key={prod._id} onClick={handleProductClick} product={prod} isRTL={isRTL} />
               ))}
             </div>
           )}
