@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col, Card } from "react-bootstrap";
 import axiosInstance from "../../../axiosConfig";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const Section = ({ title, children }) => (
   <Card className="mb-3 shadow-sm border-0">
@@ -23,7 +24,6 @@ const UpdateProductModal = ({
   const [description, setDescription] = useState("");
   const [flavor, setFlavor] = useState("");
   const [category, setCategory] = useState("");
-  const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedDetails, setSelectedDetails] = useState([]);
@@ -59,7 +59,6 @@ const UpdateProductModal = ({
         setDescription(product.description || "");
         setFlavor(product.flavor || "");
         setCategory(product.category?._id || "");
-        setStock(product.stock || "");
         setSelectedDetails(product.details?.length ? product.details : []);
         setSelectedSizes(
           product.sizes?.length
@@ -86,7 +85,6 @@ const UpdateProductModal = ({
     setDescription("");
     setFlavor("");
     setCategory("");
-    setStock("");
     setImages([]);
     setSelectedDetails([]);
     setSelectedSizes([{ name: "", weight: { value: "", unit: "g" } }]);
@@ -139,7 +137,25 @@ const UpdateProductModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to save these edits?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, save it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+      resetForm();
+      handleClose();
+      return;
+    }
+
     setIsSubmitting(true);
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("sku", sku);
@@ -150,7 +166,6 @@ const UpdateProductModal = ({
       JSON.stringify(selectedDetails.filter((d) => d.trim() !== ""))
     );
     formData.append("category", category);
-    formData.append("stock", stock);
     formData.append("sizes", JSON.stringify(selectedSizes));
     images.forEach((img) => {
       if (img instanceof File) formData.append("images", img);
@@ -280,16 +295,6 @@ const UpdateProductModal = ({
                         </option>
                       ))}
                     </Form.Select>
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Stock</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value)}
-                    />
                   </Form.Group>
                 </Col>
               </Row>

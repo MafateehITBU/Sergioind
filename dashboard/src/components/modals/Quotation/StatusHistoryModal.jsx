@@ -2,9 +2,11 @@ import React from 'react';
 import { Modal, Table } from 'react-bootstrap';
 import dayjs from 'dayjs';
 
-const StatusHistoryModal = ({ show, handleClose, history = [] }) => {
+const StatusHistoryModal = ({ show, handleClose, quot }) => {
+    const history = quot?.statusHistory ?? [];
+
     return (
-        <Modal show={show} onHide={handleClose} centered size="md">
+        <Modal show={show} onHide={handleClose} centered size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>Status History</Modal.Title>
             </Modal.Header>
@@ -18,6 +20,8 @@ const StatusHistoryModal = ({ show, handleClose, history = [] }) => {
                                 <th>#</th>
                                 <th>Status</th>
                                 <th>Changed By</th>
+                                <th>Response</th>
+                                <th>Total Price</th>
                                 <th>Changed At</th>
                             </tr>
                         </thead>
@@ -27,6 +31,8 @@ const StatusHistoryModal = ({ show, handleClose, history = [] }) => {
                                     <td>{index + 1}</td>
                                     <td>{item.status}</td>
                                     <td>{item.changedBy?.name}</td>
+                                    <td>{quot.adminResponse ?? "-"}</td>
+                                    <td>{quot.totalPrice?? "-"}</td>
                                     <td>{dayjs(item.changedAt).format('YYYY-MM-DD HH:mm')}</td>
                                 </tr>
                             ))}

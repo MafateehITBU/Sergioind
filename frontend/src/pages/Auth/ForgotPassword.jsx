@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 const ResetPassword = () => {
   const { t } = useTranslation("auth");
-  const validations = t("forgot.step3.validations");
+  const validations = t("forgot.step3.validations", { returnObjects: true });
 
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -19,9 +19,11 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSendOtp = async () => {
+    setLoading(true);
     try {
       await axiosInstance.put("/user/send-otp", { email });
       toast.success("OTP sent successfully", { position: "top-right" });
@@ -30,6 +32,8 @@ const ResetPassword = () => {
       toast.error(error.response?.data?.message || "Error sending OTP", {
         position: "top-right",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,6 +52,7 @@ const ResetPassword = () => {
   };
 
   const handleVerifyOtp = async () => {
+    setLoading(true);
     try {
       const fullOtp = otp.join("");
       await axiosInstance.post("/user/verify-otp", { email, otp: fullOtp });
@@ -57,6 +62,8 @@ const ResetPassword = () => {
         error.response?.data?.message || "Invalid OTP. Please try again.",
         { position: "top-right" }
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,6 +86,7 @@ const ResetPassword = () => {
       return;
     }
 
+    setLoading(true);
     try {
       await axiosInstance.post("/user/reset-password", {
         email,
@@ -92,15 +100,15 @@ const ResetPassword = () => {
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-      }).then(() => {
-        navigate("/login");
-      });
+      }).then(() => navigate("/login"));
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: error.response?.data?.message || "Something went wrong",
         confirmButtonColor: "#59CB00",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,7 +140,7 @@ const ResetPassword = () => {
         onClick={handleSendOtp}
         className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400 cursor-pointer"
       >
-        {t("forgot.step1.btn")}
+        {loading ? "Sending..." : t("forgot.step1.btn")}
       </button>
 
       <p
@@ -155,7 +163,7 @@ const ResetPassword = () => {
       {/* OTP inputs - force LTR */}
       <div
         className="flex justify-center gap-3 mb-6"
-        style={{ direction: "ltr" }} // 👈 forces LTR layout
+        style={{ direction: "ltr" }} // forces LTR layout
       >
         {otp.map((digit, index) => (
           <input
@@ -163,14 +171,23 @@ const ResetPassword = () => {
             maxLength={1}
             value={digit}
             onChange={(e) => handleOtpChange(e, index)}
+            onKeyDown={(e) => {
+              if (e.key === "Backspace" && otp[index] === "" && index > 0) {
+                // clear the previous field and focus it
+                const newOtp = [...otp];
+                newOtp[index - 1] = "";
+                setOtp(newOtp);
+                inputRefs.current[index - 1].focus();
+              }
+            }}
             ref={(el) => (inputRefs.current[index] = el)}
             className="w-30 h-30 text-center rounded-md border border-gray-300 
-                     focus:outline-none focus:ring-2 focus:ring-green-500 
-                     text-lg shadow-md"
+               focus:outline-none focus:ring-2 focus:ring-green-500 
+               text-lg shadow-md"
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            style={{ direction: "ltr", textAlign: "center" }} // 👈 enforce LTR typing
+            style={{ direction: "ltr", textAlign: "center" }}
           />
         ))}
       </div>
@@ -191,7 +208,7 @@ const ResetPassword = () => {
         className="w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400"
         onClick={handleVerifyOtp}
       >
-        {t("forgot.step2.btn")}
+        {loading ? "Confirming OTP..." : t("forgot.step2.btn")}
       </button>
     </div>
   );
@@ -279,7 +296,7 @@ const ResetPassword = () => {
           className="mt-4 self-center w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 rounded-lg transition duration-400 cursor-pointer"
           onClick={handleResetPassword}
         >
-          {t("forgot.step3.btn")}
+          {loading ? "Changing Password..." : t("forgot.step3.btn")}
         </button>
       </div>
     );

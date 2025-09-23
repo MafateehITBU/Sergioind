@@ -18,8 +18,8 @@ const Apply = () => {
     experienceYears: "",
     gender: "",
     phoneNumber: "",
+    governorate: "",
     city: "",
-    street: "",
     cv: null,
   });
 
@@ -60,7 +60,7 @@ const Apply = () => {
       submissionData.append("phoneNumber", formData.phoneNumber);
       submissionData.append(
         "address",
-        JSON.stringify({ city: formData.city, street: formData.street })
+        JSON.stringify({ governorate: formData.governorate, city: formData.city })
       );
 
       if (formData.cv) {
@@ -239,23 +239,23 @@ const Apply = () => {
                 Address
               </label>
               <div className="flex flex-col md:flex-row md:gap-3">
-                {/* City */}
+                {/* governorate */}
                 <div className="flex-1">
                   <select
-                    name="city"
+                    name="governorate"
                     className="w-full p-3 bg-[#f1eeee] rounded text-sm border-2 border-transparent focus:outline-none focus:border-[#59cb00]"
                     onChange={handleChange}
                     required
                   >
-                    <option value="">Select City</option>
-                    {jordanCities.map((city, idx) => (
-                      <option key={idx} value={city}>
-                        {city}
+                    <option value="">Select governorate</option>
+                    {jordanCities.map((governorate, idx) => (
+                      <option key={idx} value={governorate}>
+                        {governorate}
                       </option>
                     ))}
                   </select>
                 </div>
-                {/* Street */}
+                {/* city */}
                 <div className="flex-1">
                   <div className="relative">
                     <Icon
@@ -264,8 +264,8 @@ const Apply = () => {
                     />
                     <input
                       type="text"
-                      name="street"
-                      placeholder="Street"
+                      name="city"
+                      placeholder="city"
                       className="w-full pl-10 pr-3 py-3 bg-[#f1eeee] rounded text-sm border-2 border-transparent
                 focus:outline-none focus:border-[#59cb00]"
                       onChange={handleChange}

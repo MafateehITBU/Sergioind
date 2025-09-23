@@ -12,6 +12,7 @@ import {
   sendOTPEmail,
   verifyOTPMatch,
 } from "../utils/otp.js";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 // @desc    Register User
 // @route   POST /api/user/register
@@ -51,14 +52,18 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    const phoneRegex =
-      /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    // Phone validation using libphonenumber-js
+    const parsedPhone = parsePhoneNumberFromString(phoneNumber);
+    if (!parsedPhone || !parsedPhone.isValid()) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid phone number",
+        message:
+          "Please enter a valid international phone number (include country code, e.g. +1, +44, +962)",
       });
     }
+
+    // normalize before saving (+9627xxxxxxx)
+    const normalizedPhone = parsedPhone.number;
 
     // Check for existing email across all user types
     const existingUser = await User.findOne({ email });
@@ -77,7 +82,7 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password,
-      phoneNumber,
+      phoneNumber: normalizedPhone,
       image: getAvatarUrl({ name }),
     });
 
@@ -283,15 +288,17 @@ export const updateUser = async (req, res) => {
     }
 
     if (phoneNumber) {
-      const phoneRegex =
-        /^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
-      if (!phoneRegex.test(phoneNumber)) {
+      // Global validation with libphonenumber-js
+      const parsedPhone = parsePhoneNumberFromString(phoneNumber);
+      if (!parsedPhone || !parsedPhone.isValid()) {
         return res.status(400).json({
           success: false,
-          message: "Please enter a valid phone number",
+          message:
+            "Please enter a valid international phone number (include country code, e.g. +1, +44, +962)",
         });
       }
-      updateData.phoneNumber = phoneNumber;
+      // Normalize before saving
+      updateData.phoneNumber = parsedPhone.number;
     }
 
     // Check if email is being updated and if it already exists across all user types

@@ -26,7 +26,7 @@ const QuotationsLayer = () => {
     const [showItemsModal, setShowItemsModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
-    const [statusHistory, setStatusHistory] = useState([]);
+    const [statusHistory, setStatusHistory] = useState(null);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedQuot, setSelectedQuot] = useState(null);
@@ -63,7 +63,7 @@ const QuotationsLayer = () => {
     };
 
     const handleViewHistory = (quotation) => {
-        setStatusHistory(quotation.statusHistory || []);
+        setStatusHistory(quotation || []);
         setShowHistoryModal(true);
     };
 
@@ -244,7 +244,7 @@ const QuotationsLayer = () => {
             <StatusHistoryModal
                 show={showHistoryModal}
                 handleClose={() => setShowHistoryModal(false)}
-                history={statusHistory}
+                quot={statusHistory}
             />
 
             <UpdateQuotationStatusModal

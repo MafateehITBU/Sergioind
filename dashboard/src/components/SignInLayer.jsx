@@ -17,7 +17,6 @@ const SignInLayer = () => {
     setError("");
     try {
       const res = await login(email, password);
-      console.log("Login response:", res);
 
       const userData = res?.data;
 
@@ -56,7 +55,6 @@ const SignInLayer = () => {
       <div className="container-fluid p-0 d-flex min-vh-100">
         <div className="row no-gutters w-100">
           {" "}
-          {/* Ensuring no gap between columns */}
           {/* Left side (1/4 of the screen) */}
           <div className="auth-left col-lg-3 col-md-4 p-0 position-relative text-white d-flex align-items-center justify-content-center text-center">
             <div className="green-bg position-absolute w-100 h-100">
@@ -78,7 +76,7 @@ const SignInLayer = () => {
               <form onSubmit={handleSingIn}>
                 {error && (
                   <div
-                    className="mb-4 alert alert-danger bg-danger-100 text-danger-600 border-danger-100 px-24 py-11 mb-0 fw-semibold text-lg radius-8 d-flex align-items-center justify-content-between"
+                    className="alert alert-danger bg-danger-100 text-danger-600 border-danger-100 px-24 py-11 mb-0 fw-semibold text-lg radius-8 d-flex align-items-center justify-content-between"
                     role="alert"
                   >
                     {error}

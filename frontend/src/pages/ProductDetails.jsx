@@ -151,12 +151,7 @@ const ProductDetails = () => {
                     : productDetails?.description}
                 </p>
 
-                {/* SKU */}
-                <div className="border-b border-[#e4e4e4] text-[#e4e4e4] mb-8">
-                  <p className=" text-xl">
-                    {isRTL ? "رمز المنتج" : "Product Code:"}{" "}
-                    {productDetails?.sku}
-                  </p>
+                <div className="border-b border-[#e4e4e4] text-[#e4e4e4] mb-20">
                 </div>
 
                 {/* Product Sizes */}

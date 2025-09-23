@@ -9,7 +9,7 @@ import { translateText } from "../utils/translate.js";
 // @access  Private - SuperAdmin Only
 export const createProduct = async (req, res) => {
   try {
-    let { name, sku, description, category, stock, details, flavor, sizes } =
+    let { name, sku, description, category, details, flavor, sizes } =
       req.body;
 
     // Parse JSON if sent as string
@@ -33,10 +33,10 @@ export const createProduct = async (req, res) => {
     }
 
     // Validation
-    if (!name || !sku || !description || !category || !flavor) {
+    if (!name || !description || !category || !flavor) {
       return res.status(400).json({
         success: false,
-        message: "Please provide name, sku, description, flavor, and category",
+        message: "Please provide name, description, flavor, and category",
       });
     }
 
@@ -47,7 +47,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    if (sku.length < 2 || sku.length > 100) {
+    if ( sku && (sku.length < 2 || sku.length > 100)) {
       return res.status(400).json({
         success: false,
         message: "SKU must be between 2 and 100 characters",
@@ -123,7 +123,6 @@ export const createProduct = async (req, res) => {
       details: Array.isArray(details) ? details : [],
       detailsAr,
       category,
-      stock: stock ? parseInt(stock) : 0,
       flavor: flavor,
       sizes: productSizes,
     });
@@ -312,7 +311,7 @@ export const getProductsByCategory = async (req, res) => {
 // @access  Private - SuperAdmin Only
 export const updateProduct = async (req, res) => {
   try {
-    let { name, sku, description, category, stock, details, flavor, sizes } =
+    let { name, sku, description, category, details, flavor, sizes } =
       req.body;
     const updateData = {};
 
@@ -388,15 +387,6 @@ export const updateProduct = async (req, res) => {
         });
       }
       updateData.flavor = flavor;
-    }
-
-    if (stock !== undefined) {
-      if (stock < 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Stock cannot be negative" });
-      }
-      updateData.stock = parseInt(stock);
     }
 
     if (details) {
@@ -628,43 +618,3 @@ export const toggleProductStatus = async (req, res) => {
   }
 };
 
-// @desc    Update Product Stock
-// @route   PATCH /api/products/:id/stock
-// @access  Private - SuperAdmin Only
-export const updateProductStock = async (req, res) => {
-  try {
-    const { stock } = req.body;
-
-    if (stock === undefined || stock < 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Stock must be a non-negative number",
-      });
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { stock: parseInt(stock) },
-      { new: true, runValidators: true }
-    );
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Product stock updated successfully",
-      data: product,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error updating product stock",
-      error: error.message,
-    });
-  }
-};

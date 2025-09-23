@@ -1,5 +1,5 @@
 import axiosInstance from "../axiosConfig";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, act } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HeroBadge from "../components/HeroBadge";
@@ -41,10 +41,16 @@ function Career() {
   const fetchPosts = async () => {
     try {
       const res = await axiosInstance("/post");
-      setPosts(res.data.data);
-      setFilteredPosts(res.data.data);
-      if (res.data.data.length > 0) {
-        setSelectedPost(res.data.data[0]); // default first post
+      // filter the posts that are due end dated
+      const currentDate = new Date();
+      const activePosts = res.data.data.filter((post) => {
+        const endDate = new Date(post.endDate);
+        return endDate >= currentDate;
+      });
+      setPosts(activePosts);
+      setFilteredPosts(activePosts);
+      if (activePosts.length > 0) {
+        setSelectedPost(activePosts[0]); // default first post
       }
     } catch (error) {
       toast.error(
@@ -315,7 +321,7 @@ function Career() {
                     No Jobs Found
                   </h3>
                   <p className="text-gray-500">
-                    We couldn't find any job postings matching your criteria.
+                    We couldn't find any job postings.
                   </p>
                 </div>
               </div>

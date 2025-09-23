@@ -41,12 +41,6 @@ const registerValidation = [
         .withMessage('Password is required')
         .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters'),
-    body('phoneNumber')
-        .trim()
-        .notEmpty()
-        .withMessage('Phone number is required')
-        .matches(/^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/)
-        .withMessage('Please enter a valid phone number')
 ];
 
 const loginValidation = [
@@ -71,12 +65,7 @@ const updateValidation = [
         .optional()
         .trim()
         .isEmail()
-        .withMessage('Please enter a valid email'),
-    body('phoneNumber')
-        .optional()
-        .trim()
-        .matches(/^(\+?1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/)
-        .withMessage('Please enter a valid phone number')
+        .withMessage('Please enter a valid email')
 ];
 
 const changePasswordValidation = [

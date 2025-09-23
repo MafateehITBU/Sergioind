@@ -18,7 +18,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
   const [description, setDescription] = useState("");
   const [flavor, setFlavor] = useState("");
   const [category, setCategory] = useState("");
-  const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedDetails, setSelectedDetails] = useState([""]);
@@ -47,7 +46,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
     setFlavor("");
     setSelectedDetails([""]);
     setCategory("");
-    setStock("");
     setImages([]);
     setSelectedSizes([{ name: "", weight: { value: "", unit: "g" } }]);
   };
@@ -100,7 +98,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
       JSON.stringify(selectedDetails.filter((d) => d.trim() !== ""))
     );
     formData.append("category", category);
-    formData.append("stock", stock);
     formData.append("flavor", flavor); // single flavor field
     formData.append("sizes", JSON.stringify(selectedSizes));
     images.forEach((img) => {
@@ -228,16 +225,6 @@ const CreateProductModal = ({ show, handleClose, fetchProducts }) => {
                       </option>
                     ))}
                   </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Stock</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={stock}
-                    onChange={(e) => setStock(e.target.value)}
-                  />
                 </Form.Group>
               </Col>
             </Row>

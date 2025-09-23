@@ -11,7 +11,6 @@ const productSchema = new mongoose.Schema(
     nameAr: { type: String, trim: true },
     sku: {
       type: String,
-      required: [true, "SKU is required"],
       trim: true,
       unique: true,
       maxlength: [100, "SKU cannot exceed 100 characters"],
@@ -79,11 +78,6 @@ const productSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
-    },
-    stock: {
-      type: Number,
-      default: 0,
-      min: [0, "Stock cannot be negative"],
     },
   },
   {

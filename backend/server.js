@@ -26,7 +26,6 @@ import cvRoutes from './routes/cv.js';
 
 dotenv.config();
 
-// Debug environment variables
 console.log('=== ENVIRONMENT VARIABLES DEBUG ===');
 console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME);
 console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'SET' : 'NOT SET');
@@ -46,11 +45,9 @@ app.use(helmet());
 // Logging middleware
 app.use(morgan('combined'));
 
-// CORS middleware
+// ✅ CORS: allow ALL origins, methods, and headers
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'http://localhost:3000' || 'http://localhost:5173'
-    : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://localhost:5173'],
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -68,12 +65,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB successfully');
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-  });
+  .then(() => console.log('Connected to MongoDB successfully'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
 // Test file upload route
 app.post('/api/test-upload', upload.single('image'), (req, res) => {
@@ -82,7 +75,7 @@ app.post('/api/test-upload', upload.single('image'), (req, res) => {
   console.log('req.body:', req.body);
   console.log('Content-Type:', req.get('Content-Type'));
   console.log('=== END TEST UPLOAD DEBUG ===');
-  
+
   res.json({
     success: true,
     message: 'Test upload completed',
@@ -108,7 +101,7 @@ app.use('/api/cv', cvRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'Welcome to SergioIND Backend API',
     version: '1.0.0',
     endpoints: {
@@ -138,4 +131,4 @@ const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});
