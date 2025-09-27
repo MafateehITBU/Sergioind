@@ -11,11 +11,33 @@ import { toast } from "react-toastify";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
 import ClipLoader from "react-spinners/ClipLoader";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const GalleryPhotos = () => {
   const { t, i18n } = useTranslation("gallery");
   const isRTL = i18n.dir() === "rtl";
+  const isArabic = i18n.language?.startsWith("ar");
   const points = t("images.intro.points", { returnObjects: true });
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
+  const title = isArabic
+    ? "سيرجيو | معرض الصور"
+    : "Sergio | Photo Gallery";
+
+  const description = isArabic
+    ? "اكتشف صور مصنع سيرجيو للصناعات ومنتجات الشيبس وخلف الكواليس. جولة مرئية في الجودة والإنتاج."
+    : "Explore Sergio Industries’ photo gallery—factory shots, snacks, and behind-the-scenes. A visual tour of our quality and production.";
+
+  const keywords = isArabic
+    ? "سيرجيو, صور, معرض الصور, مصنع شيبس, سناكس, جودة, خط الإنتاج"
+    : "Sergio, photo gallery, images, chips factory, snacks, production, quality";
+
+  const canonical = "https://sergio-ind.com/gallery/photos";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
 
   const [albums, setAlbums] = useState([]);
   const [expandedAlbum, setExpandedAlbum] = useState(null);
@@ -50,6 +72,22 @@ const GalleryPhotos = () => {
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={canonical} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
 
       <GalleryHero

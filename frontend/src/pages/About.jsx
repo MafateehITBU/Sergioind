@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -9,14 +10,50 @@ import Img2 from "../assets/imgs/about/img2.png";
 import Chips from "../assets/imgs/about/chips2.png";
 import CountriesBg from "../assets/imgs/about/countries-bg.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const About = () => {
-  const { t } = useTranslation("about");
+  const { t, i18n } = useTranslation("about");
   const navigate = useNavigate();
   const countries = t("export.countries", { returnObjects: true });
 
+  const isArabic = i18n.language?.startsWith("ar");
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
+  const title = isArabic ? "سيرجيو | من نحن" : "Sergio | About Us";
+
+  const description = isArabic
+    ? "تقدّم شركة سيرجيو للصناعات شيبس وسناكس عالية الجودة يحبها المستهلكون حول العالم. اكتشف رؤيتنا ورسالتنا وتاريخنا في تقديم النكهات الجريئة."
+    : "Sergio Industries crafts high-quality chips and snacks loved worldwide. Discover our vision, mission, and history in delivering bold flavors.";
+
+  const canonical = "https://sergio-ind.com/about";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        {/* Basic SEO */}
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="About Sergio, Sergio Industries, vision, mission, history, food manufacturing, Jordan, snacks company"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
 
       {/* Hero Section - Full Width */}

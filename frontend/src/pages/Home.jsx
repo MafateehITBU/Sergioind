@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow } from "swiper/modules";
@@ -13,6 +14,7 @@ import CornChips from "../assets/imgs/products/corn-chips.png";
 import WhyUsBg from "../assets/imgs/Why_Us_bg.png";
 import Question from "../assets/imgs/question.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 // Swiper styles
 import "swiper/css";
@@ -25,8 +27,44 @@ const Home = () => {
   const isRTL = i18n.dir() === "rtl";
   const points = t("whyUs.points", { returnObjects: true });
 
+  const isArabic = i18n.language?.startsWith("ar");
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
+  const title = isArabic ? "سيرجيو" : "Sergio";
+  const description = isArabic
+    ? "سيرجيو للصناعات تقدّم منتجات وسناكس بجودة عالية وطعم مميز.بنكهات غنية كتاريخنا، مذاق الشيبس أو المقرمشات لدينا يضمن أن يرسم الابتسامة على وجهك."
+    : "Sergio Industries crafts high-quality chips and snacks with standout flavor. With flavors as rich as our history, our chips and crisps are guaranteed to bring a smile to your face.";
+  const canonical = "https://sergio-ind.com/";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content={
+            isArabic
+              ? "شيبس, سناكس, شيبس ذرة, رقائق مقرمشة, سيرجيو للصناعات"
+              : "chips, snacks, corn chips, crispy chips, Sergio Industries"
+          }
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
 
       {/* Hero Section */}
@@ -45,11 +83,9 @@ const Home = () => {
                 className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 float-animation"
               />
             </div>
-
             <p className="mt-4 text-gray-400 text-base sm:text-lg">
               {t("hero.p")}
             </p>
-
             <button
               className="mt-6 px-6 py-3 cursor-pointer bg-primary hover:bg-white hover:text-primary transition duration-400 text-white rounded-lg font-semibold w-full sm:w-[40%]"
               onClick={() => navigate("/products")}
@@ -107,9 +143,9 @@ const Home = () => {
         <div className="container mx-auto px-4 pb-9 flex flex-col md:flex-row items-center justify-between gap-12">
           {/* LEFT TEXT */}
           <div
-            className={`flex flex-col w-full md:w-1/2  ${
+            className={`flex flex-col w-full md:w-1/2 ${
               isRTL ? "md:text-right" : "md:text-left"
-            } `}
+            }`}
             style={{
               backgroundImage: `url(${WhyUsBg})`,
               backgroundSize: "contain",
@@ -138,7 +174,7 @@ const Home = () => {
             ))}
 
             <button
-              className=" w-[40%] md:w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 mt-4 rounded-lg transition duration-400 cursor-pointer"
+              className="w-[40%] md:w-[25%] bg-primary hover:scale-105 transform text-white font-semibold py-3 mt-4 rounded-lg transition duration-400 cursor-pointer"
               onClick={() => navigate("/about")}
             >
               {t("whyUs.btn")}

@@ -8,12 +8,21 @@ import axiosInstance from "../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import ClipLoader from "react-spinners/ClipLoader";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 function Certificate() {
   const { i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl";
+  const isArabic = i18n.language?.startsWith("ar");
+
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // keep <html> language & direction correct
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
 
   const fetchCertificates = async () => {
     try {
@@ -37,8 +46,36 @@ function Certificate() {
     fetchCertificates();
   }, []);
 
+  // SEO strings
+  const title = isArabic ? "سيرجيو | الشهادات" : "Sergio | Certificates";
+
+  const description = isArabic
+    ? "اطّلع على شهادات الجودة والاعتمادات الرسمية لسيرجيو للصناعات، ومعايير الامتثال التي نلتزم بها لتقديم سناكس عالية الجودة بأمان."
+    : "View Sergio Industries’ quality certificates and official accreditations. Explore our compliance standards and commitment to safe, high-quality snacks.";
+
+  const canonical = "https://sergio-ind.com/certificate";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Sergio certificates, food safety certifications, quality certifications, ISO certification, snack industry standards, food manufacturing compliance, Sergio Industries"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
 
       <ToastContainer />

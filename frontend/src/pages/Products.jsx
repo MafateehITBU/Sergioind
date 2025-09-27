@@ -11,10 +11,12 @@ import Footer from "../components/Footer";
 import HeroBadge from "../components/HeroBadge";
 import ProductCard from "../components/ProductCard";
 import Bg from "../assets/imgs/products-bg.png";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const Products = () => {
   const { i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl";
+  const isArabic = i18n.language?.startsWith("ar");
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
@@ -22,6 +24,20 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
+  const title = isArabic ? "سيرجيو | المنتجات" : "Sergio | Products";
+
+  const description = isArabic
+    ? "تصفّح أحدث منتجات سيرجيو من شيبس الذرة والسناكس بنكهات مميزة وجودة عالية. اختر فئتك المفضلة واستكشف التشكيلة المتوفرة."
+    : "Browse Sergio’s latest corn chips and snacks with bold flavors and high quality. Pick a category and explore our full selection.";
+
+  const canonical = "https://sergio-ind.com/products";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
 
   const fetchProducts = async () => {
     try {
@@ -81,6 +97,24 @@ const Products = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Sergio products, chips, snacks, potato chips, corn chips, crisps, food manufacturing, flavored chips, snack company, Amman Jordan"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
       <ToastContainer />
       <HeroBadge bgImage={Bg} badgeText={isRTL ? "المنتجات" : "Products"} />

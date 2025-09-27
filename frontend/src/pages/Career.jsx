@@ -1,5 +1,5 @@
 import axiosInstance from "../axiosConfig";
-import React, { useState, useEffect, act } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HeroBadge from "../components/HeroBadge";
@@ -10,6 +10,7 @@ import { Icon } from "@iconify/react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 function Career() {
   const [posts, setPosts] = useState([]);
@@ -32,6 +33,11 @@ function Career() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.documentElement.lang = "en";
+    document.documentElement.dir = "ltr";
+  }, []);
+
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: { opacity: 1, scale: 1 },
@@ -49,9 +55,7 @@ function Career() {
       });
       setPosts(activePosts);
       setFilteredPosts(activePosts);
-      if (activePosts.length > 0) {
-        setSelectedPost(activePosts[0]); // default first post
-      }
+      if (activePosts.length > 0) setSelectedPost(activePosts[0]);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -138,8 +142,32 @@ function Career() {
     }
   };
 
+  const title = "Sergio | Careers";
+  const description =
+    "Explore open roles at Sergio Industries or drop your CV for future opportunities. Filter by experience, location, and type, then apply in minutes.";
+  const canonical = "https://sergio-ind.com/careers";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Sergio careers, jobs at Sergio, job openings, food industry jobs, apply for jobs, careers in Amman Jordan, drop CV, Sergio Industries employment"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
       <HeroBadge bgImage={Bg} badgeText="Careers" />
       <ToastContainer />

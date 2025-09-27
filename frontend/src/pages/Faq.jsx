@@ -1,27 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const Faq = () => {
-  const { t } = useTranslation("faq");
+  const { t, i18n } = useTranslation("faq");
   const questions = t("questions", { returnObjects: true });
   const navigate = useNavigate();
 
   const [openIndices, setOpenIndices] = useState([]);
 
+  const isArabic = i18n.language?.startsWith("ar");
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
+
+  const title = isArabic
+    ? "سيرجيو | الأسئلة الشائعة"
+    : "Sergio | FAQ";
+
+  const description = isArabic
+    ? "اعثر على إجابات للأسئلة الشائعة حول منتجات وخدمات سيرجيو للصناعات ودعم العملاء."
+    : "Find answers to common questions about Sergio Industries’ products, services, and customer support.";
+
+  const keywords = isArabic
+    ? "سيرجيو, أسئلة شائعة, دعم العملاء, مساعدة, شيبس, سناكس, شركة أغذية"
+    : "Sergio, FAQ, support, help, chips, snacks, food manufacturing, customer service";
+
+  const canonical = "https://sergio-ind.com/faq";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   const toggleQuestion = (index) => {
-    if (openIndices.includes(index)) {
-      setOpenIndices(openIndices.filter((i) => i !== index));
-    } else {
-      setOpenIndices([...openIndices, index]);
-    }
+    setOpenIndices((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
   };
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={canonical} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
       <section className="py-40 px-6 md:px-16 bg-white">
         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-12 items-start max-w-6xl mx-auto">
@@ -42,7 +78,7 @@ const Faq = () => {
                     className="flex justify-between items-center w-full px-5 py-4 text-left font-medium text-lg"
                   >
                     <span className="font-bold">{q.title}</span>
-                    <span className="text-2xl">
+                    <span className="text-2xl cursor-pointer">
                       {openIndices.includes(index) ? (
                         <Icon icon="mdi:minus" />
                       ) : (
@@ -71,7 +107,9 @@ const Faq = () => {
                 icon="material-symbols:chat-bubble-sharp"
                 className="text-7xl text-black"
               />
-              <h3 className="text-2xl font-bold text-center">{t("rightBox.title")}</h3>
+              <h3 className="text-2xl font-bold text-center">
+                {t("rightBox.title")}
+              </h3>
             </div>
             <p className="text-gray-600 mb-6 text-center">
               {t("rightBox.description")}

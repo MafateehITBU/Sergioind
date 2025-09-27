@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import HeroBadge from "../components/HeroBadge";
@@ -6,9 +6,16 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ContactBg from "../assets/imgs/contact-bg.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const Contact = () => {
-  const { t } = useTranslation("contact");
+  const { t, i18n } = useTranslation("contact");
+  const isArabic = i18n.language?.startsWith("ar");
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [isArabic]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -17,16 +24,21 @@ const Contact = () => {
     message: "",
   });
 
+  const title = isArabic ? "سيرجيو | اتصل بنا" : "Sergio | Contact Us";
+
+  const description = isArabic
+    ? "تواصل مع فريق سيرجيو للصناعات للاستفسارات والدعم وطلبات التعاون. يسعدنا خدمتك."
+    : "Get in touch with Sergio Industries for inquiries, support, and partnership requests. We’re here to help.";
+
+  const canonical = "https://sergio-ind.com/contact";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
 
     // Validations
     if (
@@ -36,6 +48,7 @@ const Contact = () => {
       !formData.message
     ) {
       toast.error("Please Fill all the fields", { position: "top-right" });
+      return;
     }
 
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -52,17 +65,11 @@ const Contact = () => {
       });
       return;
     }
+
     try {
       await axiosInstance.post("/contact-us", formData);
       toast.success("Message Sent Successfully", { position: "top-right" });
-
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phoneNumber: "",
-        message: "",
-      });
+      setFormData({ name: "", email: "", phoneNumber: "", message: "" });
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -74,6 +81,24 @@ const Contact = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Contact Sergio, Sergio Industries contact, customer support, food manufacturing company Amman Jordan, Sergio phone, Sergio email, Sergio location, get in touch with Sergio"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
 
       <ToastContainer />
@@ -109,7 +134,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      {t("contact.tell")} &nbsp;
+                      {t("contact.tell")}&nbsp;
                     </span>
                     <span className="text-gray-600">
                       {t("contact.phoneNumber")}
@@ -130,7 +155,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      {t("contact.email")} &nbsp;
+                      {t("contact.email")}&nbsp;
                     </span>
                     <span className="text-text">
                       {t("contact.emailAddress")}
@@ -154,7 +179,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <span className="text-lg font-semibold text-text">
-                      {t("contact.location")} &nbsp;
+                      {t("contact.location")}&nbsp;
                     </span>
                     <span className="text-text">{t("contact.address")}</span>
                   </div>
@@ -178,8 +203,8 @@ const Contact = () => {
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
                       className="w-full h-full"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         fillRule="evenodd"
@@ -219,8 +244,8 @@ const Contact = () => {
                   >
                     <svg
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                       className="w-full h-full"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         d="M20 12.05C19.98 10.53 19.53 9.04 18.69 7.76C17.86 6.49 16.67 5.48 15.28 4.85C13.89 4.23 12.35 4.01 10.84 4.23C9.33 4.45 7.92 5.1 6.77 6.1C5.61 7.09 4.77 8.4 4.33 9.86C3.9 11.32 3.89 12.88 4.31 14.34C4.73 15.81 5.56 17.13 6.7 18.14C7.84 19.15 9.24 19.81 10.75 20.05V14.38H8.75V12.05H10.75V10.28C10.7 9.87 10.75 9.45 10.88 9.06C11.01 8.67 11.23 8.31 11.52 8.01C11.8 7.71 12.15 7.48 12.54 7.33C12.92 7.18 13.34 7.11 13.75 7.14C14.35 7.15 14.95 7.2 15.54 7.3V9.3H14.54C14.19 9.3 13.86 9.41 13.59 9.62C13.37 9.89 13.25 10.21 13.24 10.56V12.07H15.46L15.1 14.4H13.25V20C15.14 19.7 16.86 18.73 18.1 17.28C19.34 15.82 20.01 13.96 20 12.05Z"
@@ -238,8 +263,8 @@ const Contact = () => {
                   >
                     <svg
                       viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
                       className="w-full h-full mt-1"
+                      xmlns="http://www.w3.org/2000/svg"
                       fill="#000"
                     >
                       <g transform="scale(0.85) translate(2,2)">

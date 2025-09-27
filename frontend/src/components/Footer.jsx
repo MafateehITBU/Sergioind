@@ -106,54 +106,35 @@ const Footer = () => {
                 <h4 className="font-itim mb-3 animated-underline pb-1 relative">
                   {t("footer.followUs")}
                 </h4>
-                <div className="flex gap-3">
+                <div className="flex gap-2 items-center">
                   {/* Instagram */}
                   <a
                     href="https://www.instagram.com/sergio.industries/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition"
+                    className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition text-white"
+                    aria-label="Instagram"
                   >
                     <svg
-                      viewBox="0 0 30 30"
-                      fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-full h-full mb-2"
+                      className="w-7 h-7 mt-1"
+                      viewBox="0 0 448 512"
+                      fill="currentColor"
                     >
                       <path
                         fillRule="evenodd"
                         clipRule="evenodd"
-                        d="M15.5 5H9.5C7.29 5 5.5 6.79 5.5 9V15C5.5 17.21 7.29 19 9.5 19H15.5C17.71 19 19.5 17.21 19.5 15V9C19.5 6.79 17.71 5 15.5 5Z"
-                        stroke="#fff"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12.5 15C10.84 15 9.5 13.66 9.5 12C9.5 10.34 10.84 9 12.5 9C14.16 9 15.5 10.34 15.5 12C15.5 13.66 14.16 15 12.5 15Z"
-                        stroke="#fff"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <rect
-                        x="16"
-                        y="8"
-                        width="2"
-                        height="2"
-                        rx="1"
-                        fill="#fff"
+                        d="M224,202.66A53.34,53.34,0,1,0,277.34,256,53.38,53.38,0,0,0,224,202.66Zm124.71-41a54,54,0,0,0-30.41-30.41c-21-8.41-71-6.49-94.3-6.49s-73.32-1.92-94.3,6.49a54,54,0,0,0-30.41,30.41c-8.41,21-6.49,71-6.49,94.3s-1.92,73.32,6.49,94.3a54,54,0,0,0,30.41,30.41c21,8.41,71,6.49,94.3,6.49s73.32,1.92,94.3-6.49a54,54,0,0,0,30.41-30.41c8.41-21,6.49-71,6.49-94.3S357.12,182.66,348.71,161.66ZM224,338a82,82,0,1,1,82-82A82,82,0,0,1,224,338Zm85.33-148.8a19.2,19.2,0,1,1,19.2-19.2A19.19,19.19,0,0,1,309.33,189.2ZM398.8,80A94.69,94.69,0,0,0,368,49.2C346.6,38.07,316.6,32,224,32S101.4,38.07,80,49.2A94.69,94.69,0,0,0,49.2,80C38.07,101.4,32,131.4,32,224s6.07,122.6,17.2,144a94.69,94.69,0,0,0,30.8,30.8c21.4,11.13,51.4,17.2,144,17.2s122.6-6.07,144-17.2a94.69,94.69,0,0,0,30.8-30.8c11.13-21.4,17.2-51.4,17.2-144S409.93,101.4,398.8,80Z"
                       />
                     </svg>
                   </a>
+
                   {/* Facebook */}
                   <a
                     href="https://www.facebook.com/sergio.ind/"
                     target="_blank"
                     aria-label="Facebook"
-                    className="hover:opacity-80"
+                    className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition"
                   >
                     <svg
                       className="w-6 h-6"
@@ -168,12 +149,13 @@ const Footer = () => {
                       />
                     </svg>
                   </a>
+
                   {/* LinkedIn */}
                   <a
                     href="#"
                     target="_blank"
                     aria-label="LinkedIn"
-                    className="hover:opacity-80"
+                    className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition"
                   >
                     <svg
                       className="w-6 h-6"
