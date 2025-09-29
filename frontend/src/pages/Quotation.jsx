@@ -1,5 +1,5 @@
 import { useQuotation } from "../context/QuotationContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Img from "../assets/imgs/no-quotation.png";
+import ShapesCaptcha from "../components/ShapesCaptcha";
 
 const Quotation = () => {
   const navigate = useNavigate();
@@ -26,6 +27,11 @@ const Quotation = () => {
   });
 
   const [products, setProducts] = useState([]);
+
+  // --- Captcha + submit wiring ---
+  const [isCaptchaOpen, setIsCaptchaOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const sendBtnRef = useRef(null);
 
   const fetchProductsDetails = async () => {
     try {
@@ -54,7 +60,41 @@ const Quotation = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  // Actual send (called after captcha passes)
+  const actuallySend = async () => {
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        ...form,
+        items: items,
+      };
+
+      await axiosInstance.post("/quotation-requests", payload);
+
+      clearItems();
+
+      Swal.fire({
+        icon: "success",
+        title: isRTL ? "تم إرسال طلب العرض" : "Quotation request sent",
+        text: isRTL ? "سنتواصل معك قريبًا" : "We will contact you shortly",
+        showConfirmButton: false,
+        timer: 4000,
+      });
+    } catch (err) {
+      console.error("Error response:", err.response?.data);
+      toast.error(
+        err.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        { position: "top-right" }
+      );
+    } finally {
+      setIsSubmitting(false);
+      setIsCaptchaOpen(false);
+    }
+  };
+
+  const handleSubmit = () => {
     // validate form
     if (!form.name || !form.email || !form.phoneNumber) {
       toast.error("Please fill in all required fields", {
@@ -80,31 +120,14 @@ const Quotation = () => {
       });
       return;
     }
-    try {
-      const payload = {
-        ...form,
-        items: items,
-      };
 
-      await axiosInstance.post("/quotation-requests", payload);
-
-      clearItems();
-
-      Swal.fire({
-        icon: "success",
-        title: "Quotation request sent",
-        text: "We will contact you shortly",
-        showConfirmButton: false,
-        timer: 4000, // auto close after 4s
-      });
-    } catch (err) {
-      console.error("Error response:", err.response?.data);
-      toast.error(
-        err.response?.data?.message ||
-          "Something went wrong. Please try again.",
-        { position: "top-right" }
-      );
+    if (items.length === 0) {
+      toast.error("Please add at least one product", { position: "top-right" });
+      return;
     }
+
+    // Open captcha instead of sending immediately
+    setIsCaptchaOpen(true);
   };
 
   const handleIncrease = (productId, size) => {
@@ -235,7 +258,7 @@ const Quotation = () => {
               </div>
 
               {/* Right - Form */}
-              <div className="border border-gray-300 rounded-2xl p-5">
+              <div className="border border-gray-300 rounded-2xl p-5 relative pb-28">
                 <h2 className="text-3xl font-itim mb-2">
                   {isRTL ? "معلومات الاتصال" : "Contact Information"}
                 </h2>
@@ -354,12 +377,28 @@ const Quotation = () => {
                 </div>
 
                 <button
+                  ref={sendBtnRef}
                   onClick={handleSubmit}
-                  disabled={items.length === 0}
-                  className="bg-primary text-white px-6 py-3 rounded-lg w-full cursor-pointer hover:scale-105 transition duration-300"
+                  disabled={items.length === 0 || isSubmitting}
+                  className="bg-primary text-white px-6 py-3 rounded-lg w-full cursor-pointer hover:scale-105 transition duration-300 disabled:opacity-60"
                 >
-                  {isRTL ? "إرسال" : "Send"}
+                  {isSubmitting
+                    ? isRTL
+                      ? "جار الإرسال..."
+                      : "Sending…"
+                    : isRTL
+                    ? "إرسال"
+                    : "Send"}
                 </button>
+
+                {/* Captcha anchored above the Send button */}
+                <ShapesCaptcha
+                  open={isCaptchaOpen}
+                  language={i18n.language}
+                  anchorRef={sendBtnRef}
+                  onClose={() => setIsCaptchaOpen(false)}
+                  onPass={actuallySend}
+                />
               </div>
             </div>
           </div>

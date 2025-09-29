@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import HeroBadge from "../components/HeroBadge";
@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import ContactBg from "../assets/imgs/contact-bg.png";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "@dr.pogodin/react-helmet";
+import ShapesCaptcha from "../components/ShapesCaptcha";
 
 const Contact = () => {
   const { t, i18n } = useTranslation("contact");
@@ -24,6 +25,10 @@ const Contact = () => {
     message: "",
   });
 
+  const [isCaptchaOpen, setIsCaptchaOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const sendBtnRef = useRef(null);
+
   const title = isArabic ? "سيرجيو | اتصل بنا" : "Sergio | Contact Us";
 
   const description = isArabic
@@ -37,7 +42,26 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  // Actual send logic (called only after captcha passes)
+  const actuallySend = async () => {
+    try {
+      setIsSubmitting(true);
+      await axiosInstance.post("/contact-us", formData);
+      toast.success("Message Sent Successfully", { position: "top-right" });
+      setFormData({ name: "", email: "", phoneNumber: "", message: "" });
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        { position: "top-right" }
+      );
+    } finally {
+      setIsSubmitting(false);
+      setIsCaptchaOpen(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     // Validations
@@ -66,17 +90,8 @@ const Contact = () => {
       return;
     }
 
-    try {
-      await axiosInstance.post("/contact-us", formData);
-      toast.success("Message Sent Successfully", { position: "top-right" });
-      setFormData({ name: "", email: "", phoneNumber: "", message: "" });
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again.",
-        { position: "top-right" }
-      );
-    }
+    // Open captcha instead of sending immediately
+    setIsCaptchaOpen(true);
   };
 
   return (
@@ -302,7 +317,7 @@ const Contact = () => {
 
               <form
                 onSubmit={handleSubmit}
-                className="space-y-6 relative pb-20"
+                className="space-y-6 relative pb-28"
               >
                 {/* Email */}
                 <div>
@@ -386,11 +401,28 @@ const Contact = () => {
 
                 {/* Send Button */}
                 <button
-                  className="absolute bottom-0 right-0 bg-white text-primary text-lg px-6 py-3 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer"
+                  ref={sendBtnRef}
+                  className={`absolute bottom-0 ${
+                    isArabic ? "left-0" : "right-0"
+                  } bg-white text-primary text-lg px-6 py-3 rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer disabled:opacity-60`}
                   type="submit"
+                  disabled={isSubmitting}
                 >
-                  {t("form.btn")}
+                  {isSubmitting
+                    ? isArabic
+                      ? "جار الإرسال..."
+                      : "Sending…"
+                    : t("form.btn")}
                 </button>
+
+                {/* Captcha box anchored above the button */}
+                <ShapesCaptcha
+                  open={isCaptchaOpen}
+                  language={i18n.language}
+                  anchorRef={sendBtnRef}
+                  onClose={() => setIsCaptchaOpen(false)}
+                  onPass={actuallySend}
+                />
               </form>
             </div>
           </div>
