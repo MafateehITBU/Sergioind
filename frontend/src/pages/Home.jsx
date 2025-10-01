@@ -12,7 +12,7 @@ import Chips4 from "../assets/imgs/products/Chips_4.png";
 import Chips5 from "../assets/imgs/products/Chips_5.png";
 import CornChips from "../assets/imgs/products/corn-chips.png";
 import WhyUsBg from "../assets/imgs/Why_Us_bg.png";
-import Question from "../assets/imgs/question.png";
+import Question from "../assets/imgs/about/Why-us.png";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "@dr.pogodin/react-helmet";
 
@@ -186,7 +186,7 @@ const Home = () => {
             <img
               src={Question}
               alt="Why Choose Us"
-              className="w-full max-w-[200px] rounded-xl float-animation"
+              className="w-full max-w-[500px] rounded-xl float-animation"
             />
           </div>
         </div>
