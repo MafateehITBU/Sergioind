@@ -173,7 +173,7 @@ const ContactUsLayer = () => {
         <div className="card basic-data-table" style={{ minHeight: '65vh' }}>
             <ToastContainer />
             <div className="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <h5 className='card-title mb-0 flex-shrink-0 w-35 w-md-100 w-sm-100'>Quotations</h5>
+                <h5 className='card-title mb-0 flex-shrink-0 w-35 w-md-100 w-sm-100'>Contact Us</h5>
                 <div className="w-35 w-md-100 w-sm-100">
                     <GlobalFilter globalFilter={search} setGlobalFilter={setSearch} />
                 </div>
@@ -183,7 +183,7 @@ const ContactUsLayer = () => {
                 {loading ? (
                     <div className="text-center p-4">Loading...</div>
                 ) : contacts.length === 0 ? (
-                    <div className="text-center p-4">No quotations found</div>
+                    <div className="text-center p-4">No contacts found</div>
                 ) : (
                     <>
                         <div className="table-responsive">
