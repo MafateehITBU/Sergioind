@@ -109,7 +109,7 @@ const Footer = () => {
                 <div className="flex gap-2 items-center">
                   {/* Instagram */}
                   <a
-                    href="https://www.instagram.com/sergio.industries/"
+                    href="https://www.instagram.com/sergio.industries?igsh=MXJzazFldzFieHdmbQ=="
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition text-white"
@@ -131,7 +131,7 @@ const Footer = () => {
 
                   {/* Facebook */}
                   <a
-                    href="https://www.facebook.com/sergio.ind/"
+                    href="https://www.facebook.com/share/176fyRC941/"
                     target="_blank"
                     aria-label="Facebook"
                     className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition"
