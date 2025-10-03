@@ -12,7 +12,7 @@ import Chips4 from "../assets/imgs/products/Chips_4.png";
 import Chips5 from "../assets/imgs/products/Chips_5.png";
 import CornChips from "../assets/imgs/products/corn-chips.png";
 import WhyUsBg from "../assets/imgs/Why_Us_bg.png";
-import Question from "../assets/imgs/about/Why-us.png";
+import Question from "../assets/imgs/about/Why-Us.png";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "@dr.pogodin/react-helmet";
 
