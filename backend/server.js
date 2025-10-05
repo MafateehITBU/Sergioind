@@ -52,15 +52,28 @@ app.use(helmet());
 // Logging middleware
 app.use(morgan("combined"));
 
-// ✅ CORS: allow ALL origins, methods, and headers
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// ✅ CORS: allow configured origins (supports credentials) and preflight
+const corsOriginsEnv = process.env.CORS_ORIGIN || "";
+const allowedOrigins = corsOriginsEnv
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow server-to-server and curl
+    if (allowedOrigins.length === 0) return callback(null, true); // allow all if not configured
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
@@ -73,11 +86,6 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB successfully"))
-  .catch((error) => console.error("MongoDB connection error:", error));
-
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
