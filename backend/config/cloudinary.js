@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
@@ -26,9 +28,6 @@ if (process.env.CLOUDINARY_URL) {
 // Fallback to hardcoded values if environment variables are not set
 if (!cloudName || !apiKey || !apiSecret) {
   console.log('Using fallback Cloudinary configuration');
-  cloudName = 'dkzpryk7k';
-  apiKey = '377795743281531';
-  apiSecret = '1Rjw1_E6RzsLHsHzZ_RQxNMXgew';
 }
 
 cloudinary.config({
