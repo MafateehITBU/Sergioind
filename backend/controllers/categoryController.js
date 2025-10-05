@@ -10,6 +10,19 @@ export const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    console.log("📥 Incoming create category request...");
+    console.log("➡️ Name:", name);
+    console.log("➡️ Description:", description);
+    console.log("➡️ File received:", req.file ? "YES ✅" : "NO ❌");
+    if (req.file) {
+      console.log("➡️ File details:", {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path,
+      });
+    }
+
     // Validation
     if (!name) {
       return res.status(400).json({
@@ -36,51 +49,75 @@ export const createCategory = async (req, res) => {
       });
     }
 
-    // Translate name, description in parallel
+    // Translate description
+    console.log("🌐 Translating description...");
     const descriptionAr = await translateText(description, "ar");
+    console.log("✅ Translation complete.");
 
     // Create category
+    console.log("🛠️ Creating category in DB...");
     const category = await Category.create({
       name,
       description,
       descriptionAr,
     });
+    console.log("✅ Category created:", category._id);
 
     // Handle image upload if provided
     if (req.file) {
       try {
-        // Upload image to Cloudinary
+        console.log("☁️ Uploading image to Cloudinary:", req.file.path);
         const result = await cloudinary.uploader.upload(req.file.path, {
           folder: "sergioind/categories",
           width: 400,
           crop: "scale",
         });
+        console.log("✅ Cloudinary upload success:", result.secure_url);
+
         // Update category with Cloudinary image info
         category.image = {
           public_id: result.public_id,
           url: result.secure_url,
         };
         await category.save();
+        console.log("✅ Category updated with image URL.");
+
         // Delete file from server
         fs.unlinkSync(req.file.path);
+        console.log("🧹 Local file deleted successfully.");
       } catch (uploadError) {
+        console.error("❌ Image upload error:", uploadError.message);
         if (req.file) {
-          fs.unlinkSync(req.file.path);
+          try {
+            fs.unlinkSync(req.file.path);
+            console.log("🧹 Local file deleted after failed upload.");
+          } catch (unlinkError) {
+            console.error(
+              "⚠️ Failed to delete local file:",
+              unlinkError.message
+            );
+          }
         }
-        console.error("Image upload error:", uploadError);
-        // Continue without image if upload fails
       }
+    } else {
+      console.log("ℹ️ No image provided, skipping upload.");
     }
 
+    console.log("✅ Sending success response...");
     res.status(201).json({
       success: true,
       message: "Category created successfully",
       data: category,
     });
   } catch (error) {
-    // Delete uploaded file if error occurs
+    console.error("🔥 Error creating category:", error.message);
     if (req.file) {
-      fs.unlinkSync(req.file.path);
+      try {
+        fs.unlinkSync(req.file.path);
+        console.log("🧹 Local file deleted after general error.");
+      } catch (unlinkError) {
+        console.error("⚠️ Failed to delete local file:", unlinkError.message);
+      }
     }
     res.status(500).json({
       success: false,
