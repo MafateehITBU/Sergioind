@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
   deploy:
@@ -25,4 +25,36 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.SERVER_IP }} "bash ~/deploy.sh"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            echo "🚀 Starting deployment..."
+
+            cd /var/www/sergio || exit
+
+            # ===== Backend =====
+            echo "📦 Updating backend..."
+            cd backend || exit
+            git pull origin main
+            npm install
+            pm2 restart sergio-backend
+            cd ..
+
+            # ===== Dashboard =====
+            echo "🖥️ Updating dashboard..."
+            cd dashboard || exit
+            git pull origin main
+            npm install
+            npm run build || echo "⚠️ No build script found"
+            pm2 restart sergio-dashboard
+            cd ..
+
+            # ===== Frontend =====
+            echo "🌐 Updating frontend..."
+            cd frontend || exit
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart sergio-frontend
+            cd ..
+
+            echo "✅ Deployment finished successfully!"
+          EOF
