@@ -45,7 +45,7 @@ function PrivacyPolicyPage() {
       </Helmet>
 
       <Header />
-      <div className="py-30 max-w-7xl mx-auto px-6">
+      <div className="py-40 max-w-7xl mx-auto px-6">
         <h1 className="text-h1">{t("title")}</h1>
 
         <h2 className="text-h2 mt-25">{t("point1.title")}</h2>

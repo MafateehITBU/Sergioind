@@ -65,6 +65,20 @@
   display: block;
 }
 
+/* Make logo smaller on screens less than 768px (mobile) */
+@media (max-width: 768px) {
+  @utility logo-img {
+    height: 80px; /* smaller height */
+  }
+}
+
+/* Optional: even smaller for very small devices */
+@media (max-width: 480px) {
+  @utility logo-img {
+    height: 60px;
+  }
+}
+
 @utility ring-primary {
   --tw-ring-color: #59cb00;
 }
