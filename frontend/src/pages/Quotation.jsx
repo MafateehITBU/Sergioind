@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import Swal from "sweetalert2";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -141,8 +142,32 @@ const Quotation = () => {
     }
   };
 
+  const title = "Sergio | Quotation";
+  const description =
+    "Request a custom quotation for our premium food products including corn chips, and snack varieties. Get competitive prices directly from our factory.";
+  const canonical = "https://sergio-ind.com/quotations";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="corn chips quotation, snack quotation, food products quotation, food industry quotation, snack production quote, snack factory Jordan"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
       <ToastContainer />
 

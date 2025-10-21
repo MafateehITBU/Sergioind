@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "../axiosConfig";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const Apply = () => {
   const location = useLocation();
@@ -60,7 +61,10 @@ const Apply = () => {
       submissionData.append("phoneNumber", formData.phoneNumber);
       submissionData.append(
         "address",
-        JSON.stringify({ governorate: formData.governorate, city: formData.city })
+        JSON.stringify({
+          governorate: formData.governorate,
+          city: formData.city,
+        })
       );
 
       if (formData.cv) {
@@ -83,8 +87,31 @@ const Apply = () => {
     }
   };
 
+  const title = "Sergio | Application";
+  const description =
+    "Apply for open roles at Sergio Industries or drop your CV for future opportunities. Filter by experience, location, and type, then apply in minutes.";
+  const canonical = "https://sergio-ind.com/apply";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Sergio careers, jobs at Sergio, job openings, food industry jobs, apply for jobs, careers in Amman Jordan, Sergio Industries application"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
       <Header />
       <ToastContainer />
       <div className="py-30 px-5 md:px-20 flex flex-col md:flex-row gap-6">

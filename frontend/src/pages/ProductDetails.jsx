@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../axiosConfig";
 import { useTranslation } from "react-i18next";
 import { useQuotation } from "../context/QuotationContext";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -94,8 +95,32 @@ const ProductDetails = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const title = "Sergio | Product Details";
+  const description =
+    "Our products are made from high-quality ingredients, carefully crafted to deliver the perfect taste and texture. Whether it’s corn chips, crisps, or other snack items, each product is designed to satisfy both everyday snacking and bulk orders for businesses. Enjoy freshness, crunch, and flavor in every bite.";
+  const canonical = "https://sergio-ind.com/product-details";
+  const ogImage = "https://sergio-ind.com/og/OG_image.png";
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="keywords"
+          content="Sergio product details, chips, snacks, corn chips, crisps, food manufacturing, flavored chips, snack company, Amman Jordan"
+        />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+      </Helmet>
+
       <Header />
       <ToastContainer />
       {/* Product Details Section */}
@@ -152,8 +177,7 @@ const ProductDetails = () => {
                     : productDetails?.description}
                 </p>
 
-                <div className="border-b border-[#e4e4e4] text-[#e4e4e4] mb-20">
-                </div>
+                <div className="border-b border-[#e4e4e4] text-[#e4e4e4] mb-20"></div>
 
                 {/* Product Sizes */}
                 <div className="mb-6">
@@ -270,7 +294,12 @@ const ProductDetails = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-30">
               {relatedProducts.map((prod) => (
-                <ProductCard key={prod._id} onClick={handleProductClick} product={prod} isRTL={isRTL} />
+                <ProductCard
+                  key={prod._id}
+                  onClick={handleProductClick}
+                  product={prod}
+                  isRTL={isRTL}
+                />
               ))}
             </div>
           )}

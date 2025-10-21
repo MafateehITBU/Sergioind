@@ -104,7 +104,7 @@ const Products = () => {
         <meta name="robots" content="index, follow" />
         <meta
           name="keywords"
-          content="Sergio products, chips, snacks, potato chips, corn chips, crisps, food manufacturing, flavored chips, snack company, Amman Jordan"
+          content="Sergio products, chips, snacks, corn chips, crisps, food manufacturing, flavored chips, snack company, Amman Jordan"
         />
 
         {/* Open Graph */}
