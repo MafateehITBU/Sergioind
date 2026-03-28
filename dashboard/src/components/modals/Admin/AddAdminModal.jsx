@@ -177,25 +177,25 @@ const AddAdminModal = ({ show, handleClose, fetchAdmins }) => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Permissions</Form.Label>
-            <Row>
-              {allPermissions.map((perm) => (
-                <Col md={4} key={perm} className="mb-2">
-                  <Form.Check className="d-flex align-items-start">
-                    <Form.Check.Input
-                      type="checkbox"
-                      value={perm}
-                      checked={permissions.includes(perm)}
-                      onChange={() => handlePermissionChange(perm)}
-                      className="mt-1"
-                    />
-                    <Form.Check.Label className="ms-2">{perm}</Form.Check.Label>
-                  </Form.Check>
-                </Col>
-              ))}
-            </Row>
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Permissions</Form.Label>
+              <Row>
+                {allPermissions.map((perm) => (
+                  <Col md={4} key={perm} className="mb-2">
+                    <Form.Check className="d-flex align-items-start">
+                      <Form.Check.Input
+                        type="checkbox"
+                        value={perm}
+                        checked={permissions.includes(perm)}
+                        onChange={() => handlePermissionChange(perm)}
+                        className="mt-1"
+                      />
+                      <Form.Check.Label className="ms-2">{perm}</Form.Check.Label>
+                    </Form.Check>
+                  </Col>
+                ))}
+              </Row>
+            </Form.Group>
 
           <div className="text-center">
             <Button

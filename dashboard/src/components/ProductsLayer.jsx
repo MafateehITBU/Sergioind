@@ -61,7 +61,8 @@ const ProductsLayer = () => {
         setSelectedProduct(product);
         setShowDeleteModal(true);
     };
-
+    
+    // handle activation/deactivation of product
     const handleActivation = async (productId) => {
         try {
             const res = await axiosInstance.patch(`/products/${productId}/toggle-status`);
