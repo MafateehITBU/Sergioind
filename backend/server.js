@@ -38,7 +38,7 @@ console.log(
   process.env.CLOUDINARY_API_SECRET ? "SET" : "NOT SET"
 );
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "SET" : "NOT SET");
-console.log("MONGODB_URI:", process.env.MONGODB_URI);
+console.log("MONGODB_URI:", process.env.MONGODB_URI ? "SET" : "NOT SET");
 console.log("=== END ENVIRONMENT VARIABLES DEBUG ===");
 
 const __filename = fileURLToPath(import.meta.url);
