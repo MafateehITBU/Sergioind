@@ -9,6 +9,7 @@ APP_DIR="${APP_DIR:-/var/www/sergio}"
 BRANCH="${BRANCH:-main}"
 API_URL="${API_URL:-https://sergio-ind.com/api}"
 PM2_APP_NAME="${PM2_APP_NAME:-sergio-backend}"
+DEPLOY_USER="${DEPLOY_USER:-deploy}"
 
 log() {
   printf '\n[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
@@ -48,10 +49,39 @@ CI=false REACT_APP_BACKEND_URL="$API_URL" npm run build
 
 log "Restarting backend with PM2"
 cd "$APP_DIR/backend"
-if pm2 describe "$PM2_APP_NAME" >/dev/null 2>&1; then
-  pm2 delete "$PM2_APP_NAME"
+
+PORT="$(
+  grep -E '^PORT=' .env 2>/dev/null | tail -n1 | cut -d '=' -f2- | tr -d ' \r"' || true
+)"
+PORT="${PORT:-5001}"
+
+log "Stopping PM2 app and freeing port $PORT"
+pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
+if id "$DEPLOY_USER" >/dev/null 2>&1; then
+  sudo -u "$DEPLOY_USER" pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
 fi
-pm2 start ecosystem.config.cjs
-pm2 save
+pkill -9 -f "$APP_DIR/backend/server.js" 2>/dev/null || true
+if command -v fuser >/dev/null 2>&1; then
+  fuser -k "${PORT}/tcp" 2>/dev/null || true
+elif command -v lsof >/dev/null 2>&1; then
+  lsof -ti:"$PORT" | xargs -r kill -9 2>/dev/null || true
+fi
+sleep 3
+
+if ss -lntp 2>/dev/null | grep -q ":${PORT} "; then
+  echo "Port $PORT is still in use. Aborting deploy restart."
+  ss -lntp | grep ":${PORT} " || true
+  exit 1
+fi
+
+if id "$DEPLOY_USER" >/dev/null 2>&1; then
+  log "Starting backend with PM2 as $DEPLOY_USER (fork mode)"
+  sudo -u "$DEPLOY_USER" bash -c "cd '$APP_DIR/backend' && pm2 start server.js --name '$PM2_APP_NAME' -f --time && pm2 save"
+  pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
+else
+  log "Starting backend with PM2 as $(whoami) (fork mode)"
+  pm2 start server.js --name "$PM2_APP_NAME" -f --time
+  pm2 save
+fi
 
 log "Deploy finished successfully"
