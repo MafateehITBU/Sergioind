@@ -20,5 +20,13 @@ jobs:
       - name: Deploy app
         run: |
           cd /var/www/sergio
-          chmod +x scripts/deploy.sh scripts/fix-pm2-backend.sh
+          if [ ! -f scripts/deploy.sh ]; then
+            echo "scripts/deploy.sh not found in /var/www/sergio"
+            exit 1
+          fi
+          if [ -f scripts/fix-pm2-backend.sh ]; then
+            echo "Found scripts/fix-pm2-backend.sh"
+          else
+            echo "scripts/fix-pm2-backend.sh not found, continuing"
+          fi
           APP_DIR=/var/www/sergio PM2_APP_NAME=sergio-backend API_URL=https://sergio-ind.com/api DEPLOY_USER=deploy bash scripts/deploy.sh
