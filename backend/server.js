@@ -76,11 +76,29 @@ app.use((req, res, next) => {
 app.use(morgan("combined"));
 
 // ✅ CORS: allow configured origins (supports credentials) and preflight
-const corsOriginsEnv = process.env.CORS_ORIGIN || "";
-const allowedOrigins = corsOriginsEnv
+const configuredOrigins = [
+  process.env.CORS_ORIGIN || "",
+  process.env.FRONTEND_URL || "",
+].join(",");
+
+const allowedOrigins = configuredOrigins
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+const defaultProductionOrigins = [
+  "https://sergio-ind.com",
+  "https://www.sergio-ind.com",
+  "https://dashboard.sergio-ind.com",
+];
+
+for (const origin of defaultProductionOrigins) {
+  if (!allowedOrigins.includes(origin)) {
+    allowedOrigins.push(origin);
+  }
+}
+
+console.log("Allowed CORS origins:", allowedOrigins);
 
 const corsOptions = {
   origin: (origin, callback) => {
