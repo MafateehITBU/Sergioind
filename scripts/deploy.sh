@@ -77,7 +77,10 @@ fi
 if id "$DEPLOY_USER" >/dev/null 2>&1; then
   log "Starting backend with PM2 as $DEPLOY_USER (fork mode)"
   sudo -u "$DEPLOY_USER" bash -c "cd '$APP_DIR/backend' && pm2 start server.js --name '$PM2_APP_NAME' -f --time && pm2 save"
-  pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
+  # If this script is run as root, remove any duplicate root-owned PM2 app.
+  if [[ "$(id -un)" != "$DEPLOY_USER" ]]; then
+    pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
+  fi
 else
   log "Starting backend with PM2 as $(whoami) (fork mode)"
   pm2 start server.js --name "$PM2_APP_NAME" -f --time
